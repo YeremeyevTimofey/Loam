@@ -45,12 +45,13 @@ No server, no account, nothing leaves your computer.
 | **Codex** | `codex mcp add loam -- npx -y loam-mcp --folder <path>` | |
 | **Cursor** · **VS Code (Copilot)** | One-click install links in the app | |
 | **Gemini CLI** · **Windsurf** · others | A few lines in the agent's MCP config | |
+| **ChatGPT** · **Gemini** · **claude.ai** in a browser | **Copy for any chat** in the app: a process or skill as text to paste | Read-only. These chats cannot run a local server, so they cannot save corrections back |
 
 The app's **Connect your agent** screen writes the exact command or config for your agent and your folder (Mac, Windows and Linux), and the [install guide](https://loam.dev/install) shows them step by step. Agents other than Claude Desktop need [Node](https://nodejs.org) 22 or newer; check with `node --version`.
 
 **3. Tell your agent:** `Run my Loam onboarding interview`. Then ask for your work in plain words, for example `Do my weekly client report`.
 
-> **Agents without MCP** (a chat in a web browser, for example) cannot save to Loam yet. Any agent that opens the folder can still read it: `AGENTS.md` is read natively by Codex, Cursor, Copilot and Windsurf, and Loam adds `GEMINI.md` for Gemini CLI and copies your skills to `.claude/skills` and `.agents/skills`, where Claude Code, Cursor, Codex, Gemini CLI, Copilot and others look for them.
+> **Chats in a browser** (ChatGPT, Gemini, claude.ai) cannot run a local server. Open a process or a skill in the app and press **Copy for any chat**: you see exactly what will be copied, tick what to include, and paste it into the chat. It is a one-way copy; the text contains your latest example and corrections, and imported skills are wrapped as data. Any agent that opens the folder can also read it: `AGENTS.md` is read natively by Codex, Cursor, Copilot and Windsurf, and Loam adds `GEMINI.md` for Gemini CLI and copies your skills to `.claude/skills` and `.agents/skills`, where Claude Code, Cursor, Codex, Gemini CLI, Copilot and others look for them.
 
 <details>
 <summary>Verify the download</summary>
@@ -81,6 +82,7 @@ The demo is a fictional account manager, Sarah, at a 20-person marketing agency.
 | No account, no server | The site is static files; there is no backend dependency |
 | Other people's skills are checked | One scanner, shared by the app and the server, tested against malicious skills for every red category, look-alike letters, hidden characters and more |
 | A review never grants anything | The agent's verdict is information only; it is not used in any access decision |
+| "Copy for any chat" is one-way | It shows the exact text first, flags anything that looks like a key or a password, wraps imported skills as data, and a static rule forbids any write in that code |
 | The extension only touches your folder | Paths are normalised and checked again through symlinks; tests try `../`, absolute paths and links |
 
 Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Found a hole in the scanner? Please read [SECURITY.md](SECURITY.md).

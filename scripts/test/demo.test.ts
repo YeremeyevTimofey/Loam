@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildProcess, lineDiff, loadKb, MemoryStore, parseProcess, planUpdateProfile, planUpdateSection, scanSkill, parseDoc } from '../../packages/loam-core/src';
+import { buildProcess, buildProcessChatBundle, buildSkillChatBundle, chatNotices, CHAT_TOKENS_WARN, defaultSelection, lineDiff, loadKb, MemoryStore, parseProcess, planUpdateProfile, planUpdateSection, renderChatText, scanSkill, parseDoc } from '../../packages/loam-core/src';
+import { countTokens } from '../../packages/loam-core/src/tokens';
 import { buildDemoBase, buildDemoSummary, DEMO_TODAY, isAuthored, KB_DIR, SUMMARY_FILE, walkDir } from '../lib/demo';
 
 describe('demo base (§13.3)', async () => {
@@ -53,6 +54,28 @@ describe('demo base (§13.3)', async () => {
     // counters in the files agree with the files
     for (const p of snap.processes) expect(p.fm.corrections, p.slug).toBe(p.corrections.length);
     for (const p of snap.processes) expect(p.skillStale, p.slug).toBe(false);
+  });
+
+  it('"Copy for any chat" works for every process and every skill of the sample, stays small, and never points at a file', async () => {
+    for (const p of snap.processes) {
+      const bundle = await buildProcessChatBundle(store, p.slug, DEMO_TODAY);
+      const text = renderChatText(bundle, defaultSelection(bundle));
+      const tokens = countTokens(text);
+      expect(tokens, p.slug).toBeGreaterThan(300);
+      expect(tokens, p.slug).toBeLessThan(CHAT_TOKENS_WARN / 2);
+      expect(text, p.slug).not.toMatch(/processes\/|SKILL\.md|examples\/|\.loam\//);
+      expect(text, p.slug).not.toContain('Not filled in yet');
+      // the handbook pasted into the sample profile is what makes a typical agent read 5,000+ tokens; the copy leaves it out
+      expect(text, p.slug).not.toContain('Northlight agency handbook');
+      expect(chatNotices(bundle, defaultSelection(bundle)).filter((n) => n.code === 'secret'), p.slug).toEqual([]);
+    }
+    for (const s of snap.skills) {
+      const bundle = await buildSkillChatBundle(store, s.name, DEMO_TODAY);
+      const text = renderChatText(bundle, defaultSelection(bundle));
+      expect(countTokens(text), s.name).toBeLessThan(CHAT_TOKENS_WARN);
+      expect(text.startsWith(s.kind === 'process' ? '# Loam context:' : '# Loam skill:'), s.name).toBe(true);
+      expect(text.includes('BEGIN IMPORTED SKILL'), s.name).toBe(s.kind === 'library' && s.fm.source === 'imported');
+    }
   });
 
   it('editing leaves the rest of a file alone: only the edited lines show up in the diff', async () => {

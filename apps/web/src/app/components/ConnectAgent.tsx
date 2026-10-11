@@ -187,11 +187,9 @@ export function ConnectAgent({ className }: { className?: string }) {
           ))}
         </ul>
       ) : null}
-      {agent !== 'claude-desktop' ? (
-        <p className="t-secondary mt-4">
-          Agents that cannot run a local MCP server (a chat in a web browser, for example) cannot save to Loam yet. Any agent that opens this folder can still read it by following AGENTS.md.
-        </p>
-      ) : null}
+      <p className="t-secondary mt-4">
+        A chat in a web browser (ChatGPT, Gemini or claude.ai) cannot run a local server, so it cannot save to Loam. You can still give it a process or a skill: open it in Loam and press “Copy for any chat”. Any agent that opens this folder can also read it by following AGENTS.md.
+      </p>
     </Card>
   );
 }

@@ -70,3 +70,19 @@ Not in the original 42 criteria: they back the change from “Claude only” to 
 | Skills reach every agent's folder; instructions are current | ✅ | core `agents.test`, `e2e/agents`: both skill folders written, repaired and cleaned; user folders untouched; outdated `AGENTS.md` flagged and fixed with a preview; `GEMINI.md` created only when missing; agents cannot write these paths through a note |
 | The Sarah section tells the truth | ✅ | `e2e/agents`: every number, correction, skill and link is compared with `summary.json`, which a test regenerates from the sample base |
 | No address is typed outside `site.config.json`; README matches its template | ✅ | `check:rules` (also mutation-tested: injecting a violation turns the rule red) |
+
+## Added in the "Copy for any chat" round
+
+For a chat that cannot run Loam (ChatGPT, Gemini or claude.ai in a browser): a process or a skill as text to paste. One-way by design.
+
+| Claim | Status | Evidence |
+|---|---|---|
+| The text carries what a chat needs and nothing it cannot use | ✅ | core `chat-context.test`: profile, process, newest examples, names, corrections (newest first, once each, was / should be); no file paths, no skill file, no automation notes; deterministic |
+| The person sees exactly what is copied and chooses what goes in | ✅ | `e2e/chat`: the preview equals the clipboard and the downloaded file, byte for byte; ticking a part changes the text and the token count at once; the process itself cannot be unticked; long profile sections and older examples are off by default |
+| It never writes and never calls out | ✅ | core test on a store that refuses every write; `e2e/chat`: the folder is identical before and after, no request leaves the page; `check:rules` “copy for any chat never writes to the folder” (mutation-tested) |
+| Other people's skills stay data | ✅ | core test: imported text inside the marker frame with a chat-specific notice, forged markers neutralised, a visible warning; `e2e/chat` on the sample's imported skill; `check:rules` (mutation-tested) |
+| An example cannot end its own frame | ✅ | core + `e2e/chat`: a hostile example with closing tags and fake headings stays inside one block |
+| Keys and passwords are caught before they leave | ✅ | core `findSecretLike` + notice naming the part (never the secret); `e2e/chat`: warning, “Copy anyway”, gone when the part is unticked; the same patterns the skill scanner uses |
+| Works in every browser, on a phone, by keyboard, accessibly | ✅ | `e2e/chat`: download in Chromium, Firefox and WebKit; 375 px without sideways scroll and 44 px targets; Escape returns focus; axe on the open dialog |
+| 🟡 The text works well in ChatGPT, Gemini and claude.ai | 🟡 | The layout follows each vendor's published prompting guidance (long context first, task last, tagged examples, rules stated once). **No real chat was used here**: how each one treats the text is theirs |
+

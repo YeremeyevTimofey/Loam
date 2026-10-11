@@ -91,7 +91,27 @@ The *Connect your agent* screen generates the exact command or config for the ch
 
 On Windows the server is started through `cmd /c npx …`, which every client expects. The generator is a pure function, tested with real parsers (JSON, TOML), by decoding the Cursor and VS Code links, and by running the shell commands for ten awkward paths (spaces, quotes, `$`, backticks, Unicode, `~`) through a real `sh` with stand-ins for the CLIs.
 
-Not done: a “copy for any chat” export for agents without MCP, and finding the folder from the agent's working directory.
+**3. Chats that cannot run a local server (ChatGPT, Gemini, claude.ai in a browser): “Copy for any chat”.** A button on the process page and on each skill card turns one process or skill into text to paste. See the next section.
+
+Not done: finding the folder from the agent's working directory.
+
+### Copy for any chat
+
+`packages/loam-core/src/chat-context.ts`, `apps/web/src/app/components/ChatCopyDialog.tsx`.
+
+| Decision | Why |
+|---|---|
+| Built from the sources, not from `SKILL.md` | A chat cannot open files. The generated skill points at `profile.md`, `examples/…` and `corrections.md`; the copy carries what those files say. Process headings, the newest example, the corrections and the relevant profile sections are inlined |
+| Order: how to use it → about me → the process → examples → names → corrections → “wait for my task” | Long reference material first, the instruction last, as the vendors' prompting guides advise; the corrections sit closest to the task, where they weigh most. Markdown headings for structure, a tag only around text that is copied verbatim (`<example>`) |
+| Rules stated once, in the first lines | The chat is told it cannot open files or save anything (so it does not claim to), that `profile.md` / `loam_*` mentions map to the sections below, and not to invent facts |
+| Defaults keep it short; every part can be ticked | Profile core on, the long handbook off; newest good example and newest “avoid” example on, older ones off; names whole when the list is short, only the mentioned ones when it is long. Real token counts (the tokenizer loads when the dialog opens), a warning above 6,000 tokens |
+| The person reads the exact text before it leaves | Preview = clipboard = downloaded file. Copy, or download a `.md` for chats that turn long pastes into attachments or for a Project's files |
+| One-way, on purpose | Nothing is written, no network. A chat has no way to save a correction back; those still go through an agent with MCP. A static rule forbids any write call in these two files |
+| Other people's skills are still data | Imported text goes inside the same marker frame as over MCP, with a notice written for a chat (no links, no connected apps), forged markers neutralised, and a warning in the dialog |
+| An example cannot end its own frame | A closing `</example>` inside the text is escaped |
+| Keys and passwords are caught | The scanner's secret patterns run over the ticked text; the dialog names the part (never the secret) and the button reads “Copy anyway” |
+
+Not done: writing a correction back from a chat (it would need an “Add a correction” form in the app); copying the whole profile without a process.
 
 ## MCP tools
 
@@ -152,6 +172,7 @@ Fixes the app can do for you (always with a diff first): sync the agent copies, 
 | The server only touches the chosen folder | Server tests: `../`, absolute, `~`, symlink escapes are errors; reads and writes |
 | Other people's skills are checked | 8 malicious fixtures (one per red category + capability cases) refused in core, server and UI tests; the 6 starter skills and everyday text pass |
 | Reviews grant nothing | `check:rules` + tests: capabilities unchanged after a `safe` verdict |
+| “Copy for any chat” is one-way and shows what leaves | The exact text is previewed, equals the clipboard and the download; a store that refuses every write still builds it; the folder is identical before and after (e2e); `check:rules` forbids writes in that code; keys and passwords are flagged first |
 
 `npx` itself downloads the `loam-mcp` package from npm on first use; that is npm's request, not the server's. The server code makes none.
 
@@ -191,4 +212,4 @@ Things the spec did not settle, or where an installed dependency or a later requ
 
 ## Not in the MVP
 
-Vector search (planned: local embeddings with `transformers.js` and `sqlite-vec`, merged with BM25 by reciprocal rank fusion); importing skills by URL; publishing or versioning skills; an expert mode for refused skills; dark theme; accounts, sync, team features; running processes inside the product; a “copy for any chat” export for agents without MCP; finding the folder from the agent's working directory.
+Vector search (planned: local embeddings with `transformers.js` and `sqlite-vec`, merged with BM25 by reciprocal rank fusion); importing skills by URL; publishing or versioning skills; an expert mode for refused skills; dark theme; accounts, sync, team features; running processes inside the product; saving a correction made in a browser chat; finding the folder from the agent's working directory.

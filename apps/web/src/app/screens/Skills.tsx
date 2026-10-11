@@ -7,8 +7,9 @@ import {
   type ImportResult,
   type Skill,
 } from '@loam/core';
-import { BookOpen, ClipboardPaste, Eye, FileUp, RefreshCw, ScrollText, ShieldQuestion, Trash2 } from 'lucide-react';
+import { BookOpen, ClipboardCopy, ClipboardPaste, Eye, FileUp, RefreshCw, ScrollText, ShieldQuestion, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { ChatCopyDialog, type ChatTarget } from '../components/ChatCopyDialog';
 import { AuditDialog, CapabilityBadges, ImportPreviewDialog, ReviewDialog, SOURCE_LABEL, ViewSkillDialog } from '../components/SkillDialogs';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -28,7 +29,7 @@ function reviewBadge(s: Skill) {
   return <Badge tone={v === 'safe' ? 'success' : v === 'suspicious' ? 'warning' : v === 'unsafe' ? 'danger' : 'neutral'}>Reviewed{v ? `: ${v}` : ''}</Badge>;
 }
 
-function SkillCard({ skill, onView, onReview }: { skill: Skill; onView: () => void; onReview: () => void }) {
+function SkillCard({ skill, onView, onReview, onCopy }: { skill: Skill; onView: () => void; onReview: () => void; onCopy: () => void }) {
   const { store, today, propose } = useApp();
   const library = skill.kind === 'library';
   return (
@@ -49,6 +50,9 @@ function SkillCard({ skill, onView, onReview }: { skill: Skill; onView: () => vo
       <div className="flex flex-wrap gap-2">
         <Button variant="secondary" onClick={onView}>
           <Eye size={20} aria-hidden /> View
+        </Button>
+        <Button variant="secondary" onClick={onCopy} aria-label={`Copy ${skill.name} for any chat`}>
+          <ClipboardCopy size={20} aria-hidden /> Copy for any chat
         </Button>
         {skill.fm.source === 'imported' && !skill.fm.reviewed ? (
           <Button variant="secondary" onClick={onReview}>
@@ -73,6 +77,7 @@ function SkillCard({ skill, onView, onReview }: { skill: Skill; onView: () => vo
 export function SkillsScreen() {
   const { snap, store, today, propose, refresh } = useApp();
   const [viewing, setViewing] = useState<Skill | null>(null);
+  const [chat, setChat] = useState<ChatTarget | null>(null);
   const [reviewing, setReviewing] = useState<string | null>(null);
   const [auditOpen, setAuditOpen] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
@@ -179,7 +184,7 @@ export function SkillsScreen() {
         ) : (
           <div className="grid gap-4 min-[900px]:grid-cols-2">
             {library.map((s) => (
-              <SkillCard key={s.path} skill={s} onView={() => setViewing(s)} onReview={() => setReviewing(s.name)} />
+              <SkillCard key={s.path} skill={s} onView={() => setViewing(s)} onReview={() => setReviewing(s.name)} onCopy={() => setChat({ kind: 'skill', name: s.name })} />
             ))}
           </div>
         )}
@@ -189,7 +194,7 @@ export function SkillsScreen() {
             <p className="t-secondary mb-3">Loam builds these itself from each process, its examples and its corrections. Rebuild them from the process page.</p>
             <div className="grid gap-4 min-[900px]:grid-cols-2">
               {generated.map((s) => (
-                <SkillCard key={s.path} skill={s} onView={() => setViewing(s)} onReview={() => undefined} />
+                <SkillCard key={s.path} skill={s} onView={() => setViewing(s)} onReview={() => undefined} onCopy={() => setChat({ kind: 'process', slug: s.name })} />
               ))}
             </div>
           </details>
@@ -273,6 +278,7 @@ export function SkillsScreen() {
       <ImportPreviewDialog result={importing?.result ?? null} content={importing?.content ?? ''} onClose={() => setImporting(null)} onAdd={() => void add()} busy={busy} />
       <ViewSkillDialog skill={viewing} onClose={() => setViewing(null)} profileText={profileText} />
       <ReviewDialog name={reviewing} onClose={() => setReviewing(null)} />
+      <ChatCopyDialog target={chat} onClose={() => setChat(null)} />
       <AuditDialog open={auditOpen} onOpenChange={setAuditOpen} entries={snap.audit} />
     </div>
   );

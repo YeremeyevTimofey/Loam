@@ -113,6 +113,7 @@ rule('the manifest advertises only loam_* tools', '12', JSON.parse(read(path.joi
 const VERDICT_OK = new Set([
   'packages/loam-core/src/schema.ts', 'packages/loam-core/src/skills.ts', 'packages/loam-core/src/ops-skills.ts', 'packages/loam-core/src/lint.ts',
   'apps/web/src/app/screens/Skills.tsx', 'apps/web/src/app/components/SkillDialogs.tsx',
+  'packages/loam-core/src/chat-context.ts', // only to say "not reviewed yet" in a notice; the copy is made either way
 ]);
 rule('review verdicts are only recorded and shown, never used for access', '25', scan(
   [...allProductCode],
@@ -129,6 +130,25 @@ rule('the scanner and the lint rules exist only in loam-core', '§4.2', scan(
   [...appCode, ...serverCode],
   (code) => grep(stripComments(code), /ignore (all )?previous|BULK_READ|INCLUDE_CONTENTS|const RULES\b|function scanSkill|function runLint/g),
 ));
+
+// --- "Copy for any chat" is a one-way copy: it reads, shows and hands text to the clipboard or a download, nothing else
+const CHAT_FILES = [
+  path.join(root, 'packages/loam-core/src/chat-context.ts'),
+  path.join(root, 'apps/web/src/app/components/ChatCopyDialog.tsx'),
+];
+rule('copy for any chat never writes to the folder', 'chat', scan(
+  CHAT_FILES,
+  (code) => grep(stripComments(code), /\bwriteFile\b|\bdeleteFile\b|\brestore\s*\(|\bapplyPlan\b|\bcommitPlan\b|\bpropose\b|\bstage\s*\(|\bnewPlan\b|\bappendAudit\b|\bmergePlans\b/g),
+));
+rule('copy for any chat wraps imported skills as data and neutralises forged markers', 'chat', (() => {
+  const core = stripComments(read(CHAT_FILES[0]));
+  return /wrapImported\(/.test(core) && /IMPORTED_NOTICE_CHAT/.test(core) && /source === 'imported'/.test(core) && /<\\\\\/example/.test(core) ? [] : ['chat-context.ts no longer frames imported text or protects the example tag'];
+})());
+rule('copy for any chat checks the ticked text for keys and passwords before it is copied', 'chat', (() => {
+  const core = stripComments(read(CHAT_FILES[0]));
+  const ui = stripComments(read(CHAT_FILES[1]));
+  return /findSecretLike\(/.test(core) && /chatNotices\(/.test(ui) ? [] : ['the secret check is not wired into the dialog'];
+})());
 
 // --- §0: nothing added that the spec forbids
 const pkg = (p) => JSON.parse(read(path.join(root, p)));

@@ -138,6 +138,20 @@ const HARD_OBJECTS = `${SOFT_OBJECTS}|history|everything|examples?|corrections|n
 const TLD =
   'com|net|org|io|dev|app|ai|co|ru|ly|xyz|info|biz|cloud|online|site|link|top|me|us|uk|de|fr|nl|eu|ca|au|jp|cn|tk|ml';
 
+// Text that looks like an actual secret, not a request for one. Shared with the "copy for a chat" check.
+const SECRET_KEY_SHAPES =
+  /\b(?:sk|pk|rk)-[A-Za-z0-9_-]{16,}\b|\bghp_[A-Za-z0-9]{20,}\b|\bgithub_pat_[A-Za-z0-9_]{20,}|\bAKIA[0-9A-Z]{16}\b|\bxox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\./;
+const SECRET_ASSIGNMENT = /\b(?:api[_-]?key|secret|password|passwd|token)\s*[:=]\s*["']?[A-Za-z0-9+/_-]{12,}/i;
+
+/** Lines that contain what looks like a key, token or password. Used to warn before text leaves the computer. */
+export function findSecretLike(text: string): number[] {
+  const lines: number[] = [];
+  text.split('\n').forEach((line, i) => {
+    if (SECRET_KEY_SHAPES.test(line) || SECRET_ASSIGNMENT.test(line)) lines.push(i + 1);
+  });
+  return lines;
+}
+
 const RULES: Rule[] = [
   // ---- injection: no negation exceptions, a skill has no business discussing this
   { category: 'injection', allowNegation: 'strict', re: /\b(?:ignore|disregard|forget|override|bypass|discard|skip)\b[^.\n]{0,40}\b(?:previous|prior|above|earlier|preceding|all|any|your|the|these|those|system|safety)\b[^.\n]{0,30}\b(?:instructions?|prompts?|rules?|guidelines?|directions?|constraints?|restrictions?|programming|messages?|context|AGENTS\.md)\b/i },
@@ -186,8 +200,8 @@ const RULES: Rule[] = [
 
   // ---- credentials
   { category: 'credentials', allowNegation: true, re: /\b(?:ask|request|require|prompt|demand|obtain|collect|provide|enter|give|supply|share|paste|type|send|tell|reveal|disclose|extract|retrieve|read|find|need|needs|must have)(?:s|ing)?\b[^.\n]{0,50}\b(?:api[\s_-]?keys?|(?:access|auth(?:entication)?|bearer|secret|session|login|oauth|jwt|api)[\s_-]?tokens?|passwords?|passphrases?|passcodes?|secrets?|credentials?|private keys?|ssh keys?|login details?|2fa|otp|one[- ]time (?:code|password)|cvv|card number|social security)\b/i },
-  { category: 'credentials', allowNegation: false, re: /\b(?:sk|pk|rk)-[A-Za-z0-9_-]{16,}\b|\bghp_[A-Za-z0-9]{20,}\b|\bgithub_pat_[A-Za-z0-9_]{20,}|\bAKIA[0-9A-Z]{16}\b|\bxox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\./ },
-  { category: 'credentials', allowNegation: false, re: /\b(?:api[_-]?key|secret|password|passwd|token)\s*[:=]\s*["']?[A-Za-z0-9+/_-]{12,}/i },
+  { category: 'credentials', allowNegation: false, re: SECRET_KEY_SHAPES },
+  { category: 'credentials', allowNegation: false, re: SECRET_ASSIGNMENT },
   { category: 'credentials', allowNegation: true, originalOnly: true, re: /(?:запрос|попрос|потреб|введи|укаж|передай|сообщи|пришли)\S*\s+(?:\S+\s+){0,3}(?:пароль|парол|токен|api[\s-]?ключ|секрет|ключ доступа)/i },
 ];
 
