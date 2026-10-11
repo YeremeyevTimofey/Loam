@@ -41,7 +41,7 @@ jobs:
       - name: Checksum
         working-directory: apps/mcp-server/dist
         run: shasum -a 256 loam.mcpb > loam.mcpb.sha256
-      - uses: actions/attest-build-provenance@v2
+      - uses: actions/attest-build-provenance@v4
         with:
           subject-path: apps/mcp-server/dist/loam.mcpb
       - name: GitHub Release
