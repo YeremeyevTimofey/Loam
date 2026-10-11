@@ -1,0 +1,260 @@
+{
+  "generated": "2026-10-11",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "tokens": 603,
+      "words": 414
+    },
+    {
+      "path": "context/entities.md",
+      "tokens": 212,
+      "words": 142
+    },
+    {
+      "path": "context/glossary.md",
+      "tokens": 260,
+      "words": 195
+    },
+    {
+      "path": "processes/client-onboarding-brief/SKILL.md",
+      "tokens": 424,
+      "words": 260
+    },
+    {
+      "path": "processes/client-onboarding-brief/process.md",
+      "tokens": 881,
+      "words": 665
+    },
+    {
+      "path": "processes/contract-negotiation/SKILL.md",
+      "tokens": 340,
+      "words": 217
+    },
+    {
+      "path": "processes/contract-negotiation/process.md",
+      "tokens": 289,
+      "words": 177
+    },
+    {
+      "path": "processes/meeting-follow-up/SKILL.md",
+      "tokens": 395,
+      "words": 240
+    },
+    {
+      "path": "processes/meeting-follow-up/corrections.md",
+      "tokens": 87,
+      "words": 61
+    },
+    {
+      "path": "processes/meeting-follow-up/process.md",
+      "tokens": 243,
+      "words": 148
+    },
+    {
+      "path": "processes/monthly-invoice-check/SKILL.md",
+      "tokens": 365,
+      "words": 231
+    },
+    {
+      "path": "processes/monthly-invoice-check/process.md",
+      "tokens": 326,
+      "words": 204
+    },
+    {
+      "path": "processes/weekly-client-report/SKILL.md",
+      "tokens": 679,
+      "words": 433
+    },
+    {
+      "path": "processes/weekly-client-report/corrections.md",
+      "tokens": 296,
+      "words": 201
+    },
+    {
+      "path": "processes/weekly-client-report/process.md",
+      "tokens": 372,
+      "words": 243
+    },
+    {
+      "path": "profile.md",
+      "tokens": 3916,
+      "words": 3242
+    },
+    {
+      "path": "skills/client-bad-news-email/SKILL.md",
+      "tokens": 421,
+      "words": 255
+    },
+    {
+      "path": "skills/competitor-snapshot/SKILL.md",
+      "tokens": 1340,
+      "words": 1052
+    },
+    {
+      "path": "skills/meeting-summary/SKILL.md",
+      "tokens": 415,
+      "words": 267
+    },
+    {
+      "path": "skills/weekly-status-report/SKILL.md",
+      "tokens": 391,
+      "words": 244
+    }
+  ],
+  "totalTokens": 12255,
+  "typical": {
+    "files": [
+      "AGENTS.md",
+      "profile.md",
+      "processes/weekly-client-report/SKILL.md",
+      "processes/weekly-client-report/examples/good-02.md"
+    ],
+    "tokens": 5648,
+    "runsPerMonth": 27.2,
+    "monthlyUsd": 0.460312
+  },
+  "checks": [
+    {
+      "rule": "cost",
+      "name": "What a typical task costs",
+      "status": "ok",
+      "summary": "A typical task (instructions, profile, one skill, one example) reads about 5,648 tokens — roughly $0.46 a month at your usage (at $3 per million tokens)."
+    },
+    {
+      "rule": "budget",
+      "name": "File size limits",
+      "status": "attention",
+      "summary": "3 files are longer than recommended."
+    },
+    {
+      "rule": "duplicates",
+      "name": "Repeated text",
+      "status": "attention",
+      "summary": "1 paragraph is repeated."
+    },
+    {
+      "rule": "contradictions",
+      "name": "Possible contradictions",
+      "status": "ok",
+      "summary": "Nothing contradicts anything else."
+    },
+    {
+      "rule": "stale",
+      "name": "Out-of-date processes",
+      "status": "ok",
+      "summary": "Your frequent processes are up to date."
+    },
+    {
+      "rule": "placeholders",
+      "name": "Unfilled templates",
+      "status": "ok",
+      "summary": "No template text left behind."
+    },
+    {
+      "rule": "no-examples",
+      "name": "Processes without examples",
+      "status": "attention",
+      "summary": "1 process without an example."
+    },
+    {
+      "rule": "unreviewed",
+      "name": "Unreviewed imported skills",
+      "status": "ok",
+      "summary": "No unreviewed imports."
+    },
+    {
+      "rule": "no-description",
+      "name": "Skills without a description",
+      "status": "ok",
+      "summary": "Every skill has a description."
+    },
+    {
+      "rule": "layout",
+      "name": "Agent skill copies and instructions",
+      "status": "ok",
+      "summary": "The copies in .claude/skills and .agents/skills, and the instructions for your agents, are in step."
+    }
+  ],
+  "findings": [
+    {
+      "rule": "budget",
+      "severity": "high",
+      "title": "profile.md is 3,242 words — the limit is 400",
+      "detail": "Your AI reads this file in full, so it costs 3,916 tokens each time and buries what matters. Keep only your role, tools and tone here. Move details about clients and projects to context/entities.md.",
+      "files": [
+        "profile.md"
+      ]
+    },
+    {
+      "rule": "budget",
+      "severity": "medium",
+      "title": "processes/client-onboarding-brief/process.md is 665 words — the limit is 600",
+      "detail": "Your AI reads this file in full, so it costs 881 tokens each time and buries what matters. Keep the description short. Move long reference material into a file in context/ and mention it by name.",
+      "files": [
+        "processes/client-onboarding-brief/process.md"
+      ],
+      "goto": {
+        "screen": "process",
+        "slug": "client-onboarding-brief",
+        "label": "Open process"
+      }
+    },
+    {
+      "rule": "budget",
+      "severity": "medium",
+      "title": "skills/competitor-snapshot/SKILL.md is 1,052 words — the limit is 1,000",
+      "detail": "Your AI reads this file in full, so it costs 1,340 tokens each time and buries what matters. Cut repeated rules and long examples. Move reference text into context/ and point to it.",
+      "files": [
+        "skills/competitor-snapshot/SKILL.md"
+      ]
+    },
+    {
+      "rule": "duplicates",
+      "severity": "medium",
+      "title": "3 paragraphs are repeated across 3 files",
+      "detail": "“Northlight writes the way a good colleague talks: plainly, warmly and with the point first. We choose the s…” and 2 more. Repeated text is paid for every time it is read. Keep it in one place.",
+      "files": [
+        "profile.md",
+        "processes/client-onboarding-brief/process.md",
+        "skills/competitor-snapshot/SKILL.md"
+      ],
+      "fix": {
+        "kind": "dedupe",
+        "label": "Remove the repeats"
+      }
+    },
+    {
+      "rule": "no-examples",
+      "severity": "low",
+      "title": "“Monthly invoice check” has no examples yet",
+      "detail": "It still needs access before it can be automated. Add one real finished result now, so it is ready the day access arrives.",
+      "files": [
+        "processes/monthly-invoice-check/examples/"
+      ],
+      "goto": {
+        "screen": "process",
+        "slug": "monthly-invoice-check",
+        "label": "Add an example"
+      }
+    }
+  ],
+  "savings": {
+    "beforeTokens": 12255,
+    "afterTokens": 8512,
+    "percent": 31,
+    "typicalBefore": 5648,
+    "typicalAfter": 2215,
+    "typicalPercent": 61,
+    "items": [
+      {
+        "label": "Remove repeated paragraphs",
+        "tokens": 310
+      },
+      {
+        "label": "Bring oversized files down to their limit",
+        "tokens": 3433
+      }
+    ]
+  }
+}

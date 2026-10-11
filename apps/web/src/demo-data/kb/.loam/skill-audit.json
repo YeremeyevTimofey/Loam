@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "action": "import",
+      "skill": "meeting-summary",
+      "source": "starter",
+      "scanner": "pass",
+      "verdict": null,
+      "detail": "origin: bundled",
+      "time": "2026-09-15T09:12:00.000Z",
+      "hash": "bc121606f74356e5052592ff3f4d6867fcc76b29c3b8712325a515a8d20289b8"
+    },
+    {
+      "action": "import",
+      "skill": "weekly-status-report",
+      "source": "starter",
+      "scanner": "pass",
+      "verdict": null,
+      "detail": "origin: bundled",
+      "time": "2026-09-15T09:13:00.000Z",
+      "hash": "ae0d0a27f24b608b29f20488493b8886fbcccddbd3082050ced79b1e93e5e8b8"
+    },
+    {
+      "action": "import",
+      "skill": "client-bad-news-email",
+      "source": "starter",
+      "scanner": "pass",
+      "verdict": null,
+      "detail": "origin: bundled",
+      "time": "2026-09-22T14:02:00.000Z",
+      "hash": "796e4550a1da21638d0bfc3ece9d28214ba0d00fa5a5e3a66dc6c3fb0aaf2910"
+    },
+    {
+      "time": "2026-09-22T15:40:00.000Z",
+      "action": "import",
+      "skill": "competitor-snapshot",
+      "source": "imported",
+      "scanner": "warn",
+      "verdict": null,
+      "hash": "e675d38190f1be83012550d26ee1f53ecd6a37ccc006f10f587a20e4a2222e30",
+      "detail": "origin: file"
+    },
+    {
+      "time": "2026-09-22T15:52:00.000Z",
+      "action": "review",
+      "skill": "competitor-snapshot",
+      "source": "imported",
+      "scanner": "warn",
+      "verdict": "safe",
+      "hash": "e675d38190f1be83012550d26ee1f53ecd6a37ccc006f10f587a20e4a2222e30",
+      "detail": "No suspicious instructions found"
+    },
+    {
+      "action": "sync",
+      "skill": "*",
+      "source": "sync",
+      "scanner": null,
+      "verdict": null,
+      "detail": "18 files updated",
+      "time": "2026-09-22T15:53:00.000Z",
+      "hash": "bb1441978f1b03c97b4c6543dbe9d57919d6d654e9fcb2c514e942cdb13ef7f5"
+    },
+    {
+      "action": "reject",
+      "skill": "inbox-cleaner",
+      "source": "imported",
+      "scanner": "fail",
+      "verdict": null,
+      "detail": "delete",
+      "time": "2026-09-29T10:05:00.000Z",
+      "hash": "e3a494ddd7370e0f14a58efa19affba845a6f75b766af95a37dcb3cd5a77cccc"
+    }
+  ]
+}

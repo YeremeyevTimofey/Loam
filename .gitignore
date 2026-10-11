@@ -147,3 +147,24 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# ---- Loam ----
+# dependencies and build output
+node_modules
+dist
+*.mcpb
+*.tgz
+.vite
+coverage
+test-results
+playwright-report
+
+# machine and editor files
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+.idea
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,19 @@
+name: Idea or request
+description: Suggest something Loam should do
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What are you trying to get done?
+      description: Describe the situation, not the solution. Who does this, how often, what goes wrong today?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to happen?
+  - type: textarea
+    id: agents
+    attributes:
+      label: Does it depend on a particular AI agent?

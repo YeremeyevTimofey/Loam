@@ -1,0 +1,24 @@
+{
+  "name": "@loam/mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Loam MCP server (stdio). Packed into loam.mcpb",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "pack": "node scripts/pack.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "pack:npm": "node scripts/npm-pack.mjs"
+  },
+  "dependencies": {
+    "@loam/core": "*",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "better-sqlite3": "^13.0.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@anthropic-ai/mcpb": "^2.1.2",
+    "@types/better-sqlite3": "^7.6.13",
+    "esbuild": "^0.28.2"
+  }
+}

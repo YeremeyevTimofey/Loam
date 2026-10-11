@@ -1,0 +1,20 @@
+{
+  "name": "Loam",
+  "siteUrl": "https://loam.dev",
+  "github": {
+    "owner": "YeremeyevTimofey",
+    "repo": "Loam"
+  },
+  "npmPackage": "loam-mcp",
+  "contactEmail": "hello@loam.dev",
+  "author": "the Loam team",
+  "analytics": {
+    "domain": "loam.dev",
+    "origin": "https://plausible.io",
+    "script": "https://plausible.io/js/script.tagged-events.js"
+  },
+  "download": {
+    "path": "/download/loam.mcpb",
+    "asset": "loam.mcpb"
+  }
+}

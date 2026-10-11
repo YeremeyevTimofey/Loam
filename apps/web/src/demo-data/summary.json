@@ -1,0 +1,163 @@
+{
+  "persona": {
+    "name": "Sarah Chen",
+    "role": "Account manager",
+    "company": "Northlight",
+    "industry": "Digital marketing agency, 20 people",
+    "tools": [
+      "HubSpot",
+      "Google Sheets",
+      "Looker Studio",
+      "Slack",
+      "Notion"
+    ]
+  },
+  "numbers": {
+    "readyCount": 3,
+    "readyHours": 108,
+    "typicalBefore": 5648,
+    "typicalAfter": 2215,
+    "typicalPercent": 61
+  },
+  "processes": [
+    {
+      "slug": "meeting-follow-up",
+      "title": "Meeting follow-up",
+      "frequency": "daily",
+      "minutes": 15,
+      "hours": 62.5,
+      "automation": "ready",
+      "runs": 4,
+      "corrections": 1,
+      "stable": false,
+      "examples": 1
+    },
+    {
+      "slug": "weekly-client-report",
+      "title": "Weekly client report",
+      "frequency": "weekly",
+      "minutes": 40,
+      "hours": 33.3,
+      "automation": "ready",
+      "runs": 7,
+      "corrections": 4,
+      "stable": true,
+      "examples": 2
+    },
+    {
+      "slug": "client-onboarding-brief",
+      "title": "Client onboarding brief",
+      "frequency": "ad-hoc",
+      "minutes": 90,
+      "hours": 12,
+      "automation": "ready",
+      "runs": 2,
+      "corrections": 0,
+      "stable": false,
+      "examples": 1
+    },
+    {
+      "slug": "monthly-invoice-check",
+      "title": "Monthly invoice check",
+      "frequency": "monthly",
+      "minutes": 120,
+      "hours": 24,
+      "automation": "needs-access",
+      "runs": 0,
+      "corrections": 0,
+      "stable": false,
+      "examples": 0
+    },
+    {
+      "slug": "contract-negotiation",
+      "title": "Contract negotiation",
+      "frequency": "ad-hoc",
+      "minutes": 180,
+      "hours": 18,
+      "automation": "manual-only",
+      "runs": 0,
+      "corrections": 0,
+      "stable": false,
+      "examples": 0
+    }
+  ],
+  "learning": {
+    "slug": "weekly-client-report",
+    "title": "Weekly client report",
+    "runs": 7,
+    "stable": true,
+    "corrections": [
+      {
+        "date": "2026-08-14",
+        "run": 1,
+        "note": "Put the traffic and conversion numbers in the first paragraph, before any commentary.",
+        "was": "Overall it was a positive week for the account, with several highlights worth noting.",
+        "should": "Sessions 18,420 (+12%), conversions 214 (+9%). The rise came from paid search."
+      },
+      {
+        "date": "2026-08-28",
+        "run": 2,
+        "note": "Never use exclamation marks, and never write \"unfortunately\". State what happened instead.",
+        "was": "Unfortunately the email campaign underperformed!",
+        "should": "The email campaign opened at 18% against a target of 24%."
+      },
+      {
+        "date": "2026-09-11",
+        "run": 3,
+        "note": "End every report with exactly one ask for the client, with a date. Not two, not a general \"let us know\".",
+        "was": "Let us know if you have any thoughts on the plan.",
+        "should": "Could you confirm the revised budget by Wednesday 16 September?"
+      },
+      {
+        "date": "2026-09-25",
+        "run": 4,
+        "note": "Name the channel (paid search, paid social, email) next to every number. Clients get confused by blended totals.",
+        "was": "Conversions were up 9% this week.",
+        "should": "Paid search conversions were up 9% (214 vs 196), paid social was flat."
+      }
+    ]
+  },
+  "skills": [
+    {
+      "name": "client-bad-news-email",
+      "source": "starter",
+      "description": "Draft an email telling a client about a delay or a problem - the fact, the reason without excuses, what we do, when they hear next",
+      "scanner": "pass",
+      "reviewed": true,
+      "verdict": null
+    },
+    {
+      "name": "competitor-snapshot",
+      "source": "imported",
+      "description": "Build a one-page snapshot of a competitor from the notes and links the user pastes in",
+      "scanner": "warn",
+      "reviewed": true,
+      "verdict": "safe"
+    },
+    {
+      "name": "meeting-summary",
+      "source": "starter",
+      "description": "Turn raw meeting notes into a structured summary with decisions, owners, deadlines and open questions",
+      "scanner": "pass",
+      "reviewed": true,
+      "verdict": null
+    },
+    {
+      "name": "weekly-status-report",
+      "source": "starter",
+      "description": "Write a weekly status report - done, in progress, risks and what is needed from the reader",
+      "scanner": "pass",
+      "reviewed": true,
+      "verdict": null
+    }
+  ],
+  "safety": {
+    "refused": [
+      {
+        "skill": "inbox-cleaner",
+        "reason": "delete"
+      }
+    ],
+    "reviews": 1
+  }
+}

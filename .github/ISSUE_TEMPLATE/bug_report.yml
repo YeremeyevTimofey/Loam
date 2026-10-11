@@ -1,0 +1,40 @@
+name: Bug report
+description: Something does not work as it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Security problems** (a skill that gets past the scanner, access outside the folder): please do not file them here, see SECURITY.md.
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did it happen?
+      options: [The app (loam.dev/app), The demo, Claude Desktop extension, "loam-mcp via npx (Cursor, Codex, VS Code, Gemini CLI, Claude Code, other)", The website, Something else]
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Which AI agent and version? (if relevant)
+      placeholder: Cursor 2.x, Codex CLI 0.x, Claude Desktop 1.x ...
+  - type: input
+    id: system
+    attributes:
+      label: Browser and system
+      placeholder: Chrome 140 on macOS 15, Edge on Windows 11 ...
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    id: check
+    attributes:
+      label: Output of `npx -y loam-mcp --check --folder <your folder>` (for connection problems)
+      render: text

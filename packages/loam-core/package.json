@@ -1,0 +1,19 @@
+{
+  "name": "@loam/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared schema, parsing, scoring, lint, skill generation and the skill security scanner",
+  "exports": {
+    ".": "./src/index.ts",
+    "./lint": "./src/lint.ts",
+    "./tokens": "./src/tokens.ts"
+  },
+  "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json" },
+  "dependencies": {
+    "diff": "^9.0.0",
+    "gpt-tokenizer": "^4.0.0",
+    "gray-matter": "^4.0.3",
+    "zod": "^4.6.5"
+  }
+}

@@ -1,0 +1,189 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* Content files are prose, not markup: do not scan them for class names. */
+@source not '../demo-data';
+@source not '../starter-skills';
+
+/* Only the design system's colours exist as utilities: no accidental bg-red-500. */
+@theme inline {
+  --color-*: initial;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-line: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-warning-ink: var(--warning-ink);
+  --color-success-ink: var(--success-ink);
+  --color-success-soft: var(--success-soft);
+  --color-on-accent: var(--on-accent);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --font-sans: var(--f-sans);
+  --font-mono: var(--f-mono);
+  --shadow-menu: var(--sh-menu);
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-variable.woff2') format('woff2-variations');
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--f-sans);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  /* Body text is 16px on phones, 17px on desktop. The root stays 16px so rem spacing stays on the 8px grid. */
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  @media (min-width: 768px) {
+    body {
+      font-size: 17px;
+    }
+  }
+  *,
+  *::before,
+  *::after {
+    border-color: var(--border);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+  /* Links inside text are underlined: colour alone must not be the only cue (§12C.5). Buttons and nav opt out. */
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--f-mono);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+/* Typography scale (§12C.2). Headings never end with a full stop and are never all caps. */
+@layer components {
+  .t-h1 {
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .t-h2 {
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+  .t-h3 {
+    font-size: 20px;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+  .t-secondary {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+  .t-mono {
+    font-family: var(--f-mono);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  @media (min-width: 768px) {
+    .t-h1 {
+      font-size: 48px;
+    }
+    .t-h2 {
+      font-size: 30px;
+    }
+  }
+
+  /* Layout (§12C.3) */
+  .measure {
+    width: 100%;
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+  .wide {
+    width: 100%;
+    max-width: var(--wide);
+    margin-inline: auto;
+  }
+  .gutter {
+    padding-inline: 16px;
+  }
+  @media (min-width: 768px) {
+    .gutter {
+      padding-inline: 24px;
+    }
+  }
+
+  /* Motion (§12C.4): opacity and a 4px rise, 150ms. Nothing else moves. */
+  .appear {
+    animation: appear var(--duration) ease-out both;
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appear {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

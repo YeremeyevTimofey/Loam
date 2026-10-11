@@ -1,0 +1,41 @@
+{
+  "name": "loam",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Loam \u2014 work context for AI agents",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @loam/web",
+    "build": "npm run build -w @loam/web",
+    "build:mcp": "npm run build -w @loam/mcp-server",
+    "pack:mcpb": "npm run pack -w @loam/mcp-server",
+    "preview": "npm run preview -w @loam/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "check:rules": "node scripts/check-rules.mjs",
+    "demo:build": "tsx scripts/build-demo-data.ts",
+    "assets": "tsx scripts/build-assets.ts",
+    "verify": "npm run typecheck && npm run test && npm run build && npm run build:mcp && npm run pack:mcpb && npm run check:rules && vitest run -c vitest.e2e.config.ts",
+    "test:e2e": "npm run build && vitest run -c vitest.e2e.config.ts",
+    "screenshots": "tsx scripts/build-screenshots.ts",
+    "pack:npm": "npm run pack:npm -w @loam/mcp-server",
+    "readme": "node scripts/readme.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@types/node": "^22.19.0",
+    "playwright": "^1.64.0",
+    "smol-toml": "^1.9.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

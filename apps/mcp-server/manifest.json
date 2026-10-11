@@ -1,0 +1,119 @@
+{
+  "manifest_version": "0.3",
+  "name": "loam",
+  "display_name": "Loam",
+  "version": "0.1.0",
+  "description": "Work context for AI agents: connects your Loam knowledge base folder to Claude Desktop.",
+  "long_description": "Loam keeps what your AI assistant needs to know about your work in a folder on your computer: your profile, your recurring processes, examples of good results, corrections and skills. This extension lets Claude Desktop read that folder and, when you ask, remember corrections and examples. Nothing leaves your computer: the extension makes no network requests and only touches the folder you choose. (Using Cursor, Codex, VS Code, Gemini CLI or another agent? See the install guide: they connect the same server with one command.)",
+  "author": {
+    "name": "Loam"
+  },
+  "license": "MIT",
+  "keywords": [
+    "knowledge base",
+    "context",
+    "skills",
+    "workflow",
+    "local-first"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/index.mjs"
+      ],
+      "env": {
+        "LOAM_FOLDER": "${user_config.knowledge_base_folder}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "loam_overview",
+      "description": "Compact overview of the knowledge base: owner, processes with hours per year, skills."
+    },
+    {
+      "name": "loam_get_process",
+      "description": "A process with its newest example path and its corrections."
+    },
+    {
+      "name": "loam_search",
+      "description": "Ranked keyword search over the whole knowledge base."
+    },
+    {
+      "name": "loam_read",
+      "description": "Read one text file inside the knowledge base folder."
+    },
+    {
+      "name": "loam_list_skills",
+      "description": "List all skills with source, permissions and review state."
+    },
+    {
+      "name": "loam_get_skill",
+      "description": "Read one skill. Imported skills come wrapped in a warning frame."
+    },
+    {
+      "name": "loam_import_skill",
+      "description": "Add a skill from outside after a safety scan that blocks dangerous ones."
+    },
+    {
+      "name": "loam_review_skill",
+      "description": "Get a skill inside a protective frame with a safety checklist to review it."
+    },
+    {
+      "name": "loam_set_skill_review",
+      "description": "Record a review verdict on an imported skill (information only)."
+    },
+    {
+      "name": "loam_get_interview_script",
+      "description": "The onboarding interview script and your progress in it."
+    },
+    {
+      "name": "loam_save_interview",
+      "description": "Save the interview results: profile, processes, glossary, entities."
+    },
+    {
+      "name": "loam_upsert_note",
+      "description": "Write a markdown note when you ask; keeps the old version and shows the diff."
+    },
+    {
+      "name": "loam_record_correction",
+      "description": "Remember a correction for a process so the next result is right."
+    },
+    {
+      "name": "loam_add_example",
+      "description": "Save a finished result as an example of what good looks like."
+    },
+    {
+      "name": "loam_generate_skill",
+      "description": "Rebuild a process skill from its description, examples and corrections."
+    },
+    {
+      "name": "loam_log_run",
+      "description": "Count one run of a process."
+    },
+    {
+      "name": "loam_lint",
+      "description": "Check the health of the knowledge base: size, repeats, gaps, cost."
+    }
+  ],
+  "user_config": {
+    "knowledge_base_folder": {
+      "type": "directory",
+      "title": "Knowledge base folder",
+      "description": "The folder you chose in the Loam app (the one that contains AGENTS.md). Loam only reads and writes inside it.",
+      "required": true
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32"
+    ],
+    "runtimes": {
+      "node": ">=22"
+    }
+  }
+}

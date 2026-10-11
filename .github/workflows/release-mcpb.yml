@@ -1,0 +1,54 @@
+name: Release
+
+# Push a tag like v0.1.0 to publish a release. It does three things:
+#   1. GitHub Release with loam.mcpb (+ checksum + build attestation). The site's download button leads to
+#      https://github.com/<owner>/<repo>/releases/latest/download/loam.mcpb, which GitHub serves straight as a download.
+#   2. npm: publishes the loam-mcp package that Claude Code, Cursor, Codex, VS Code, Gemini CLI and others start with npx.
+#   3. Nothing else: the website is deployed by deploy-web.yml.
+# Needs the secret NPM_TOKEN (an npm "automation" token with publish rights for the package).
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - name: Versions match the tag
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          for f in apps/mcp-server/manifest.json apps/mcp-server/package.json package.json; do
+            v="$(node -p "require('./$f').version")"
+            test "$tag" = "$v" || { echo "Tag $tag does not match $f ($v)"; exit 1; }
+          done
+      - run: npm test
+      - run: npm run pack:mcpb
+      - run: npm run pack:npm
+      - name: The packed extension answers over stdio
+        run: npx vitest run scripts/test/mcpb.test.ts
+      - name: Checksum
+        working-directory: apps/mcp-server/dist
+        run: shasum -a 256 loam.mcpb > loam.mcpb.sha256
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: apps/mcp-server/dist/loam.mcpb
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" apps/mcp-server/dist/loam.mcpb apps/mcp-server/dist/loam.mcpb.sha256 --title "Loam $GITHUB_REF_NAME" --generate-notes
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish apps/mcp-server/dist/npm --access public --provenance

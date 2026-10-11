@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  @font-face{font-family:'Inter';src:url(__FONT__) format('woff2-variations');font-weight:400 600}
+  :root{--bg:__BG__;--surface:#fff;--text:__TEXT__;--muted:__MUTED__;--border:#e4e4e7;--accent:__ACCENT__;--soft:#f7fee7}
+  *{box-sizing:border-box}
+  body{margin:0;width:1200px;height:800px;background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:var(--text);display:flex;align-items:center;justify-content:center}
+  .win{width:960px;height:660px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+  .bar{height:44px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:8px;color:var(--muted);font-size:14px}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--border)}
+  .chat{flex:1;padding:28px 40px;display:flex;flex-direction:column;gap:18px;font-size:19px;line-height:1.5}
+  .me{align-self:flex-end;max-width:560px;background:var(--soft);color:var(--accent);padding:12px 18px;border-radius:12px}
+  .ai{max-width:700px}
+  .ai b{font-weight:600}
+  .tool{align-self:flex-start;font-family:ui-monospace,Menlo,monospace;font-size:14px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:6px 10px}
+  .input{margin:0 40px 28px;border:1px solid var(--border);border-radius:10px;padding:14px 18px;color:var(--muted);font-size:17px}
+</style>
+<body><div class="win">
+  <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:12px">Your agent</span></div>
+  <div class="chat">
+    <div class="me">Run my Loam onboarding interview</div>
+    <div class="tool">loam_get_interview_script · stage: role</div>
+    <div class="ai"><b>Let's start with your day.</b> What did you actually do yesterday between 10 and 12?</div>
+    <div class="me">Wrote the weekly report for Acme, then sorted out two invoice questions.</div>
+    <div class="ai">How long does the weekly report take you, and how often do you write it?</div>
+    <div class="me">Every Friday, about 40 minutes.</div>
+    <div class="ai">Got it: weekly, 40 minutes. What do you copy from last week each time?</div>
+  </div>
+  <div class="input">Reply…</div>
+</div></body>

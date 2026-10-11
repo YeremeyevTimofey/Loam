@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  @font-face{font-family:'Inter';src:url(__FONT__) format('woff2-variations');font-weight:400 600}
+  :root{--bg:__BG__;--surface:#fff;--text:__TEXT__;--muted:__MUTED__;--border:#e4e4e7;--accent:__ACCENT__;--soft:#f7fee7}
+  *{box-sizing:border-box}
+  body{margin:0;width:1200px;height:800px;background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:var(--text);display:flex;align-items:center;justify-content:center}
+  .win{width:980px;height:640px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+  .bar{height:44px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:8px;color:var(--muted);font-size:14px}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--border)}
+  .body{flex:1;display:flex}
+  .side{width:220px;border-right:1px solid var(--border);padding:20px 14px;font-size:16px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  .side div{padding:10px 12px;border-radius:6px}
+  .side .on{background:var(--soft);color:var(--accent);font-weight:500}
+  .main{flex:1;padding:32px 40px}
+  h1{font-size:28px;margin:0 0 6px;font-weight:600;letter-spacing:-.01em}
+  p{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+  .btn{display:inline-block;height:44px;line-height:44px;padding:0 20px;border-radius:6px;background:var(--accent);color:#fff;font-weight:500;font-size:17px}
+  .file{display:inline-flex;align-items:center;gap:12px;border:1px solid var(--border);border-radius:8px;padding:14px 18px;background:var(--surface);font-size:17px;font-weight:500}
+  .doc{width:28px;height:34px;border:2px solid var(--accent);border-radius:4px}
+  .drop{margin-top:28px;border:2px dashed var(--border);border-radius:10px;height:230px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px}
+  .field{margin-top:22px;border:1px solid var(--border);border-radius:6px;height:48px;display:flex;align-items:center;padding:0 14px;font-size:17px;gap:10px}
+  .folder{width:22px;height:16px;border:2px solid var(--accent);border-radius:3px}
+  .row{display:flex;gap:12px;margin-top:22px;align-items:center}
+  .tag{font-size:13px;padding:3px 8px;border-radius:4px;background:var(--soft);color:var(--accent);font-weight:500}
+</style>
+<body><div class="win">
+  <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:12px">__TITLE__</span></div>
+  <div class="body">__BODY__</div>
+</div></body>
