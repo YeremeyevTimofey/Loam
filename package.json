@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@types/node": "^22.19.0",
+    "@types/node": "^26.6.4",
     "playwright": "^1.64.0",
     "smol-toml": "^1.9.1",
     "tsx": "^4.23.15",
