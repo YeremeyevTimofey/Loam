@@ -30,7 +30,7 @@ jobs:
       - run: npx playwright install --with-deps chromium firefox webkit
       # Browser tests, plus installing the npm package with npx and talking to it over MCP.
       - run: npx vitest run -c vitest.e2e.config.ts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: packages
           path: |
