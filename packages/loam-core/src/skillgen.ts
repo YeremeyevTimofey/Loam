@@ -29,6 +29,19 @@ const quote = (s: string, n = 200) => {
   return one.length > n ? `${one.slice(0, n - 1)}…` : one;
 };
 
+/** Newest first, dropping repeats of the same rule. The order a person's corrections are applied in. */
+export function newestFirstUnique(corrections: Correction[]): Correction[] {
+  const seen = new Set<string>();
+  return [...corrections]
+    .sort((a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1))
+    .filter((c) => {
+      const key = c.note.toLowerCase().replace(/\s+/g, ' ').trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
 function ruleText(c: Correction): string {
   const extra = c.was && c.should ? ` Was: "${quote(c.was)}". Should be: "${quote(c.should)}".` : '';
   return `${c.note.replace(/\s+/g, ' ').trim()}${extra}`;
@@ -46,17 +59,7 @@ export function generateProcessSkill(input: {
   const examples = sortExamples(input.examples);
   const newestGood = examples.find((e) => e.kind === 'good');
 
-  // Newest first, dropping repeats of the same rule.
-  const seen = new Set<string>();
-  const rules = [...corrections]
-    .sort((a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1))
-    .filter((c) => {
-      const key = c.note.toLowerCase().replace(/\s+/g, ' ').trim();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .slice(0, MAX_SKILL_RULES);
+  const rules = newestFirstUnique(corrections).slice(0, MAX_SKILL_RULES);
 
   const fm: SkillFrontmatter = {
     name: slug,

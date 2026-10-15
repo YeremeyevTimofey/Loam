@@ -11,8 +11,9 @@ import {
   type SectionKey,
   getSection,
 } from '@loam/core';
-import { ArrowLeft, Eye, FilePlus, FolderTree, Pencil, RefreshCw, SlidersHorizontal, Trash2 } from 'lucide-react';
+import { ArrowLeft, ClipboardCopy, Eye, FilePlus, FolderTree, Pencil, RefreshCw, SlidersHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { ChatCopyDialog } from '../components/ChatCopyDialog';
 import { CopyField } from '../components/CopyField';
 import { AddExampleDialog, EditDetailsDialog, ViewFilesDialog } from '../components/ProcessDialogs';
 import { Badge } from '../components/ui/badge';
@@ -90,6 +91,7 @@ export function ProcessScreen({ slug }: { slug: string }) {
   const [adding, setAdding] = useState(false);
   const [details, setDetails] = useState(false);
   const [files, setFiles] = useState(false);
+  const [chat, setChat] = useState(false);
   const [viewing, setViewing] = useState<{ name: string; text: string } | null>(null);
   const proc = snap?.processes.find((p) => p.slug === slug);
 
@@ -129,6 +131,9 @@ export function ProcessScreen({ slug }: { slug: string }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" onClick={() => setChat(true)}>
+            <ClipboardCopy size={20} aria-hidden /> Copy for any chat
+          </Button>
           <Button variant="secondary" onClick={() => setDetails(true)}>
             <SlidersHorizontal size={20} aria-hidden /> Edit numbers
           </Button>
@@ -141,6 +146,7 @@ export function ProcessScreen({ slug }: { slug: string }) {
       <Card className="mb-6">
         <p className="mb-2 font-medium">To run it, tell your agent:</p>
         <CopyField text={runCommand(proc.fm.title)} />
+        <p className="t-secondary mt-3">No agent connected? Use “Copy for any chat” to paste this process, your latest example and your corrections into ChatGPT, Gemini or claude.ai.</p>
         <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4">
           {[
             ['Time per run', `${proc.fm.minutes_per_run} min`],
@@ -296,6 +302,7 @@ export function ProcessScreen({ slug }: { slug: string }) {
       <AddExampleDialog proc={proc} open={adding} onOpenChange={setAdding} />
       <EditDetailsDialog proc={proc} open={details} onOpenChange={setDetails} />
       <ViewFilesDialog slug={slug} open={files} onOpenChange={setFiles} />
+      <ChatCopyDialog target={chat ? { kind: 'process', slug } : null} onClose={() => setChat(false)} />
       <Dialog open={viewing !== null} onOpenChange={(o) => !o && setViewing(null)}>
         <DialogContent wide>
           <DialogHeader>

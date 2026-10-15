@@ -110,7 +110,9 @@ describe('Connect your agent works for more than Claude (the new positioning)', 
       expect(JSON.parse((await codeBlocks(page))[0]!).mcpServers.loam.args).toContain('/home/sarah/Loam');
       await pickAgent(page, 'Another agent');
       expect(JSON.parse((await codeBlocks(page))[0]!).mcpServers.loam.command).toBe('npx');
-      expect(await page.getByText(/cannot save to Loam yet/).count()).toBe(1);
+      // a chat in a browser cannot be connected; the screen says so and points to the read-only copy
+      expect(await page.getByText(/cannot run a local server, so it cannot save to Loam/).count()).toBe(1);
+      expect(await page.getByText(/Copy for any chat/).count()).toBe(1);
     } finally {
       await context.close();
     }

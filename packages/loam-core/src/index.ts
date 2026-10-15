@@ -26,3 +26,4 @@ export * from './ops-skills';
 export * from './memory-store';
 export * from './policy';
 export * from './ops-protocol';
+export * from './chat-context';
