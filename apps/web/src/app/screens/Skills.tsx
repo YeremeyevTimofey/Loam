@@ -211,7 +211,7 @@ export function SkillsScreen() {
           <h3 className="t-h3 mb-1 flex items-center gap-2">
             <BookOpen size={20} aria-hidden /> Starter pack
           </h3>
-          <p className="t-secondary mb-4">Six skills written and reviewed by us. Each one is added to your folder with one click.</p>
+          <p className="t-secondary mb-4">Skills written and reviewed by us. Each one is added to your folder with one click.</p>
           <ul className="divide-y divide-line">
             {STARTER_SKILLS.map((s) => {
               const desc = /^description:\s*(.+)$/m.exec(s.text)?.[1] ?? '';

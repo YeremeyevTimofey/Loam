@@ -27,7 +27,7 @@ How to reproduce everything below: `npm run verify`.
 | 15 | “Remember this correction”: entry in `corrections.md`, counter up, diff shown | ✅ | server test “learning loop through the tools” (the diff is in the tool's reply) |
 | 16 | After three corrections `loam_generate_skill` rebuilds `SKILL.md` with the rules | ✅ | same test + core `ops.test` |
 | 17 | The next run takes the corrections into account | 🟡 | Data side proven (rules newest first in the skill, `loam_get_process` returns them). Agent behaviour not testable here |
-| 18 | Skills screen shows six starter skills; “Add” copies to `skills/<name>/SKILL.md` | ✅ | `e2e/skills` “lists the six starter skills, adds one…” |
+| 18 | Skills screen shows seven starter skills; “Add” copies to `skills/<name>/SKILL.md` | ✅ | `e2e/skills` “lists the seven starter skills, adds one…” |
 | 19 | “Sync to agents” creates `.claude/skills/loam-<name>/SKILL.md`; the user's own folder there is untouched | ✅ | `e2e/skills` (also after delete and after repairing a damaged copy); core `ops.test` |
 | 20 | Import by file and by paste; preview shows full text, scan result, capabilities | ✅ | `e2e/skills` “shows a preview…”, “imports a 1500-word skill… via a file” |
 | 21 | Six malicious skills, one per red category, each refused with category and line; no “add anyway” anywhere | ✅ | `core/scanner.test` (6 fixtures + evasion cases), `server` tests, `e2e/skills` (also asserts no control that overrides) |

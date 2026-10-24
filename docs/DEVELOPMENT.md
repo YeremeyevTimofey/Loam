@@ -35,7 +35,7 @@ apps/web/                   index.html (landing), install.html, 404.html, app/in
   src/app/                  the React app: screens, components, store (FsStore, DemoStore), lib/agents.ts
   src/landing/              build-time generators for the landing page and the install guide
   src/demo-data/kb/         the sample knowledge base (authored files + files derived by npm run demo:build)
-  src/starter-skills/       the six starter skills (plain markdown)
+  src/starter-skills/       the starter skills (plain markdown)
   _headers.template         security headers (analytics host filled in at build time)
 apps/mcp-server/            src/ (server, CLI, tools), manifest.json (Claude Desktop), scripts/ (build, pack)
 packages/loam-core/         schema, scanner, lint, skill generation, KbStore: shared by app and server

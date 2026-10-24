@@ -173,7 +173,7 @@ Fixes the app can do for you (always with a diff first): sync the agent copies, 
 | Only external resource on the landing page is the analytics script | e2e records requests on `/`; fonts and images are self-hosted |
 | Works offline after the first visit | e2e: loads, goes offline, reloads every screen |
 | The server only touches the chosen folder | Server tests: `../`, absolute, `~`, symlink escapes are errors; reads and writes |
-| Other people's skills are checked | 8 malicious fixtures (one per red category + capability cases) refused in core, server and UI tests; the 6 starter skills and everyday text pass |
+| Other people's skills are checked | 8 malicious fixtures (one per red category + capability cases) refused in core, server and UI tests; the 7 starter skills and everyday text pass |
 | Reviews grant nothing | `check:rules` + tests: capabilities unchanged after a `safe` verdict |
 | “Copy for any chat” is one-way and shows what leaves | The exact text is previewed, equals the clipboard and the download; a store that refuses every write still builds it; the folder is identical before and after (e2e); `check:rules` forbids writes in that code; keys and passwords are flagged first |
 

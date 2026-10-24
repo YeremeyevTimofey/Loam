@@ -256,10 +256,10 @@ describe('skills: storage, import and sync (acceptance 18-20, 27)', () => {
     await expect(planAddStarterSkill(store, starter, TODAY)).rejects.toThrow(/already/);
     expect((await readAudit(store))[0]).toMatchObject({ action: 'import', skill: 'meeting-summary', source: 'starter' });
   });
-  it('all six starter skills can be added', async () => {
+  it('all seven starter skills can be added', async () => {
     const store = await freshBase();
     for (const s of starterSkills()) await apply(store, await planAddStarterSkill(store, s, TODAY));
-    expect((await loadSkills(store)).skills).toHaveLength(6);
+    expect((await loadSkills(store)).skills).toHaveLength(7);
   });
   it('syncs to .claude/skills with the loam- prefix and leaves the user\'s own skills alone', async () => {
     const store = await freshBase();
