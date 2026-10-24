@@ -10,7 +10,7 @@ body:
     id: where
     attributes:
       label: Where did it happen?
-      options: [The app (loam.dev/app), The demo, Claude Desktop extension, "loam-mcp via npx (Cursor, Codex, VS Code, Gemini CLI, Claude Code, other)", The website, Something else]
+      options: [The app (loam-ai.pages.dev/app), The demo, Claude Desktop extension, "loam-mcp via npx (Cursor, Codex, VS Code, Gemini CLI, Claude Code, other)", The website, Something else]
     validations:
       required: true
   - type: input

@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "AGENTS.md",
-      "tokens": 603,
+      "tokens": 606,
       "words": 414
     },
     {
@@ -102,7 +102,7 @@
       "words": 244
     }
   ],
-  "totalTokens": 12255,
+  "totalTokens": 12258,
   "typical": {
     "files": [
       "AGENTS.md",
@@ -110,16 +110,16 @@
       "processes/weekly-client-report/SKILL.md",
       "processes/weekly-client-report/examples/good-02.md"
     ],
-    "tokens": 5648,
+    "tokens": 5651,
     "runsPerMonth": 27.2,
-    "monthlyUsd": 0.460312
+    "monthlyUsd": 0.4605565
   },
   "checks": [
     {
       "rule": "cost",
       "name": "What a typical task costs",
       "status": "ok",
-      "summary": "A typical task (instructions, profile, one skill, one example) reads about 5,648 tokens — roughly $0.46 a month at your usage (at $3 per million tokens)."
+      "summary": "A typical task (instructions, profile, one skill, one example) reads about 5,651 tokens — roughly $0.46 a month at your usage (at $3 per million tokens)."
     },
     {
       "rule": "budget",
@@ -240,11 +240,11 @@
     }
   ],
   "savings": {
-    "beforeTokens": 12255,
-    "afterTokens": 8512,
+    "beforeTokens": 12258,
+    "afterTokens": 8515,
     "percent": 31,
-    "typicalBefore": 5648,
-    "typicalAfter": 2215,
+    "typicalBefore": 5651,
+    "typicalAfter": 2218,
     "typicalPercent": 61,
     "items": [
       {

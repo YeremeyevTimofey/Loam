@@ -43,7 +43,7 @@ describe('landing page (acceptance 32-34, 40)', () => {
       expect(report).not.toContain('plausible');
       expect(await page.locator('body').innerText()).toMatch(/\d+% less context per task/);
       // metadata: favicon, share preview
-      expect(await page.locator('meta[property="og:image"]').getAttribute('content')).toBe('https://loam.dev/og.png');
+      expect(await page.locator('meta[property="og:image"]').getAttribute('content')).toBe('https://loam-ai.pages.dev/og.png');
       for (const asset of ['/og.png', '/favicon.svg', '/favicon.ico', '/logo.svg', '/apple-touch-icon.png']) {
         expect((await page.request.get(`${site.origin}${asset}`)).status(), asset).toBe(200);
       }

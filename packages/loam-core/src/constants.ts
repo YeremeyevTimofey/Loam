@@ -81,7 +81,7 @@ export const NO_INVENTING =
   'Do not invent facts, names or numbers that are not in the knowledge base or in the user\'s message.';
 
 /** Where people open the app. Used in messages for people and agents. */
-export const APP_URL = 'https://loam.dev/app';
+export const APP_URL = 'https://loam-ai.pages.dev/app';
 
 /** The public repository: source, documentation and the place to report a problem. Checked against site.config.json by `npm run check:rules`. */
 export const REPO_URL = 'https://github.com/YeremeyevTimofey/Loam';

@@ -1,6 +1,6 @@
 {
   "name": "Loam",
-  "siteUrl": "https://loam.dev",
+  "siteUrl": "https://loam-ai.pages.dev",
   "github": {
     "owner": "YeremeyevTimofey",
     "repo": "Loam",
@@ -10,7 +10,7 @@
   "contactEmail": "hello@loam.dev",
   "author": "the Loam team",
   "analytics": {
-    "domain": "loam.dev",
+    "domain": "loam-ai.pages.dev",
     "origin": "https://plausible.io",
     "script": "https://plausible.io/js/script.tagged-events.js"
   },

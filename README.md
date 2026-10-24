@@ -7,7 +7,7 @@
 **Work context for AI agents.**<br>
 Answer questions about your workday for 15 minutes. Get a knowledge base on your own computer that Claude, Cursor, Codex, Gemini and other AI agents can actually use.
 
-[**Download for Claude Desktop**](https://github.com/YeremeyevTimofey/Loam/releases/latest/download/loam.mcpb) &nbsp;·&nbsp; [Try the live demo](https://loam.dev/app?demo=1) &nbsp;·&nbsp; [Set up another agent](https://loam.dev/install) &nbsp;·&nbsp; [Report a problem](https://github.com/YeremeyevTimofey/Loam/issues)
+[**Download for Claude Desktop**](https://github.com/YeremeyevTimofey/Loam/releases/latest/download/loam.mcpb) &nbsp;·&nbsp; [Try the live demo](https://loam-ai.pages.dev/app?demo=1) &nbsp;·&nbsp; [Set up another agent](https://loam-ai.pages.dev/install) &nbsp;·&nbsp; [Report a problem](https://github.com/YeremeyevTimofey/Loam/issues)
 
 [![CI](https://github.com/YeremeyevTimofey/Loam/actions/workflows/ci.yml/badge.svg)](https://github.com/YeremeyevTimofey/Loam/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/YeremeyevTimofey/Loam)](https://github.com/YeremeyevTimofey/Loam/releases/latest)
@@ -37,7 +37,7 @@ No server, no account, nothing leaves your computer.
 
 ## Get started
 
-**1. Set up a folder:** open [loam.dev/app](https://loam.dev/app) in Chrome or Edge, choose an empty folder, and Loam fills it in. (Want to look first? [Open the demo](https://loam.dev/app?demo=1); it works in any browser.)
+**1. Set up a folder:** open [loam-ai.pages.dev/app](https://loam-ai.pages.dev/app) in Chrome or Edge, choose an empty folder, and Loam fills it in. (Want to look first? [Open the demo](https://loam-ai.pages.dev/app?demo=1); it works in any browser.)
 
 **2. Connect your AI agent.** Loam works with any agent that can run a local [MCP](https://modelcontextprotocol.io) server:
 
@@ -54,7 +54,7 @@ No server, no account, nothing leaves your computer.
 
 That button is for Mac and Linux with your folder at `~/Loam`. For another folder, or on Windows, use the app's **Connect your agent** screen. An AI agent that installs servers for you (Cline, for example) can follow [llms-install.md](llms-install.md).
 
-The app's **Connect your agent** screen writes the exact command or config for your agent and your folder (Mac, Windows and Linux), and the [install guide](https://loam.dev/install) shows them step by step. Agents other than Claude Desktop need [Node](https://nodejs.org) 22 or newer; check with `node --version`.
+The app's **Connect your agent** screen writes the exact command or config for your agent and your folder (Mac, Windows and Linux), and the [install guide](https://loam-ai.pages.dev/install) shows them step by step. Agents other than Claude Desktop need [Node](https://nodejs.org) 22 or newer; check with `node --version`.
 
 **3. Tell your agent:** `Run my Loam onboarding interview`. Then ask for your work in plain words, for example `Do my weekly client report`.
 
@@ -74,12 +74,12 @@ gh attestation verify loam.mcpb --repo YeremeyevTimofey/Loam
 
 ## See it on an example
 
-The demo is a fictional account manager, Sarah, at a 20-person marketing agency. [Open her knowledge base](https://loam.dev/app?demo=1) to see:
+The demo is a fictional account manager, Sarah, at a 20-person marketing agency. [Open her knowledge base](https://loam-ai.pages.dev/app?demo=1) to see:
 
 - **5 processes** found by the interview, 3 ready to automate: about **108 hours a year**.
 - A weekly report refined by **4 corrections** until it was marked *stable*.
 - Starter skills, one imported skill with a safety scan and an agent review, and one skill the safety check **refused**.
-- A health check: a typical task reads **5,648 tokens** in this deliberately messy sample, **2,215** after the suggested clean-up (**61% less**).
+- A health check: a typical task reads **5,651 tokens** in this deliberately messy sample, **2,218** after the suggested clean-up (**61% less**).
 
 ## Private and safe by design
 

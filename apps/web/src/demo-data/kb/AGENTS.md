@@ -35,4 +35,4 @@ Never write without being asked. When the user says to remember something, call 
 
 ## If the loam_* tools are not available
 
-Your agent may not be connected to Loam. You can still read the base: skills are in `skills/<name>/SKILL.md` and `processes/<slug>/SKILL.md`, and the trust rules above still apply. Do not edit files in the base this way. If the user wants to save a correction or an example, tell them to connect Loam (https://loam.dev/app, "Connect your agent"), so the change is checked and kept in history.
+Your agent may not be connected to Loam. You can still read the base: skills are in `skills/<name>/SKILL.md` and `processes/<slug>/SKILL.md`, and the trust rules above still apply. Do not edit files in the base this way. If the user wants to save a correction or an example, tell them to connect Loam (https://loam-ai.pages.dev/app, "Connect your agent"), so the change is checked and kept in history.
