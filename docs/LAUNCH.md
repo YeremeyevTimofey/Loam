@@ -43,7 +43,7 @@ Do these on launch day, in this order. Each takes minutes except where noted.
 | **Glama, mcp.so** | Glama indexes open repositories by itself; claim yours. mcp.so takes a repository address for free (ignore the paid option) |
 | **Cline marketplace** | An issue in [cline/mcp-marketplace](https://github.com/cline/mcp-marketplace): repository address, a 400×400 PNG logo (`sips -z 400 400 apps/web/public/icon-512.png --out loam-400.png` on a Mac), and a sentence confirming that Cline installed it from the README or [llms-install.md](../llms-install.md) |
 | **Cursor** | A post in the forum's [Showcase → Built for Cursor](https://forum.cursor.com/c/showcase/9). The README has an "Add to Cursor" button |
-| **Skill lists** | [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) and [claudeskills.info](https://claudeskills.info/): optional, the six starter skills are the entry |
+| **Skill lists** | [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) and [claudeskills.info](https://claudeskills.info/): optional, the starter skills are the entry |
 | **Open-source directories** | AlternativeTo, OpenAlternative, DevHunt. Skip the paid AI-tool directories until the free ones show they send visitors |
 
 Not worth it for Loam: Smithery wants a remote HTTP server (Loam runs on the person's computer), and Anthropic's own directory no longer takes `.mcpb` extensions (only plugins), so `loam.mcpb` stays a direct download.

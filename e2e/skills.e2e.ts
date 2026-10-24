@@ -37,10 +37,10 @@ const paste = async (page: Page, text: string) => {
 };
 
 describe('starter pack and sync (acceptance 18, 19)', () => {
-  it('lists the six starter skills, adds one by copying it, syncs with the loam- prefix and leaves the user\'s own skill alone', async () => {
+  it('lists the seven starter skills, adds one by copying it, syncs with the loam- prefix and leaves the user\'s own skill alone', async () => {
     const { page, close } = await skillsScreen();
     try {
-      for (const name of ['meeting-summary', 'client-bad-news-email', 'weekly-status-report', 'incoming-doc-review', 'meeting-prep', 'task-handoff']) {
+      for (const name of ['meeting-summary', 'client-bad-news-email', 'weekly-status-report', 'incoming-doc-review', 'meeting-prep', 'task-handoff', 'find-skills']) {
         expect(await page.getByRole('button', { name: `Add ${name}` }).count(), name).toBe(1);
       }
       await page.getByRole('button', { name: 'Add meeting-summary' }).click();

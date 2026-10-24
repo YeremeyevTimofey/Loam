@@ -1,4 +1,4 @@
-// The six starter skills (§14.3). Each is a plain markdown file so it can be read and edited as one.
+// The starter skills (§14.3). Each is a plain markdown file so it can be read and edited as one.
 const files = import.meta.glob('./*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 export interface StarterSkill {
