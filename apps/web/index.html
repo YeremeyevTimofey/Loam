@@ -128,7 +128,12 @@
           <h2 id="privacy-h" class="t-h2 mb-5">Private by design, safe by default</h2>
           <p class="mb-4">Your data never leaves your computer. There is no server, no account and no sign-up: the app is a web page that reads and writes the folder you choose, and nothing else. The code is open, so you can check that.</p>
           <p class="mb-4">Skills from other people are checked before they are added. Anything that deletes files, uses the internet, sends your data out, asks for passwords or tries to change how your AI behaves is refused, with no way to override it. Imported instructions can never write to your folder and can never reach the network.</p>
-          <p><a href="{{githubUrl}}">Read the code on GitHub</a></p>
+          <ul class="flex flex-wrap gap-x-5 gap-y-1" aria-label="Check it yourself">
+            <li><a href="{{githubUrl}}" class="inline-flex min-h-11 items-center">Read the code on GitHub</a></li>
+            <li><a href="{{file:docs/ARCHITECTURE.md#privacy-each-claim-and-how-it-is-checked}}" class="inline-flex min-h-11 items-center">How each promise is checked</a></li>
+            <li><a href="{{file:packages/loam-core/src/scanner.ts}}" class="inline-flex min-h-11 items-center">The skill checker</a></li>
+            <li><a href="{{file:SECURITY.md}}" class="inline-flex min-h-11 items-center">Security policy</a></li>
+          </ul>
         </div>
       </section>
 
@@ -149,6 +154,8 @@
         <nav aria-label="Footer" class="flex flex-wrap items-center gap-x-5 gap-y-1">
           <a href="{{githubUrl}}" class="inline-flex h-11 items-center">GitHub</a>
           <a href="/install" class="inline-flex h-11 items-center">Install guide</a>
+          <a href="{{issuesUrl}}" class="inline-flex h-11 items-center">Report a problem</a>
+          <a href="{{file:LICENSE}}" class="inline-flex h-11 items-center">Licence</a>
           <a href="mailto:{{contactEmail}}" class="inline-flex h-11 items-center">{{contactEmail}}</a>
         </nav>
       </div>

@@ -85,6 +85,28 @@ git push origin v0.1.0
 4. creates the GitHub Release with `loam.mcpb` and the checksum attached;
 5. publishes `loam-mcp` to npm with provenance.
 
+## 6. List the server in the official MCP Registry
+
+The [MCP Registry](https://modelcontextprotocol.io/registry/quickstart) is the public catalogue of MCP servers that agents and other directories read from. It stores only a short description (`server.json`); the code stays on npm, so publish the package first (section 5).
+
+`npm run pack:npm` writes the description for you, from `site.config.json` and the version in the manifest, to `apps/mcp-server/dist/npm/server.json` (it is not part of the npm package). The package carries the matching `mcpName`; the registry checks that the two agree. Once, on your computer:
+
+```bash
+brew install mcp-publisher                       # or the binary from the registry's releases page
+npm run pack:npm                                 # on the tagged commit, so the versions match what is on npm
+cd apps/mcp-server/dist/npm
+mcp-publisher login github                       # sign in as the account that owns the repository
+mcp-publisher publish
+curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=loam"   # the server is listed
+```
+
+- The name is `io.github.<owner>/loam`. A GitHub sign-in only allows names that start with your own user name; if the registry rejects the capital letters of the owner, change the one line in `scripts/lib/registry.mjs` (`mcpName`) and rebuild.
+- Each new release needs `mcp-publisher publish` again (the registry can also be published from GitHub Actions with the repository's own identity; see its documentation).
+- The registry is marked as a preview by its maintainers, so its schema and address can change: `scripts/test/registry.test.ts` checks the generated file against the schema it was written for.
+- Anthropic's own directory no longer accepts `.mcpb` extensions (only plugins), so `loam.mcpb` stays a direct download. Agents that install servers for people (Cline, for example) can follow [llms-install.md](../llms-install.md).
+
+For what to do next, to be found and starred, see [LAUNCH.md](LAUNCH.md).
+
 ## How the one-click download works
 
 The button on the site and in the app points to **`<your domain>/download/loam.mcpb`**. That address answers with a redirect (written to `_redirects`) to
@@ -121,6 +143,5 @@ npx -y loam-mcp --check --folder <a Loam folder>             # Node, folder and 
 
 ## Optional
 
-- **The official MCP registry**: the npm package already carries `mcpName` (`io.github.<owner>/loam`); add a `server.json` and publish with the registry's CLI to make Loam discoverable inside MCP clients.
 - **Social preview**: Settings → General → Social preview → upload `apps/web/public/og.png`.
 - **Replace the install-guide illustrations** (`apps/web/public/shots/install-*.png`, drawn, not real) with real screenshots, then `npm run build`.

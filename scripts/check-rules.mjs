@@ -175,7 +175,7 @@ rule('no domain, repository or package address typed outside site.config.json', 
 rule('the address the core quotes in messages matches the site address', '§0', new RegExp(`'${site.appUrl.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}'`).test(read(path.join(root, 'packages/loam-core/src/constants.ts'))) ? [] : [`APP_URL in constants.ts is not ${site.appUrl}`]);
 const versions = ['package.json', 'apps/mcp-server/package.json', 'apps/mcp-server/manifest.json'].map((f) => [f, JSON.parse(read(path.join(root, f))).version]);
 rule('the root, the server package and the extension manifest carry one version', '§0', new Set(versions.map(([, v]) => v)).size === 1 ? [] : versions.map(([f, v]) => `${f}: ${v}`));
-rule('README.md is generated from its template and up to date', '§0', (() => {
+rule('README.md and llms-install.md are generated from their templates and up to date', '§0', (() => {
   try {
     execFileSync('node', [path.join(root, 'scripts/readme.mjs'), '--check'], { stdio: 'pipe' });
     return [];
@@ -184,6 +184,79 @@ rule('README.md is generated from its template and up to date', '§0', (() => {
   }
 })());
 rule('the server package name is the one in site.config.json', '§0', JSON.parse(read(path.join(root, 'apps/mcp-server/scripts/npm-pack.mjs').replace('npm-pack.mjs', '../package.json'))).name === '@loam/mcp-server' && /site\.npmPackage/.test(read(path.join(root, 'apps/mcp-server/scripts/npm-pack.mjs'))) ? [] : ['npm-pack.mjs does not use site.npmPackage']);
+
+// --- links into the repository: they point at this repository, and at files that exist
+const repoUrlPattern = new RegExp(`${site.githubUrl.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}(?:/(blob|tree)/${site.branch}/([^\\s"'<>)\\]]*))?`, 'g');
+rule('the repository address in constants.ts, package.json and the hand-written files is the one in site.config.json', 'links', (() => {
+  const bad = [];
+  if (!new RegExp(`REPO_URL = '${site.githubUrl.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}'`).test(read(path.join(root, 'packages/loam-core/src/constants.ts')))) bad.push(`REPO_URL in constants.ts is not ${site.githubUrl}`);
+  const rootPkg = JSON.parse(read(path.join(root, 'package.json')));
+  if (rootPkg.repository?.url !== `git+${site.githubUrl}.git`) bad.push(`package.json repository is ${rootPkg.repository?.url}`);
+  if (rootPkg.bugs?.url !== site.issuesUrl) bad.push(`package.json bugs is ${rootPkg.bugs?.url}`);
+  // an address typed in a markdown or yaml file that looks like this repository (same owner or same name) must be exactly this repository:
+  // forks and typos show up here, while links to other people's repositories are fine
+  const handWritten = [...walk(root).filter((f) => /\.(md|ya?ml)$/.test(f) && !rel(f).startsWith('apps/web/src/demo-data/')), ];
+  for (const f of handWritten) {
+    for (const m of read(f).matchAll(/github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)/g)) {
+      const mine = m[1].toLowerCase() === site.github.owner.toLowerCase() || m[2].toLowerCase() === site.github.repo.toLowerCase();
+      if (mine && `${m[1]}/${m[2]}` !== `${site.github.owner}/${site.github.repo}`) bad.push(`${rel(f)}: ${m[0]}`);
+    }
+  }
+  return bad;
+})());
+
+const slugOfHeading = (h) => h.trim().toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, '').replace(/\s/g, '-');
+const anchorsOf = (file) => new Set([...read(file).matchAll(/^#{1,6}\s+(.+?)\s*$/gm)].map((m) => slugOfHeading(m[1].replace(/[`*_]/g, ''))));
+/** Is `target` (a repo-relative path, optional #anchor) a real file or folder? Returns a problem or null. */
+const repoPathProblem = (target, kind) => {
+  const [p0, anchor] = target.split('#');
+  const full = path.join(root, p0);
+  if (!existsSync(full)) return `${p0} does not exist`;
+  const isDir = statSync(full).isDirectory();
+  if (kind === 'dir' && !isDir) return `${p0} is a file, not a folder`;
+  if (kind === 'file' && isDir) return `${p0} is a folder, not a file`;
+  if (anchor && !(p0.endsWith('.md') && anchorsOf(full).has(anchor))) return `${p0} has no heading "#${anchor}"`;
+  return null;
+};
+rule('every link into the repository (pages, app, README, docs) points at a file, folder or heading that exists', 'links', (() => {
+  const bad = [];
+  const check = (where, target, kind) => { const problem = repoPathProblem(target, kind); if (problem) bad.push(`${where}: ${problem}`); };
+  // pages: {{file:...}} / {{dir:...}} placeholders in the sources
+  for (const f of ['index.html', 'install.html', '404.html'].map((x) => path.join(root, 'apps/web', x))) {
+    for (const m of read(f).matchAll(/\{\{(file|dir):([^}\s]+)\}\}/g)) check(rel(f), m[2], m[1]);
+  }
+  // the app: repoFile('...') / repoDir('...')
+  for (const f of appCode) {
+    for (const m of stripComments(read(f)).matchAll(/\brepo(File|Dir)\(\s*'([^']+)'\s*\)/g)) check(rel(f), m[2], m[1].toLowerCase());
+  }
+  // what was actually built
+  for (const f of ['index.html', 'install.html', '404.html']) {
+    const page = rendered(f);
+    if (page === null) { bad.push(`${f}: apps/web/dist is missing (run \`npm run build\`)`); continue; }
+    for (const m of page.matchAll(repoUrlPattern)) if (m[1]) check(`dist/${f}`, decodeURIComponent(m[2]), m[1] === 'blob' ? 'file' : 'dir');
+  }
+  // markdown: relative links
+  for (const f of [path.join(root, 'README.md'), path.join(root, 'llms-install.md'), path.join(root, 'SECURITY.md'), path.join(root, 'CONTRIBUTING.md'), ...under('docs', ['.md'])]) {
+    for (const m of stripComments(read(f)).matchAll(/\]\(([^)\s]+)\)/g)) {
+      const link = m[1];
+      if (/^(https?:|mailto:)/.test(link)) continue;
+      const [p0, anchor] = link.split('#');
+      const target = p0 === '' ? f : path.resolve(path.dirname(f), p0);
+      if (!existsSync(target)) { bad.push(`${rel(f)}: ${link} does not exist`); continue; }
+      if (anchor && target.endsWith('.md') && !anchorsOf(target).has(anchor)) bad.push(`${rel(f)}: ${link} has no such heading`);
+    }
+  }
+  // links to the repository typed out in markdown or yaml (blob/tree)
+  for (const f of walk(root).filter((x) => /\.(md|ya?ml)$/.test(x) && !rel(x).startsWith('apps/web/src/demo-data/'))) {
+    for (const m of read(f).matchAll(repoUrlPattern)) if (m[1]) check(rel(f), decodeURIComponent(m[2]), m[1] === 'blob' ? 'file' : 'dir');
+  }
+  return bad;
+})());
+rule('the app opens links out of the page in a new tab, never in place', 'links', scan(
+  appCode,
+  (code) => grep(stripComments(code), /<a\b[^>]*href=\{?\s*(?:REPO_URL|ISSUES_URL|RELEASES_URL|repoFile|repoDir)[^>]*>/g)
+    .filter((tag) => !/target="_blank"/.test(tag)),
+));
 
 console.log(`\n${checks - failures.length}/${checks} rules hold.`);
 if (failures.length) {

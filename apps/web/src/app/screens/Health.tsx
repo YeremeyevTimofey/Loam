@@ -2,11 +2,13 @@ import { FILE } from '@loam/core';
 import type { LintFinding, LintReport } from '@loam/core/lint';
 import { ArrowRight, CircleCheck, CircleAlert, RefreshCw, Wrench } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { NewTabLink } from '../components/NewTabLink';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { useApp } from '../context';
 import { cn } from '../lib/cn';
+import { repoFile } from '../lib/links';
 
 const n = (x: number) => x.toLocaleString('en-US');
 const SEVERITY = { high: ['danger', 'Important'], medium: ['warning', 'Worth fixing'], low: ['muted', 'Minor'] } as const;
@@ -80,7 +82,11 @@ export function HealthScreen() {
           <p className="t-secondary mt-2">
             {report.findings.length === 0
               ? 'Everything looks good. Your agent reads little and finds what it needs.'
-              : `${report.findings.length} thing${report.findings.length === 1 ? '' : 's'} to look at. The most important come first.`}
+              : `${report.findings.length} thing${report.findings.length === 1 ? '' : 's'} to look at. The most important come first.`}{' '}
+            <NewTabLink inline href={repoFile('docs/ARCHITECTURE.md#context-lint')}>
+              How these checks work
+            </NewTabLink>
+            .
           </p>
         </div>
         <Button variant="secondary" onClick={() => void run()} disabled={running}>

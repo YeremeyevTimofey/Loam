@@ -11,8 +11,8 @@ Loam's promises are specific: your data stays on your computer, the app and the 
 
 ## How to report
 
-Please use GitHub's private vulnerability reporting (Security tab → *Report a vulnerability*), or email the address in `site.config.json` (`contactEmail`). Do not open a public issue for something that is exploitable. We aim to acknowledge a report within three working days.
+Please use GitHub's private vulnerability reporting ([report a vulnerability](https://github.com/YeremeyevTimofey/Loam/security/advisories/new)), or email the address in [`site.config.json`](site.config.json) (`contactEmail`). Do not open a public issue for something that is exploitable. We aim to acknowledge a report within three working days.
 
 ## Scope notes
 
-The scanner is a pattern filter, one of three layers (scanner, the untrusted-text frame and rules in `AGENTS.md`, and no write capability for imported skills). A skill that a determined author rewrites to dodge the patterns is expected to be possible; what matters is that the other two layers still hold. Reports of both kinds are welcome, and fixes for the scanner always come with a new test.
+The scanner ([`scanner.ts`](packages/loam-core/src/scanner.ts)) is a pattern filter, one of three layers (scanner, the untrusted-text frame and rules in `AGENTS.md`, and no write capability for imported skills). A skill that a determined author rewrites to dodge the patterns is expected to be possible; what matters is that the other two layers still hold. Reports of both kinds are welcome, and fixes for the scanner always come with a new test.

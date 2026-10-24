@@ -3,10 +3,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../context';
 import { AGENTS, checkFolder, connectFor, detectOs, type AgentId, type Block, type Os } from '../lib/agents';
 import { cn } from '../lib/cn';
-import { INTERVIEW_COMMAND, MCPB_URL, NPM_PACKAGE } from '../lib/links';
+import { INTERVIEW_COMMAND, ISSUES_URL, MCPB_URL, NPM_PACKAGE, RELEASES_URL } from '../lib/links';
 import { recallFolderPath, rememberFolderPath } from '../store/folder';
 import { CodeBlock } from './CodeBlock';
 import { CopyField } from './CopyField';
+import { NewTabLink } from './NewTabLink';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
@@ -106,6 +107,9 @@ export function ConnectAgent({ className }: { className?: string }) {
                 <Download size={20} aria-hidden /> Download loam.mcpb
               </a>
             </Button>
+            <p className="t-secondary mt-1">
+              Every version and its checksum are on the <NewTabLink inline href={RELEASES_URL}>releases page</NewTabLink>.
+            </p>
           </Step>
           <Step n={2} title="Add it to Claude Desktop">
             <p className="t-secondary">
@@ -189,6 +193,9 @@ export function ConnectAgent({ className }: { className?: string }) {
       ) : null}
       <p className="t-secondary mt-4">
         A chat in a web browser (ChatGPT, Gemini or claude.ai) cannot run a local server, so it cannot save to Loam. You can still give it a process or a skill: open it in Loam and press “Copy for any chat”. Any agent that opens this folder can also read it by following AGENTS.md.
+      </p>
+      <p className="t-secondary mt-2">
+        Something not working? <NewTabLink inline href={ISSUES_URL}>Tell us on GitHub</NewTabLink> which agent and which computer you use.
       </p>
     </Card>
   );

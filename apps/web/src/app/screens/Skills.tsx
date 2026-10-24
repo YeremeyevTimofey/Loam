@@ -17,7 +17,9 @@ import { Card } from '../components/ui/card';
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/input';
+import { NewTabLink } from '../components/NewTabLink';
 import { commitPlan, useApp } from '../context';
+import { repoFile } from '../lib/links';
 import { STARTER_SKILLS } from '../../starter-skills';
 
 const MAX_FILE = 100_000;
@@ -147,7 +149,7 @@ export function SkillsScreen() {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div className="measure !mx-0">
           <h1 className="t-h1">Skills</h1>
-          <p className="t-secondary mt-2">Skills tell your agent how to do a kind of task. Add the ones you want; anything from outside is checked first. “Sync to agents” copies them where Claude Code, Cursor, Codex, Gemini CLI, Copilot and other agents look for skills.</p>
+          <p className="t-secondary mt-2">Skills tell your agent how to do a kind of task. Add the ones you want; anything from outside is checked first. “Sync to agents” copies them where Claude Code, Cursor, Codex, Gemini CLI, Copilot and other agents look for skills. <NewTabLink inline href={repoFile('docs/ARCHITECTURE.md#skills-and-the-security-model')}>How the safety check works</NewTabLink>.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={() => void sync()} disabled={busy}>

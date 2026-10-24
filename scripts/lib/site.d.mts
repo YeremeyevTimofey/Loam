@@ -1,7 +1,7 @@
 export interface SiteConfig {
   name: string;
   siteUrl: string;
-  github: { owner: string; repo: string };
+  github: { owner: string; repo: string; branch?: string };
   npmPackage: string;
   contactEmail: string;
   author: string;
@@ -10,7 +10,10 @@ export interface SiteConfig {
 }
 export interface Site extends SiteConfig {
   githubUrl: string;
+  /** The branch that file links point at (default: main). */
+  branch: string;
   issuesUrl: string;
+  securityUrl: string;
   releasesUrl: string;
   releaseDownloadUrl: string;
   downloadUrl: string;
@@ -18,5 +21,9 @@ export interface Site extends SiteConfig {
   installUrl: string;
   npmUrl: string;
   host: string;
+  /** A file in the repository, optionally with a #heading: https://github.com/<owner>/<repo>/blob/<branch>/<path> */
+  fileUrl(path: string): string;
+  /** A folder in the repository. */
+  dirUrl(path: string): string;
 }
 export function resolveSite(config: SiteConfig): Site;

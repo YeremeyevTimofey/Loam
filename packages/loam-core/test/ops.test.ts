@@ -26,6 +26,7 @@ import {
   loadSkills,
   InterviewInput,
   LoamError,
+  REPO_URL,
   type Plan,
 } from '../src';
 import { fixture, freshBase, starterSkills, TODAY } from './helpers';
@@ -56,6 +57,12 @@ describe('scaffold (acceptance 2)', () => {
     await store.writeFile('README.md', 'mine');
     const plan = await planScaffold(store, TODAY);
     expect(plan.changes).toHaveLength(0);
+  });
+  it('the README of a new folder says where the source and the issue tracker are', async () => {
+    const store = await freshBase();
+    const readme = await store.readFile('README.md');
+    expect(readme).toContain(`at ${REPO_URL}.`);
+    expect(REPO_URL).toMatch(/^https:\/\/github\.com\/[^/]+\/[^/]+$/);
   });
   it('AGENTS.md matches the spec and stays within its word budget', async () => {
     const store = await freshBase();

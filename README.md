@@ -7,12 +7,15 @@
 **Work context for AI agents.**<br>
 Answer questions about your workday for 15 minutes. Get a knowledge base on your own computer that Claude, Cursor, Codex, Gemini and other AI agents can actually use.
 
-[**Download for Claude Desktop**](https://github.com/YeremeyevTimofey/Loam/releases/latest/download/loam.mcpb) &nbsp;·&nbsp; [Try the live demo](https://loam.dev/app?demo=1) &nbsp;·&nbsp; [Set up another agent](https://loam.dev/install)
+[**Download for Claude Desktop**](https://github.com/YeremeyevTimofey/Loam/releases/latest/download/loam.mcpb) &nbsp;·&nbsp; [Try the live demo](https://loam.dev/app?demo=1) &nbsp;·&nbsp; [Set up another agent](https://loam.dev/install) &nbsp;·&nbsp; [Report a problem](https://github.com/YeremeyevTimofey/Loam/issues)
 
 [![CI](https://github.com/YeremeyevTimofey/Loam/actions/workflows/ci.yml/badge.svg)](https://github.com/YeremeyevTimofey/Loam/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/YeremeyevTimofey/Loam)](https://github.com/YeremeyevTimofey/Loam/releases/latest)
 [![npm](https://img.shields.io/npm/v/loam-mcp)](https://www.npmjs.com/package/loam-mcp)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/YeremeyevTimofey/Loam?style=flat)](https://github.com/YeremeyevTimofey/Loam/stargazers)
+[![Node 22+](https://img.shields.io/badge/node-%E2%89%A522-339933)](https://nodejs.org)
+[![MCP server](https://img.shields.io/badge/MCP-server-blue)](https://modelcontextprotocol.io)
 
 <img src="apps/web/public/shots/step-2-processes.png" width="760" alt="Loam showing five processes with the hours each takes per year">
 
@@ -47,6 +50,10 @@ No server, no account, nothing leaves your computer.
 | **Gemini CLI** · **Windsurf** · others | A few lines in the agent's MCP config | |
 | **ChatGPT** · **Gemini** · **claude.ai** in a browser | **Copy for any chat** in the app: a process or skill as text to paste | Read-only. These chats cannot run a local server, so they cannot save corrections back |
 
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=loam&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImxvYW0tbWNwIiwiLS1mb2xkZXIiLCJ%2BL0xvYW0iXX0%3D)
+
+That button is for Mac and Linux with your folder at `~/Loam`. For another folder, or on Windows, use the app's **Connect your agent** screen. An AI agent that installs servers for you (Cline, for example) can follow [llms-install.md](llms-install.md).
+
 The app's **Connect your agent** screen writes the exact command or config for your agent and your folder (Mac, Windows and Linux), and the [install guide](https://loam.dev/install) shows them step by step. Agents other than Claude Desktop need [Node](https://nodejs.org) 22 or newer; check with `node --version`.
 
 **3. Tell your agent:** `Run my Loam onboarding interview`. Then ask for your work in plain words, for example `Do my weekly client report`.
@@ -56,7 +63,7 @@ The app's **Connect your agent** screen writes the exact command or config for y
 <details>
 <summary>Verify the download</summary>
 
-Every release publishes `loam.mcpb.sha256` next to the file and a GitHub build attestation:
+Every [release](https://github.com/YeremeyevTimofey/Loam/releases) publishes `loam.mcpb.sha256` next to the file and a GitHub build attestation:
 
 ```bash
 shasum -a 256 loam.mcpb          # compare with loam.mcpb.sha256
@@ -78,25 +85,25 @@ The demo is a fictional account manager, Sarah, at a 20-person marketing agency.
 
 | Claim | How it is checked |
 |---|---|
-| Your data never leaves your machine | The app page ships a Content-Security-Policy with `connect-src 'none'`; tests record every request; a static audit finds no network calls in the app, the server or the core |
+| Your data never leaves your machine | The app page ships a Content-Security-Policy with `connect-src 'none'`; tests record every request; a static audit ([`scripts/check-rules.mjs`](scripts/check-rules.mjs)) finds no network calls in the app, the server or the core |
 | No account, no server | The site is static files; there is no backend dependency |
-| Other people's skills are checked | One scanner, shared by the app and the server, tested against malicious skills for every red category, look-alike letters, hidden characters and more |
+| Other people's skills are checked | One scanner ([`scanner.ts`](packages/loam-core/src/scanner.ts)), shared by the app and the server, tested against [malicious skills](packages/loam-core/test/fixtures/malicious) for every red category, look-alike letters, hidden characters and more |
 | A review never grants anything | The agent's verdict is information only; it is not used in any access decision |
-| "Copy for any chat" is one-way | It shows the exact text first, flags anything that looks like a key or a password, wraps imported skills as data, and a static rule forbids any write in that code |
-| The extension only touches your folder | Paths are normalised and checked again through symlinks; tests try `../`, absolute paths and links |
+| "Copy for any chat" is one-way | It shows the exact text first, flags anything that looks like a key or a password, wraps imported skills as data, and a static rule forbids any write in that code ([`chat-context.ts`](packages/loam-core/src/chat-context.ts)) |
+| The extension only touches your folder | Paths are normalised and checked again through symlinks ([`node-store.ts`](apps/mcp-server/src/node-store.ts)); tests try `../`, absolute paths and links |
 
-Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Found a hole in the scanner? Please read [SECURITY.md](SECURITY.md).
+Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#privacy-each-claim-and-how-it-is-checked). Found a hole in the scanner? Please read [SECURITY.md](SECURITY.md) and [report it privately](https://github.com/YeremeyevTimofey/Loam/security/advisories/new).
 
 ## Repository
 
-```
-apps/web/          landing page, install guide, the app (React), sample knowledge base, starter skills
-apps/mcp-server/   the MCP server, packed as loam.mcpb (Claude Desktop) and as the npm package loam-mcp
-packages/loam-core/  schema, scanner, lint, skill generation: shared by the app and the server
-e2e/  scripts/     browser tests (Chromium, Firefox, WebKit) and build tooling
-docs/              architecture, development, publishing, acceptance criteria
-site.config.json   every address (domain, repository, package name) in one place
-```
+| Folder | What is in it |
+|---|---|
+| [`apps/web/`](apps/web) | landing page, install guide, the app (React), [sample knowledge base](apps/web/src/demo-data/kb), [starter skills](apps/web/src/starter-skills) |
+| [`apps/mcp-server/`](apps/mcp-server) | the MCP server, packed as `loam.mcpb` (Claude Desktop) and as the npm package [`loam-mcp`](https://www.npmjs.com/package/loam-mcp) |
+| [`packages/loam-core/`](packages/loam-core) | schema, scanner, lint, skill generation: shared by the app and the server |
+| [`e2e/`](e2e) · [`scripts/`](scripts) | browser tests (Chromium, Firefox, WebKit) and build tooling |
+| [`docs/`](docs) | architecture, development, publishing, acceptance criteria |
+| [`site.config.json`](site.config.json) | every address (domain, repository, package name) in one place |
 
 Quick start for developers (Node 22+):
 
@@ -107,6 +114,12 @@ npm run verify       # types, tests, build, rules audit, both packages, browser 
 ```
 
 More: [development guide](docs/DEVELOPMENT.md) · [architecture](docs/ARCHITECTURE.md) · [publishing](docs/PUBLISHING.md) · [acceptance criteria](docs/acceptance.md) · [contributing](CONTRIBUTING.md).
+
+## Help
+
+- **Something not working, or an idea?** [Open an issue](https://github.com/YeremeyevTimofey/Loam/issues) and say which agent and which computer you use.
+- **A security problem?** [Report it privately](https://github.com/YeremeyevTimofey/Loam/security/advisories/new); please do not open a public issue for something exploitable.
+- **Want to contribute?** Read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
 ## License
 

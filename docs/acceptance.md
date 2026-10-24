@@ -86,3 +86,24 @@ For a chat that cannot run Loam (ChatGPT, Gemini or claude.ai in a browser): a p
 | Works in every browser, on a phone, by keyboard, accessibly | ✅ | `e2e/chat`: download in Chromium, Firefox and WebKit; 375 px without sideways scroll and 44 px targets; Escape returns focus; axe on the open dialog |
 | 🟡 The text works well in ChatGPT, Gemini and claude.ai | 🟡 | The layout follows each vendor's published prompting guidance (long context first, task last, tagged examples, rules stated once). **No real chat was used here**: how each one treats the text is theirs |
 
+## Added in the "links to GitHub" round
+
+| Claim | Status | Evidence |
+|---|---|---|
+| Every page and screen points to the repository, its issues, its licence and the files that back each promise | ✅ | `e2e/links`: landing (code, how each promise is checked, the skill checker, security policy, footer), install guide (releases and checksum, the extension source, issues), the not-found page, the app's start screen and every demo screen (footer; docs links on Skills and Health), the connect screen (releases next to the download, issues) |
+| A link into the repository never goes dead | ✅ | `check:rules`: every `{{file:…}}` / `{{dir:…}}`, `repoFile` / `repoDir`, link in the built pages, and relative or typed-out link in README, SECURITY, CONTRIBUTING and `docs/` must point at a file, folder or `#heading` that exists (mutation-tested: a typo, a folder used as a file, a wrong heading, a broken README link, a fork's address, a link without a new tab) |
+| One source for the address | ✅ | owner, repo and branch live in `site.config.json`; `REPO_URL`, the root `package.json` and the hand-written markdown and yaml are checked against it |
+| Links out of the app open in a new tab and make no request | ✅ | `e2e/links`: `target="_blank"` + `rel="noopener noreferrer"`, a screen-reader hint, 44 px targets; the page requests nothing; a click opens the address in another tab and the app stays where it was |
+| The server and the packages say where the source is | ✅ | `--help` and a failed `--check` print the repository and issues addresses (set when the server is built; `e2e/npm-package` runs the packed tarball); the npm README and the extension manifest link the repository, issues and documentation; the README Loam writes into a new folder says where to get help |
+
+## Added in the "listings and launch" round
+
+| Claim | Status | Evidence |
+|---|---|---|
+| The description for the official MCP Registry is valid and agrees with the npm package | ✅ | `scripts/test/registry.test.ts` validates `server.json` against the registry's own schema (saved in `scripts/test/fixtures`; mutation-tested: a too-long description, a wrong version, a field the schema does not know); `e2e/npm-package` checks that the staged file matches the package's `mcpName`, name and version, and is not inside the tarball |
+| 🟡 The registry accepts it | 🟡 | Needs the package on npm and a GitHub sign-in as the owner. Steps in `docs/PUBLISHING.md`. The registry is a preview, so the schema may change |
+| The "Add to Cursor" button works on GitHub and installs what the app installs | ✅ / 🟡 | `apps/web/test/agents`: the README link is https (GitHub drops `cursor://`), and its config equals `serverCommand` for `~/Loam`. Clicking it in a real Cursor was not done |
+| `llms-install.md` is generated and shows the same command as the app | ✅ | generated with the README from `docs/templates`; `check:rules` fails if it is stale; `apps/web/test/agents` compares its JSON with `serverCommand`. Whether Cline follows it was not tried |
+| A click on `/download/loam.mcpb` on a local dev server does not end in a GitHub 404 | ✅ | `e2e/dev-download`: the extension built on this computer is served as a download named `loam.mcpb`, or a plain message says how to build it; the preview server still redirects (`e2e/agents`) |
+| The launch checklist links are real | ✅ | `check:rules`: every relative link and `#heading` in `docs/` exists |
+
