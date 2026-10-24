@@ -1,6 +1,6 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { isKnowledgeBase } from '@loam/core';
-import { parseCli, USAGE } from './cli';
+import { parseCli, REPO, USAGE } from './cli';
 import { createContext } from './context';
 import { createLoamServer, SERVER_VERSION } from './server';
 
@@ -37,6 +37,7 @@ if (cli.kind === 'check') {
     lines.push(`Folder: ${ctx.problem}`);
     ok = false;
   }
+  if (!ok && REPO) lines.push(`Still stuck? Tell us which agent and computer you use: ${REPO}/issues`);
   process.stdout.write(`${lines.join('\n')}\n`);
   ctx.ready?.search.close();
   process.exit(ok ? 0 : 1);

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { chmodSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { parse as parseToml } from 'smol-toml';
@@ -131,5 +131,30 @@ describe('what people paste as a folder path', () => {
     expect(detectOs('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 'MacIntel')).toBe('mac');
     expect(detectOs('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Win32')).toBe('windows');
     expect(detectOs('Mozilla/5.0 (X11; Linux x86_64)', 'Linux x86_64')).toBe('linux');
+  });
+});
+
+describe('the static buttons and files outside the app agree with the app', () => {
+  const root = path.resolve(__dirname, '../../..');
+
+  it('the "Add to Cursor" button in the README installs exactly what the app would for ~/Loam, through an https address GitHub keeps', () => {
+    const readme = readFileSync(path.join(root, 'README.md'), 'utf8');
+    const m = /\]\((https:\/\/cursor\.com\/install-mcp\?name=([^&)]+)&config=([^)\s]+))\)/.exec(readme);
+    expect(m, 'the README has an Add to Cursor link').toBeTruthy();
+    expect(m![2]).toBe('loam');
+    const config = JSON.parse(Buffer.from(decodeURIComponent(m![3]!), 'base64').toString('utf8'));
+    expect(config).toEqual(serverCommand({ os: 'mac', npmPackage: PKG, folder: '~/Loam' }));
+    expect(readme).not.toContain('cursor://'); // GitHub removes links that are not http(s)
+    // the app's own link carries the same config
+    const appLink = block('cursor', 'link', '~/Loam').href!;
+    expect(appLink).toContain(`config=${m![3]}`);
+  });
+
+  it('llms-install.md (for agents such as Cline) shows the same start command as the app', () => {
+    const text = readFileSync(path.join(root, 'llms-install.md'), 'utf8');
+    const json = /```json\n([\s\S]*?)```/.exec(text)![1]!.replace('<FULL PATH OF THE LOAM FOLDER>', '/Users/sarah/Loam');
+    const entry = JSON.parse(json).mcpServers.loam;
+    expect(entry).toMatchObject(serverCommand({ os: 'mac', npmPackage: PKG, folder: '/Users/sarah/Loam' }));
+    expect(text).toContain('--check --folder');
   });
 });

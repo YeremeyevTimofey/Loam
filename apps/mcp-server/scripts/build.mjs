@@ -2,6 +2,7 @@ import { build } from 'esbuild';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { site } from '../../../scripts/lib/site-node.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 mkdirSync(path.join(root, 'dist/server'), { recursive: true });
@@ -19,7 +20,8 @@ await build({
   // Some bundled CommonJS packages call require() for Node built-ins.
   // The first line makes the file runnable as a command (npx loam-mcp). The second gives bundled CommonJS code require().
   banner: { js: "#!/usr/bin/env node\nimport { createRequire as __loamRequire } from 'node:module'; const require = __loamRequire(import.meta.url);" },
-  define: { 'process.env.LOAM_VERSION': JSON.stringify(version) },
+  // The version and the repository address are fixed at build time (the address comes from site.config.json).
+  define: { 'process.env.LOAM_VERSION': JSON.stringify(version), 'process.env.LOAM_REPO': JSON.stringify(site.githubUrl) },
   legalComments: 'none',
   // gray-matter contains an eval-based JavaScript front-matter engine. Loam replaces every engine
   // except YAML at runtime (packages/loam-core/src/frontmatter.ts), so it is dead code.

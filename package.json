@@ -2,8 +2,16 @@
   "name": "loam",
   "version": "0.1.0",
   "private": true,
-  "description": "Loam \u2014 work context for AI agents",
+  "description": "Loam — work context for AI agents",
   "license": "MIT",
+  "homepage": "https://loam.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YeremeyevTimofey/Loam.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YeremeyevTimofey/Loam/issues"
+  },
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -32,6 +40,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@types/node": "^22.19.0",
+    "ajv": "^8.20.0",
     "playwright": "^1.64.0",
     "smol-toml": "^1.9.1",
     "tsx": "^4.23.15",

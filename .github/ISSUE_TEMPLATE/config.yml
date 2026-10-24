@@ -3,3 +3,6 @@ contact_links:
   - name: Security problem
     url: https://github.com/YeremeyevTimofey/Loam/security/advisories/new
     about: Please report vulnerabilities privately (see SECURITY.md).
+  - name: Setting up an agent
+    url: https://github.com/YeremeyevTimofey/Loam/blob/main/README.md#get-started
+    about: Commands and configs for Claude Desktop, Claude Code, Cursor, Codex, VS Code, Gemini CLI and more.

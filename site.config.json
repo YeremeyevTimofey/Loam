@@ -3,7 +3,8 @@
   "siteUrl": "https://loam.dev",
   "github": {
     "owner": "YeremeyevTimofey",
-    "repo": "Loam"
+    "repo": "Loam",
+    "branch": "main"
   },
   "npmPackage": "loam-mcp",
   "contactEmail": "hello@loam.dev",

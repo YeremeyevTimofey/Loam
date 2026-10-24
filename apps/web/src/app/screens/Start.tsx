@@ -2,6 +2,7 @@ import { applyPlan, isKnowledgeBase, planScaffold, todayIso, type KbStore } from
 import { FolderOpen } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Wordmark } from '../components/Logo';
+import { SiteFooter } from '../components/SiteFooter';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { FsStore } from '../store/FsStore';
@@ -74,83 +75,86 @@ export function StartScreen({ onOpen }: { onOpen: (store: KbStore) => void }) {
   };
 
   return (
-    <main className="gutter flex min-h-screen flex-col py-6">
-      <Wordmark className="mx-auto mb-10 w-full max-w-[var(--wide)] md:mb-16" />
-      <div className="measure appear flex-1">
-        <h1 className="t-h1 mb-4">Choose a folder for your knowledge base</h1>
-        <p className="mb-3">
-          Loam keeps what your AI assistant needs to know about your work in a folder on your computer. Pick an empty folder, or the one you used before, and Loam sets it up.
-        </p>
-        <p className="mb-3">Nothing is uploaded. This page has no server and no account; it only reads and writes the folder you choose.</p>
-        <p className="mb-8">When you are done, you connect the folder to your agent and let it interview you about your day.</p>
+    <div className="flex min-h-screen flex-col">
+      <main className="gutter flex flex-1 flex-col py-6">
+        <Wordmark className="mx-auto mb-10 w-full max-w-[var(--wide)] md:mb-16" />
+        <div className="measure appear flex-1">
+          <h1 className="t-h1 mb-4">Choose a folder for your knowledge base</h1>
+          <p className="mb-3">
+            Loam keeps what your AI assistant needs to know about your work in a folder on your computer. Pick an empty folder, or the one you used before, and Loam sets it up.
+          </p>
+          <p className="mb-3">Nothing is uploaded. This page has no server and no account; it only reads and writes the folder you choose.</p>
+          <p className="mb-8">When you are done, you connect the folder to your agent and let it interview you about your day.</p>
 
-        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap">
-          {remembered ? (
-            <>
-              <Button onClick={() => void continueWith()} disabled={busy}>
-                <FolderOpen size={20} aria-hidden /> Continue with {remembered.handle.name}
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap">
+            {remembered ? (
+              <>
+                <Button onClick={() => void continueWith()} disabled={busy}>
+                  <FolderOpen size={20} aria-hidden /> Continue with {remembered.handle.name}
+                </Button>
+                <Button variant="secondary" onClick={() => void choose()} disabled={busy}>
+                  Choose a different folder
+                </Button>
+              </>
+            ) : (
+              <Button onClick={() => void choose()} disabled={busy || !checked}>
+                <FolderOpen size={20} aria-hidden /> Choose folder
               </Button>
-              <Button variant="secondary" onClick={() => void choose()} disabled={busy}>
-                Choose a different folder
-              </Button>
-            </>
-          ) : (
-            <Button onClick={() => void choose()} disabled={busy || !checked}>
-              <FolderOpen size={20} aria-hidden /> Choose folder
-            </Button>
-          )}
+            )}
+          </div>
+
+          {error ? (
+            <p role="alert" className="mt-4 rounded-md bg-danger-soft p-3 text-[15px] text-danger">
+              {error}
+            </p>
+          ) : null}
+
+          <p className="t-secondary mt-8">
+            Works in Chrome and Edge on a computer. To connect your AI agent (Claude, Cursor, Codex, VS Code, Gemini and others) you also need that agent; the{' '}
+            <a href="/install">install guide</a> shows how. Just looking?{' '}
+            <a href="/app?demo=1">See a filled example instead</a>.
+          </p>
         </div>
 
-        {error ? (
-          <p role="alert" className="mt-4 rounded-md bg-danger-soft p-3 text-[15px] text-danger">
-            {error}
-          </p>
-        ) : null}
-
-        <p className="t-secondary mt-8">
-          Works in Chrome and Edge on a computer. To connect your AI agent (Claude, Cursor, Codex, VS Code, Gemini and others) you also need that agent; the{' '}
-          <a href="/install">install guide</a> shows how. Just looking?{' '}
-          <a href="/app?demo=1">See a filled example instead</a>.
-        </p>
-      </div>
-
-      <Dialog open={confirm !== null} onOpenChange={(o) => !o && setConfirm(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>This folder already has files</DialogTitle>
-            <DialogDescription>It is not a Loam knowledge base yet.</DialogDescription>
-          </DialogHeader>
-          <DialogBody>
-            <p className="mb-3">
-              Loam will add its own files here (README.md, AGENTS.md, profile.md and the folders processes, skills and context). It will not change or delete anything that is already in the folder.
-            </p>
-            <p className="t-secondary">If you would rather keep things separate, cancel and create a new folder, for example one called “Loam”.</p>
-          </DialogBody>
-          <DialogFooter>
-            <Button variant="secondary" onClick={() => setConfirm(null)}>
-              Cancel
-            </Button>
-            <Button
-              disabled={busy}
-              onClick={async () => {
-                const store = confirm;
-                if (!store) return;
-                setBusy(true);
-                try {
-                  await finish(store);
-                } catch (e) {
-                  setError(describePickerError(e));
-                  setConfirm(null);
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              Set up Loam here
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </main>
+        <Dialog open={confirm !== null} onOpenChange={(o) => !o && setConfirm(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>This folder already has files</DialogTitle>
+              <DialogDescription>It is not a Loam knowledge base yet.</DialogDescription>
+            </DialogHeader>
+            <DialogBody>
+              <p className="mb-3">
+                Loam will add its own files here (README.md, AGENTS.md, profile.md and the folders processes, skills and context). It will not change or delete anything that is already in the folder.
+              </p>
+              <p className="t-secondary">If you would rather keep things separate, cancel and create a new folder, for example one called “Loam”.</p>
+            </DialogBody>
+            <DialogFooter>
+              <Button variant="secondary" onClick={() => setConfirm(null)}>
+                Cancel
+              </Button>
+              <Button
+                disabled={busy}
+                onClick={async () => {
+                  const store = confirm;
+                  if (!store) return;
+                  setBusy(true);
+                  try {
+                    await finish(store);
+                  } catch (e) {
+                    setError(describePickerError(e));
+                    setConfirm(null);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                Set up Loam here
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

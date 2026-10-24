@@ -1,6 +1,9 @@
 import os from 'node:os';
 
-export const USAGE = `Loam MCP server — gives your AI agent access to your Loam knowledge base.
+/** The repository address is set when the server is built; from source (tests) there is none, and the line is left out. */
+export const REPO = process.env.LOAM_REPO;
+
+export const usage = (repo: string | undefined = REPO): string => `Loam MCP server — gives your AI agent access to your Loam knowledge base.
 
 Usage:
   loam-mcp --folder <path>     Start the server for the folder you set up in the Loam app
@@ -9,7 +12,9 @@ Usage:
   loam-mcp --version | --help
 
 The folder can also be given with the LOAM_FOLDER environment variable.
-Your agent starts this server for you: add it to the agent's MCP settings (Loam app → Connect your agent).`;
+Your agent starts this server for you: add it to the agent's MCP settings (Loam app → Connect your agent).${repo ? `\n\nSource, documentation and issues: ${repo}` : ''}`;
+
+export const USAGE = usage();
 
 export type Cli =
   | { kind: 'run'; folder: string | undefined }

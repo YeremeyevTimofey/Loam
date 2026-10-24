@@ -9,6 +9,8 @@ npm run dev              # Vite dev server: landing /, install guide /install, a
 
 Open `/app?demo=1` for the sample knowledge base (any browser), or `/app` in Chrome or Edge for a real folder.
 
+The download address `/download/loam.mcpb` goes to GitHub Releases on the real site, and there is no release until you publish one (GitHub answers "404"). The dev server therefore hands out the extension you built with `npm run pack:mcpb` instead, and tells you how to build it if it is missing. `npm run preview` behaves like the real host and always redirects.
+
 ## Commands
 
 | Command | What it does |
@@ -18,10 +20,10 @@ Open `/app?demo=1` for the sample knowledge base (any browser), or `/app` in Chr
 | `npm run build` | `apps/web/dist`: landing, install guide, app, 404, service worker, `_headers`, `_redirects` |
 | `npm run check:rules` | Static audit of the spec's rules on source and on built files (needs `npm run build`) |
 | `npm run pack:mcpb` | `apps/mcp-server/dist/loam.mcpb`, the Claude Desktop extension |
-| `npm run pack:npm` | `apps/mcp-server/dist/npm-out/loam-mcp-<version>.tgz`, the npm package for every other agent |
+| `npm run pack:npm` | `apps/mcp-server/dist/npm-out/loam-mcp-<version>.tgz`, the npm package for every other agent, and `dist/npm/server.json` for the MCP Registry |
 | `npm run test:e2e` | Builds, then drives Chromium, Firefox and WebKit against the build; also installs the npm tarball with `npx` and talks to it over MCP (needs network) |
 | `npm run demo:build` | Regenerates the derived files of the sample base and `summary.json` (a test fails if they drift) |
-| `npm run readme` | Regenerates `README.md` from `docs/templates/README.md.tmpl` |
+| `npm run readme` | Regenerates `README.md` and `llms-install.md` from `docs/templates/*.tmpl` |
 | `npm run assets` · `npm run screenshots` | Brand files; landing and install images |
 | `npm run verify` | Everything above, in order |
 
@@ -44,6 +46,7 @@ scripts/                    demo data, assets, screenshots, rules audit, README 
 ## Changing things
 
 - **An address** (domain, repository, package name, contact): edit `site.config.json`, then `npm run readme && npm run build`.
+- **A link into the repository** (a file, a folder or a heading on GitHub): in the pages write `{{file:docs/ARCHITECTURE.md#context-lint}}` or `{{dir:apps/mcp-server}}`; in the app use `repoFile('…')` / `repoDir('…')` from `lib/links.ts`; in `README.md.tmpl` and the other markdown files use ordinary relative links. All of them are built from `site.config.json` (owner, repo, branch) and `npm run check:rules` fails if one points at a file, folder or heading that does not exist. The few addresses typed by hand in markdown and yaml (`CONTRIBUTING.md`, `SECURITY.md`, `.github/ISSUE_TEMPLATE/config.yml`) are checked against the config too.
 - **The interview**: `packages/loam-core/src/interview.ts`. Users get it through *Redo interview → Update interview script*; the server reads the copy in their folder.
 - **Starter skills**: `apps/web/src/starter-skills/*.md`. They must pass the scanner with no flags (a test checks).
 - **The sample base**: edit the authored files in `apps/web/src/demo-data/kb/` (profile, process, corrections, examples, context, the imported skill), then `npm run demo:build`. Keep it believable.

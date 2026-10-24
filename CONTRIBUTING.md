@@ -5,7 +5,7 @@ Thank you for helping. Loam is small on purpose: a change should be traceable to
 ## Before you start
 
 - Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (what is built and why) and [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) (commands).
-- For anything bigger than a fix, open an issue first to agree on the idea.
+- For anything bigger than a fix, [open an issue](https://github.com/YeremeyevTimofey/Loam/issues) first to agree on the idea.
 - The ground rules are not negotiable, and `npm run check:rules` enforces most of them: no server, no accounts, no LLM calls inside the product, no tracking in the app, no network requests, no external fonts or scripts, no colours outside `tokens.css`, and nothing that weakens the skill security model.
 
 ## Making a change
@@ -24,4 +24,4 @@ npm run verify     # types, tests, build, rules audit, both packages, browser te
 
 ## Pull requests
 
-Describe what changed and why, and say which checks you ran. Small, focused pull requests are merged fastest.
+Describe what changed and why, and say which checks you ran (the [pull request template](.github/PULL_REQUEST_TEMPLATE.md) lists them). Found a security problem instead? Please [report it privately](https://github.com/YeremeyevTimofey/Loam/security/advisories/new). Small, focused pull requests are merged fastest.

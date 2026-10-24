@@ -1,4 +1,4 @@
-import { APP_URL, PLACEHOLDER } from './constants';
+import { APP_URL, PLACEHOLDER, REPO_URL } from './constants';
 import { stringifyDoc } from './frontmatter';
 
 /** CLAUDE.md and GEMINI.md are one line each: the agent follows AGENTS.md. (Codex, Cursor, Copilot and Windsurf read AGENTS.md directly.) */
@@ -29,6 +29,8 @@ After that, ask your agent for your recurring work in plain words, for example \
 - \`CLAUDE.md\`, \`GEMINI.md\` — one line each, pointing the agent to \`AGENTS.md\`
 
 You never need to edit these files by hand. The Loam app shows every change before it is saved and keeps the old version in \`.loam/history\`.
+
+Questions or problems? The source, the documentation and the place to report an issue are at ${REPO_URL}.
 `;
 
 export function ownerLabel(who: { name?: string; role?: string } = {}): string {

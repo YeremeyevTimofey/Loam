@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { createReadStream, existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
@@ -113,9 +113,15 @@ self.addEventListener('fetch', (event) => {
 /**
  * Static hosts (Cloudflare Pages) send /app to /app/ (keeping the query) and the download address to the file in GitHub
  * Releases (see `_redirects`, written below). The dev and preview servers do the same, so every link can be tried locally.
+ *
+ * One difference, in the dev server only: until a release exists GitHub answers that address with "404", so a local click
+ * would lead nowhere. The dev server hands out the extension built on this computer instead (`npm run pack:mcpb`), or says
+ * how to make it. The preview server, which stands in for the real host, always redirects (a test relies on that).
  */
 function localRedirects(): Plugin {
-  const redirect = (req: { url?: string }, res: { statusCode: number; setHeader(k: string, v: string): void; end(): void }, next: () => void) => {
+  type Res = { statusCode: number; setHeader(k: string, v: string | number): void; end(body?: string): void };
+  const isDownload = (url: string) => url === site.download.path || url.startsWith(`${site.download.path}?`);
+  const redirect = (req: { url?: string }, res: Res, next: () => void) => {
     const url = req.url ?? '';
     if (url === '/app' || url.startsWith('/app?')) {
       res.statusCode = 308;
@@ -123,7 +129,7 @@ function localRedirects(): Plugin {
       res.end();
       return;
     }
-    if (url === site.download.path || url.startsWith(`${site.download.path}?`)) {
+    if (isDownload(url)) {
       res.statusCode = 302;
       res.setHeader('Location', site.releaseDownloadUrl);
       res.end();
@@ -131,9 +137,24 @@ function localRedirects(): Plugin {
     }
     next();
   };
+  const localBuild = process.env.LOAM_DEV_MCPB ?? path.resolve(here, '../mcp-server/dist', site.download.asset);
+  const serveLocalBuild = (req: { url?: string }, res: Res & NodeJS.WritableStream, next: () => void) => {
+    if (!isDownload(req.url ?? '')) return redirect(req, res, next);
+    if (!existsSync(localBuild)) {
+      res.statusCode = 404;
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.end(`There is no ${site.download.asset} on this computer yet.\nBuild it with: npm run pack:mcpb\nOn the real site this address goes to the newest release on GitHub (${site.releaseDownloadUrl}); until you publish a release, that page says "404".\n`);
+      return;
+    }
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Length', statSync(localBuild).size);
+    res.setHeader('Content-Disposition', `attachment; filename="${site.download.asset}"`);
+    createReadStream(localBuild).pipe(res);
+  };
   return {
     name: 'loam-local-redirects',
-    configureServer: (server) => void server.middlewares.use(redirect),
+    configureServer: (server) => void server.middlewares.use(serveLocalBuild),
     configurePreviewServer: (server) => void server.middlewares.use(redirect),
   };
 }
@@ -153,7 +174,7 @@ function hostingFiles(): Plugin {
 }
 
 /**
- * Fills {{placeholders}} in the three HTML pages: addresses from site.config.json, and the numbers and story of the
+ * Fills {{placeholders}} in the HTML pages: addresses from site.config.json, and the numbers and story of the
  * sample knowledge base (summary.json, written by `npm run demo:build`), so the page cannot promise anything the
  * product does not show.
  */
@@ -168,6 +189,8 @@ function siteValues(): Plugin {
     siteUrl: site.siteUrl,
     githubUrl: site.githubUrl,
     issuesUrl: site.issuesUrl,
+    releasesUrl: site.releasesUrl,
+    securityUrl: site.securityUrl,
     contactEmail: site.contactEmail,
     author: site.author,
     analyticsDomain: site.analytics.domain,
@@ -179,7 +202,14 @@ function siteValues(): Plugin {
   };
   return {
     name: 'loam-site-values',
-    transformIndexHtml: { order: 'pre', handler: (html) => html.replace(/\{\{(\w+)\}\}/g, (m, key: string) => values[key] ?? m) },
+    transformIndexHtml: {
+      order: 'pre',
+      handler: (html) =>
+        html
+          // {{file:docs/ARCHITECTURE.md#heading}} and {{dir:apps/mcp-server}}: links into the repository, built from site.config.json
+          .replace(/\{\{(file|dir):([^}\s]+)\}\}/g, (_m, kind: string, target: string) => (kind === 'file' ? site.fileUrl(target) : site.dirUrl(target)))
+          .replace(/\{\{(\w+)\}\}/g, (m, key: string) => values[key] ?? m),
+    },
   };
 }
 

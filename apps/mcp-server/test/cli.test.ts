@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCli, resolveFolderInput } from '../src/cli';
+import { parseCli, resolveFolderInput, usage } from '../src/cli';
 
 describe('command line of the server (how every agent except Claude Desktop starts it)', () => {
   it('reads --folder in all the forms agents and people write it', () => {
@@ -31,5 +31,11 @@ describe('command line of the server (how every agent except Claude Desktop star
     expect(parseCli(['--folder'])).toMatchObject({ kind: 'error', message: expect.stringContaining('needs a path') });
     expect(parseCli(['--folder', '--check'])).toMatchObject({ kind: 'error' });
     expect(parseCli(['--bogus'])).toMatchObject({ kind: 'error', message: 'Unknown option "--bogus".' });
+  });
+
+  it('points to the repository in --help when the build knows it, and says nothing otherwise', () => {
+    expect(usage('https://github.com/owner/repo')).toMatch(/\n\nSource, documentation and issues: https:\/\/github\.com\/owner\/repo$/);
+    expect(usage(undefined)).not.toMatch(/github|issues/i);
+    expect(usage(undefined)).toContain('Connect your agent');
   });
 });

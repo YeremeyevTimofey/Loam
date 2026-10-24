@@ -48,6 +48,7 @@
               <p class="mb-5">
                 <a id="download" href="{{downloadPath}}" class="plausible-event-name=Download+Extension inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 font-medium leading-none text-on-accent no-underline transition-colors duration-150 hover:bg-accent-hover hover:no-underline">Download loam.mcpb</a>
               </p>
+              <p class="t-secondary mb-5">Every version, with its checksum, is on the <a href="{{releasesUrl}}">releases page</a>.</p>
               <img src="/shots/install-1-download.png" width="1200" height="800" alt="Illustration: the download button and the saved loam.mcpb file in the Downloads folder" class="h-auto w-full rounded-lg border border-line" loading="lazy" decoding="async" />
             </li>
             <li>
@@ -75,12 +76,12 @@
           <h2 id="done-h" class="t-h3 mb-2">Check that it works</h2>
           <p class="mb-3">Start a new chat in your agent and type:</p>
           <p class="mb-3"><code class="inline-block rounded-md border border-line bg-bg px-3 py-2">Run my Loam onboarding interview</code></p>
-          <p class="t-secondary">Your agent should start asking about your role and your day. If it doesn’t, check that Loam is switched on in the agent’s MCP settings and that the folder is the right one. Terminal users can run <code>npx -y {{npmPackage}} --check --folder &lt;your folder&gt;</code>, which says what is wrong in plain words.</p>
+          <p class="t-secondary">Your agent should start asking about your role and your day. If it doesn’t, check that Loam is switched on in the agent’s MCP settings and that the folder is the right one. Terminal users can run <code>npx -y {{npmPackage}} --check --folder &lt;your folder&gt;</code>, which says what is wrong in plain words. Still stuck? <a href="{{issuesUrl}}">Tell us on GitHub</a> which agent and which computer you use.</p>
         </section>
 
         <section class="mt-10" aria-labelledby="privacy-h">
           <h2 id="privacy-h" class="t-h3 mb-2">What it can and can’t do</h2>
-          <p>It only reads and writes inside the folder you chose. It makes no network requests, and the code is <a href="{{githubUrl}}">open on GitHub</a>. Your agent only changes your files when you ask it to, and it shows you what changed.</p>
+          <p>It only reads and writes inside the folder you chose. It makes no network requests, and the code is <a href="{{githubUrl}}">open on GitHub</a> (the part that runs on your computer is in <a href="{{dir:apps/mcp-server}}">apps/mcp-server</a>). Your agent only changes your files when you ask it to, and it shows you what changed.</p>
         </section>
 
         <p class="mt-10"><a href="/app">Back to the Loam app</a></p>

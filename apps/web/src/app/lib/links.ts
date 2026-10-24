@@ -7,6 +7,11 @@ export const site = resolveSite(config);
 /** The extension for Claude Desktop. Our own address; it redirects to the file in GitHub Releases. */
 export const MCPB_URL = site.download.path;
 export const REPO_URL = site.githubUrl;
+export const ISSUES_URL = site.issuesUrl;
+export const RELEASES_URL = site.releasesUrl;
+/** A file or folder of the repository on GitHub. The path must exist: `npm run check:rules` checks every call. */
+export const repoFile = (path: string): string => site.fileUrl(path);
+export const repoDir = (path: string): string => site.dirUrl(path);
 export const NPM_PACKAGE = site.npmPackage;
 export const INTERVIEW_COMMAND = 'Run my Loam onboarding interview';
 

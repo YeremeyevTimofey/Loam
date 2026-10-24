@@ -1,5 +1,5 @@
 import { execFile, execFileSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -9,6 +9,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { applyPlan, planScaffold } from '../packages/loam-core/src';
 import { NodeStore } from '../apps/mcp-server/src/node-store';
 import { REPO } from './harness';
+
+const { site } = (await import('../scripts/lib/site-node.mjs')) as { site: import('../scripts/lib/site.d.mts').Site };
 
 const run = promisify(execFile);
 let tarball: string;
@@ -39,10 +41,24 @@ const npx = (args: string[], env: Record<string, string> = {}) =>
   );
 
 describe('the loam-mcp npm package', () => {
+  it('stages the description for the official MCP Registry beside the package, agreeing with it, and leaves it out of the package', () => {
+    const stage = path.join(REPO, 'apps/mcp-server/dist/npm');
+    const server = JSON.parse(readFileSync(path.join(stage, 'server.json'), 'utf8'));
+    const pkg = JSON.parse(readFileSync(path.join(stage, 'package.json'), 'utf8'));
+    expect(server.name).toBe(pkg.mcpName);
+    expect(server.version).toBe(pkg.version);
+    expect(server.packages[0]).toMatchObject({ registryType: 'npm', identifier: pkg.name, version: pkg.version, transport: { type: 'stdio' } });
+    expect(server.repository.url).toBe(site.githubUrl);
+    const inTarball = execFileSync('tar', ['-tzf', tarball]).toString();
+    expect(inTarball).not.toContain('server.json');
+    expect(inTarball).toContain('package/index.mjs');
+  });
+
   it('prints help and its version', async () => {
     const help = await npx(['--help']);
     expect(help.code).toBe(0);
     expect(help.out).toContain('loam-mcp --folder <path>');
+    expect(help.out).toContain(`Source, documentation and issues: ${site.githubUrl}`);
     const version = await npx(['--version']);
     expect(version.out.trim()).toBe(JSON.parse(execFileSync('node', ['-p', "JSON.stringify(require('./apps/mcp-server/manifest.json'))"], { cwd: REPO }).toString()).version);
   });
@@ -53,12 +69,14 @@ describe('the loam-mcp npm package', () => {
     const bad = await npx(['--check', '--folder', empty]);
     expect(bad.code).toBe(1);
     expect(bad.out).toMatch(/Loam knowledge base: NOT yet\. Open the Loam app/);
+    expect(bad.out).toContain(`Still stuck? Tell us which agent and computer you use: ${site.issuesUrl}`);
     const missing = await npx(['--check', '--folder', path.join(empty, 'nope')]);
     expect(missing.code).toBe(1);
     expect(missing.out).toMatch(/does not exist/);
     const good = await npx(['--check', '--folder', folder]);
     expect(good.code, good.out + good.err).toBe(0);
     expect(good.out).toContain('Loam knowledge base: yes');
+    expect(good.out).not.toContain('Still stuck?'); // only shown when something is wrong
     expect(good.out).toContain('SQLite full-text index (ok)');
     expect(good.out).toMatch(/Node 22\.|Node 2[3-9]\./);
   }, 240_000);

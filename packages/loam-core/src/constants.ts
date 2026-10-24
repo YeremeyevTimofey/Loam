@@ -82,3 +82,6 @@ export const NO_INVENTING =
 
 /** Where people open the app. Used in messages for people and agents. */
 export const APP_URL = 'https://loam.dev/app';
+
+/** The public repository: source, documentation and the place to report a problem. Checked against site.config.json by `npm run check:rules`. */
+export const REPO_URL = 'https://github.com/YeremeyevTimofey/Loam';

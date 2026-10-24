@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { mcpName, serverJson } from '../../../scripts/lib/registry.mjs';
 import { site } from '../../../scripts/lib/site-node.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,8 +37,8 @@ writeFileSync(
       homepage: site.siteUrl,
       repository: { type: 'git', url: `git+${site.githubUrl}.git` },
       bugs: { url: site.issuesUrl },
-      // Name used by the official MCP registry (io.github.<owner>/<name>).
-      mcpName: `io.github.${site.github.owner}/loam`,
+      // Name used by the official MCP registry (io.github.<owner>/<name>); server.json below carries the same name.
+      mcpName: mcpName(site),
       type: 'module',
       bin: { [site.npmPackage]: 'index.mjs' },
       files: ['index.mjs', 'README.md', 'LICENSE'],
@@ -48,6 +49,8 @@ writeFileSync(
     2,
   )}\n`,
 );
+// For `mcp-publisher publish` (docs/PUBLISHING.md). It is not part of the npm package: "files" above leaves it out.
+writeFileSync(path.join(stage, 'server.json'), `${JSON.stringify(serverJson({ site, version }), null, 2)}\n`);
 writeFileSync(
   path.join(stage, 'README.md'),
   `# ${site.npmPackage}
@@ -62,8 +65,8 @@ You normally do not run this yourself: add it to your agent's MCP settings. The 
 
 Options: \`--folder <path>\` (or \`LOAM_FOLDER\`), \`--check\` (diagnose Node, the folder and search), \`--version\`, \`--help\`. Requires Node 22 or newer.
 
-Source and issues: ${site.githubUrl} · MIT licence
+Source: ${site.githubUrl} · [Documentation](${site.fileUrl('docs/ARCHITECTURE.md')}) · [Report a problem](${site.issuesUrl}) · [Releases](${site.releasesUrl}) · MIT licence ([LICENSE](${site.fileUrl('LICENSE')}))
 `,
 );
 execFileSync('npm', ['pack', stage, '--pack-destination', outDir], { cwd: repo, stdio: 'inherit' });
-console.log(`\nPackage staged in ${path.relative(repo, stage)}; tarball in ${path.relative(repo, outDir)}`);
+console.log(`\nPackage staged in ${path.relative(repo, stage)} (with server.json for the MCP Registry); tarball in ${path.relative(repo, outDir)}`);

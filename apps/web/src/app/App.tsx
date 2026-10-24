@@ -2,6 +2,7 @@ import type { KbStore } from '@loam/core';
 import { useState } from 'react';
 import { DemoBanner } from './components/DemoBanner';
 import { Header } from './components/Header';
+import { SiteFooter } from './components/SiteFooter';
 import { AppProvider, useApp } from './context';
 import { Button } from './components/ui/button';
 import { FsStore } from './store/FsStore';
@@ -53,6 +54,7 @@ function Shell({ route }: { route: Route }) {
           <OverviewScreen />
         )}
       </main>
+      <SiteFooter />
     </>
   );
 }
