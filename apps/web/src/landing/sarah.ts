@@ -75,7 +75,7 @@ export function renderSarah(s: SarahSummary, links: { demo: string; processBase:
   <div class="wide">
     <p class="t-secondary mb-2">A fictional example, built from the sample knowledge base you can open yourself</p>
     <h2 id="sarah-h" class="t-h2 mb-4">Meet ${esc(first)}, an ${esc(s.persona.role.toLowerCase())}</h2>
-    <p class="mb-3 max-w-[720px]">${esc(first)} looks after six client accounts at ${esc(s.persona.company)}, a 20-person marketing agency. She answered Loam's interview once, in about 15 minutes. Everything below comes from the files that interview created, and every number is real: open her knowledge base to check.</p>
+    <p class="mb-3 max-w-[720px]">${esc(first)} looks after six client accounts at ${esc(s.persona.company)}, a 20-person marketing agency. She answered Loam's short interview once. Everything below comes from the files that interview created, and every number is real: open her knowledge base to check.</p>
     <p class="t-secondary mb-10 max-w-[720px]">Her tools: ${esc(s.persona.tools.join(', '))}.</p>
 
     <h3 class="t-h3 mb-3">1. The interview found five recurring processes</h3>

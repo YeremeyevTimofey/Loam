@@ -93,7 +93,8 @@ export const InterviewScript = z.object({
         questions: z.array(z.string()).min(1),
       }),
     )
-    .min(1),
+    // Scripts from before version 2 have branches (questions by kind of role); the current script has none.
+    .default([]),
   stages: z
     .array(
       z.object({

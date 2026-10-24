@@ -107,6 +107,10 @@ curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=loam"   # the
 
 For what to do next, to be found and starred, see [LAUNCH.md](LAUNCH.md).
 
+## The setup message for other agents
+
+People who use Cursor, Codex, Claude Code and the rest send their agent one message that points at `<site>/llms-install.md`. That file is built from `docs/templates/llms-install.md.tmpl` by `npm run readme` (three copies: the repository root, for GitHub and for installers such as Cline, and `apps/web/public`, which the site serves). It is deployed with the site, so after you change the template, run `npm run readme`, merge, and the next deploy updates what agents read. It names `loam-mcp` on npm: the message only works once the package is published (section 5).
+
 ## How the one-click download works
 
 The button on the site and in the app points to **`<your domain>/download/loam.mcpb`**. That address answers with a redirect (written to `_redirects`) to

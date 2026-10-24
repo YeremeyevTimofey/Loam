@@ -84,7 +84,7 @@ export function StartScreen({ onOpen }: { onOpen: (store: KbStore) => void }) {
             Loam keeps what your AI assistant needs to know about your work in a folder on your computer. Pick an empty folder, or the one you used before, and Loam sets it up.
           </p>
           <p className="mb-3">Nothing is uploaded. This page has no server and no account; it only reads and writes the folder you choose.</p>
-          <p className="mb-8">When you are done, you connect the folder to your agent and let it interview you about your day.</p>
+          <p className="mb-8">Then you connect the folder to your agent, and it asks you a few short questions about your work.</p>
 
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap">
             {remembered ? (

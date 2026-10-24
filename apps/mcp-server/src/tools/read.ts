@@ -17,10 +17,11 @@ import { z } from 'zod';
 import type { Ctx, Ready } from '../context';
 import { defineTool } from './define';
 
-const NOT_A_BASE = `This folder is not a Loam knowledge base yet. Ask the user to open ${APP_URL}, choose this same folder, and then try again.`;
+const notABase = (folder: string) =>
+  `This folder (${folder}) is not a Loam knowledge base yet. Ask the user whether to set it up here. If they agree, call loam_init with confirm: true, then offer to run the onboarding interview. (They can also set it up in the Loam app, in Chrome or Edge: ${APP_URL}.)`;
 
 export async function requireBase(ready: Ready): Promise<void> {
-  if (!(await isKnowledgeBase(ready.store))) throw new LoamError(NOT_A_BASE);
+  if (!(await isKnowledgeBase(ready.store))) throw new LoamError(notABase(ready.store.root));
 }
 
 const hoursText = (h: number | null) => (h === null ? 'hours/year unknown' : `~${h} h/year`);

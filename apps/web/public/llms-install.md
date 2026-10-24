@@ -1,0 +1,81 @@
+# Set up Loam (instructions for an AI agent)
+
+This file is for you, an AI agent. A person asked you to set up Loam for them. They are probably not technical: do the work yourself, one step at a time, ask before you change anything on their computer, and talk to them in their own language, in plain words, without jargon. If you are a person, read the [README](https://github.com/YeremeyevTimofey/Loam#readme) instead.
+
+## What Loam is
+
+Loam gives an AI agent the work context of one person: their profile, their recurring processes, examples of good results, and the corrections they made. It is a local MCP server (stdio) started with `npx`. It reads and writes **only one folder** that the person chose, and it makes no network requests.
+
+## 1. Check Node.js
+
+Run `node --version`. It must say 22 or newer, because the server and its search library need it.
+
+- If it is older, or missing: tell the person in one sentence why, and offer to install the current LTS version for them. Ask first, then use the normal way for their system (Homebrew on a Mac that has it, otherwise the installer from https://nodejs.org; `winget install OpenJS.NodeJS.LTS` on Windows). Do not go on until `node --version` says 22 or newer.
+
+## 2. Find the Loam folder
+
+The folder is the one that has a file `.loam/state.json` inside. Do not guess a path and do not make one up.
+
+1. Look for it in the places people keep things: Documents, Desktop, and the home folder, up to three levels down. For example on a Mac or Linux: `find ~/Documents ~/Desktop ~ -maxdepth 4 -path '*/.loam/state.json' 2>/dev/null`.
+2. **Exactly one found:** ask the person "Is this your Loam folder: `<path>`?" and go on after they say yes.
+3. **Several found:** list them and ask which one.
+4. **None found:** the person has not set one up yet. Suggest an empty folder called `Loam` in their Documents folder and create it only after they agree. Loam sets itself up in it the first time they use it: you will ask them, and then call `loam_init`.
+
+## 3. Add the server to your client
+
+The server starts with this command. Put the real folder path in, between quotes:
+
+```bash
+npx -y loam-mcp --folder "<FULL PATH OF THE LOAM FOLDER>"
+```
+
+Add it as a local (stdio) MCP server named `loam`, the way your own client does it. Show the person what you are about to add and ask before you write it. If a settings file already lists other servers, add only the `loam` entry and keep everything else as it is.
+
+The entry looks like this (on Windows use `"command": "cmd"` and start `args` with `"/c", "npx", "-y", …`):
+
+```json
+{
+  "mcpServers": {
+    "loam": {
+      "command": "npx",
+      "args": ["-y", "loam-mcp", "--folder", "<FULL PATH OF THE LOAM FOLDER>"]
+    }
+  }
+}
+```
+
+Where it goes, by client:
+
+| Client | How |
+|---|---|
+| Claude Code | `claude mcp add --transport stdio --scope user loam -- npx -y loam-mcp --folder "<FULL PATH OF THE LOAM FOLDER>"` |
+| Codex | `codex mcp add loam -- npx -y loam-mcp --folder "<FULL PATH OF THE LOAM FOLDER>"`, or `[mcp_servers.loam]` in `~/.codex/config.toml` (add `startup_timeout_sec = 60`) |
+| Cursor | the entry above in `~/.cursor/mcp.json` |
+| VS Code (Copilot) | `.vscode/mcp.json` with `{"servers": {"loam": {"type": "stdio", "command": "npx", "args": [...]}}}`, or `code --add-mcp` with the same JSON plus `"name": "loam"` |
+| Gemini CLI | the entry above in `~/.gemini/settings.json` (add `"timeout": 60000`) |
+| Windsurf | the entry above in `~/.codeium/windsurf/mcp_config.json` |
+| Cline | the entry above, in Cline's MCP settings (MCP Servers → Configure MCP Servers) |
+
+Claude Desktop does not need any of this: the person installs the extension instead (https://loam-ai.pages.dev/install).
+
+## 4. Check that it works
+
+```bash
+npx -y loam-mcp --check --folder "<FULL PATH OF THE LOAM FOLDER>"
+```
+
+The first run downloads the server (about 15 MB) and can take up to a minute. A good answer says `Node … (ok)` and shows the folder as found. "Loam knowledge base: NOT yet" is fine when the folder is new: it only means the person has not started yet. Do not create Loam's files by hand.
+
+## 5. Tell the person what to do next
+
+Say that the setup is done, and that your client may need to be restarted, or a new chat opened, before Loam shows up (say which, for your client). Then they only need to say:
+
+> Run my Loam onboarding interview
+
+If the folder is still new, you will be asked to set it up first: ask the person ("Set up Loam in `<folder>`?"), and when they agree call `loam_init` with `confirm: true`. The interview takes about four minutes.
+
+## Good to know
+
+- The tools all start with `loam_`. Use them to read; write only when the person asks, and show what changed.
+- Loam needs no account, key or password. Never ask the person for one, and never point it at any other folder.
+- If something does not work, tell the person plainly what failed. Source, documentation and issues: https://github.com/YeremeyevTimofey/Loam

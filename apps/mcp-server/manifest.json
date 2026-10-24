@@ -4,7 +4,7 @@
   "display_name": "Loam",
   "version": "0.1.0",
   "description": "Work context for AI agents: connects your Loam knowledge base folder to Claude Desktop.",
-  "long_description": "Loam keeps what your AI assistant needs to know about your work in a folder on your computer: your profile, your recurring processes, examples of good results, corrections and skills. This extension lets Claude Desktop read that folder and, when you ask, remember corrections and examples. Nothing leaves your computer: the extension makes no network requests and only touches the folder you choose. (Using Cursor, Codex, VS Code, Gemini CLI or another agent? See the install guide: they connect the same server with one command.)",
+  "long_description": "Loam keeps what your AI assistant needs to know about your work in a folder on your computer: your profile, your recurring processes, examples of good results, corrections and skills. This extension lets Claude Desktop read that folder and, when you ask, remember corrections and examples. To start, choose an empty folder when Claude asks, then tell Claude: Run my Loam onboarding interview. It takes about four minutes.\n\nAbout the warning above: Claude shows it for every extension that is installed from a file. Loam's code only touches the folder you choose, makes no network requests, and is open for you to read at {{githubUrl}}. (Using Cursor, Codex, VS Code, Gemini CLI or another agent? See {{installUrl}}: you can ask your agent to set it up for you.)",
   "author": {
     "name": "Loam"
   },
@@ -67,6 +67,10 @@
       "description": "Record a review verdict on an imported skill (information only)."
     },
     {
+      "name": "loam_init",
+      "description": "Set up Loam in the chosen folder (it asks you first)."
+    },
+    {
       "name": "loam_get_interview_script",
       "description": "The onboarding interview script and your progress in it."
     },
@@ -103,7 +107,7 @@
     "knowledge_base_folder": {
       "type": "directory",
       "title": "Knowledge base folder",
-      "description": "The folder you chose in the Loam app (the one that contains AGENTS.md). Loam only reads and writes inside it.",
+      "description": "The folder for your Loam knowledge base. An empty folder is fine: Claude sets it up for you when you start. Loam only reads and writes inside it.",
       "required": true
     }
   },

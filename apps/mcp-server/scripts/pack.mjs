@@ -26,6 +26,9 @@ manifest.homepage = site.siteUrl;
 manifest.documentation = site.installUrl;
 manifest.support = site.issuesUrl;
 manifest.repository = { type: 'git', url: site.githubUrl };
+// The description Claude Desktop shows below its install warning carries the same addresses.
+manifest.long_description = manifest.long_description.replaceAll('{{githubUrl}}', site.githubUrl).replaceAll('{{installUrl}}', site.installUrl);
+if (/\{\{\w+\}\}/.test(manifest.long_description)) throw new Error('manifest.json: an address placeholder in long_description was not filled');
 if (existsSync(icon)) manifest.icon = 'icon.png';
 writeFileSync(path.join(stage, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
 writeFileSync(path.join(stage, 'package.json'), `${JSON.stringify({ name: 'loam', version: manifest.version, private: true, type: 'module', license: 'MIT' }, null, 2)}\n`);

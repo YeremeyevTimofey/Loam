@@ -19,6 +19,8 @@ export interface Site extends SiteConfig {
   downloadUrl: string;
   appUrl: string;
   installUrl: string;
+  llmsInstallUrl: string;
+  agentSetupMessage: string;
   npmUrl: string;
   host: string;
   /** A file in the repository, optionally with a #heading: https://github.com/<owner>/<repo>/blob/<branch>/<path> */

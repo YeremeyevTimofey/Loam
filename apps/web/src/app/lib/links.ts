@@ -14,6 +14,9 @@ export const repoFile = (path: string): string => site.fileUrl(path);
 export const repoDir = (path: string): string => site.dirUrl(path);
 export const NPM_PACKAGE = site.npmPackage;
 export const INTERVIEW_COMMAND = 'Run my Loam onboarding interview';
+export const LLMS_INSTALL_URL = site.llmsInstallUrl;
+/** The one message a person sends their agent. It reads the instructions at that address and sets Loam up, asking first. */
+export const AGENT_SETUP_MESSAGE = site.agentSetupMessage;
 
 /** "Weekly client report" → "Do my weekly client report" */
 export const runCommand = (title: string): string => `Do my ${title.charAt(0).toLowerCase()}${title.slice(1)}`;

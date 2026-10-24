@@ -21,8 +21,8 @@ export function registerInterviewTools(server: McpServer, ctx: Ctx): void {
     name: 'loam_get_interview_script',
     title: 'Get the onboarding interview script',
     description:
-      'Call this when the user says "Run my Loam onboarding interview" (or wants to redo it). Returns how to run the interview, the stage to run, and what is already saved. Without a stage it returns the outline; call it again with a stage id to get that stage\'s questions. Ask one question at a time.',
-    input: { stage: z.string().optional().describe('Stage id, e.g. role, day-map, pain, quality, glossary, artifacts, summary') },
+      'Call this when the user says "Run my Loam onboarding interview" (or wants to redo it). Returns how to run the interview, the stage to run, and what is already saved. Without a stage it returns the outline; call it again with a stage id to get that stage\'s questions. It is short (about four minutes): ask one question at a time.',
+    input: { stage: z.string().optional().describe('Stage id from the outline, e.g. you, tasks, focus, voice, summary') },
     kind: 'read',
     handler: async ({ stage }, ready) => {
       await requireBase(ready);

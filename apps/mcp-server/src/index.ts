@@ -29,7 +29,7 @@ if (cli.kind === 'check') {
   if (ctx.ready) {
     lines.push(`Folder ${ctx.ready.store.root} (found)`);
     const base = await isKnowledgeBase(ctx.ready.store);
-    lines.push(base ? 'Loam knowledge base: yes' : 'Loam knowledge base: NOT yet. Open the Loam app, choose this same folder, then run the check again.');
+    lines.push(base ? 'Loam knowledge base: yes' : 'Loam knowledge base: NOT yet. That is fine: your agent can set it up when you first ask (it will ask you), or open the Loam app in Chrome or Edge and choose this same folder.');
     ok = ok && base;
     await ctx.ready.search.sync().catch(() => undefined);
     lines.push(`Search: ${ctx.ready.search.mode === 'fts5' ? 'SQLite full-text index (ok)' : 'basic keyword scan (the SQLite module did not load; everything else works)'}`);

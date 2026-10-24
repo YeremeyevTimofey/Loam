@@ -53,6 +53,17 @@ describe.skipIf(!existsSync(mcpb))('packed loam.mcpb (acceptance 7)', () => {
     expect(manifest.compatibility.runtimes.node).toBe('>=22');
   });
 
+  it('explains, next to the install warning, what Loam touches, and the addresses in it are filled in', async () => {
+    const manifest = JSON.parse(readFileSync(path.join(unpacked, 'manifest.json'), 'utf8'));
+    const { site } = (await import('../lib/site-node.mjs')) as { site: { githubUrl: string; installUrl: string } };
+    expect(manifest.long_description).toContain('About the warning above');
+    expect(manifest.long_description).toContain('only touches the folder you choose');
+    expect(manifest.long_description).toContain(site.githubUrl);
+    expect(manifest.long_description).toContain(site.installUrl);
+    expect(manifest.long_description).not.toMatch(/\{\{/);
+    expect(manifest.user_config.knowledge_base_folder.description).toMatch(/empty folder is fine/);
+  });
+
   it('lists the same tools the manifest advertises', async () => {
     const manifest = JSON.parse(readFileSync(path.join(unpacked, 'manifest.json'), 'utf8'));
     const { tools } = await client.listTools();

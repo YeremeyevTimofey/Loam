@@ -33,7 +33,16 @@ async function freshApp(): Promise<{ context: BrowserContext; page: Page }> {
   await page.getByRole('heading', { name: 'Connect your agent' }).waitFor();
   return { context, page };
 }
-const pickAgent = (page: Page, name: string) => page.getByRole('radio', { name, exact: true }).click();
+const MANUAL = 'details:has(> summary:has-text("I would rather set it up myself"))';
+/** The technical steps are folded away for every agent but Claude Desktop; the tests that need them open them. */
+async function openManual(page: Page): Promise<void> {
+  const d = page.locator(MANUAL);
+  if ((await d.count()) && !(await d.evaluate((el) => (el as HTMLDetailsElement).open))) await d.locator('> summary').click();
+}
+async function pickAgent(page: Page, name: string): Promise<void> {
+  await page.getByRole('radio', { name, exact: true }).click();
+  if (name !== 'Claude Desktop') await openManual(page);
+}
 const setSystem = (page: Page, label: string) => page.getByLabel('System').selectOption({ label });
 const codeBlocks = (page: Page) => page.locator('pre[aria-label]').allInnerTexts();
 
@@ -46,6 +55,30 @@ describe('Connect your agent works for more than Claude (the new positioning)', 
       expect(await page.getByRole('radio', { name: 'Claude Desktop' }).getAttribute('aria-checked')).toBe('true');
       expect(await page.getByRole('link', { name: 'Download loam.mcpb' }).getAttribute('href')).toBe(cfg.download.path);
       expect(await page.getByText('Run my Loam onboarding interview').first().isVisible()).toBe(true);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it('every agent but Claude Desktop starts with one message to send, and the technical steps stay folded away', async () => {
+    const { context, page } = await freshApp();
+    try {
+      for (const name of ['Claude Code', 'Cursor', 'Codex', 'VS Code (Copilot)', 'Gemini CLI', 'Windsurf', 'Another agent']) {
+        await page.getByRole('radio', { name, exact: true }).click();
+        await page.getByText(/set Loam up for you/).first().waitFor();
+        const copy = page.getByRole('button', { name: /^Copy message/ });
+        expect(await copy.count(), name).toBe(1);
+        // the path field and the commands are inside the folded block, not in the way
+        const manual = page.locator(MANUAL);
+        expect(await manual.evaluate((el) => (el as HTMLDetailsElement).open), name).toBe(false);
+        expect(await page.getByLabel(/Full path of the folder/).isVisible(), name).toBe(false);
+      }
+      await page.getByRole('button', { name: /^Copy message/ }).click();
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(cfg.agentSetupMessage);
+      expect(cfg.agentSetupMessage).toContain(cfg.llmsInstallUrl);
+      // the message says what happens and that nothing is changed without a yes; Node is the agent's job
+      expect(await page.getByText(/asks before it changes anything/).count()).toBe(1);
+      expect(await page.getByText(/If it is missing, your agent offers to install it/).count()).toBe(1);
     } finally {
       await context.close();
     }
@@ -293,7 +326,15 @@ describe('the install page covers every agent', () => {
     expect(steps).toHaveLength(3);
     for (const step of steps) expect(await step.locator('img').count()).toBe(1);
     expect(await page.locator('#claude-desktop a#download').getAttribute('href')).toBe(cfg.download.path);
-    const agents = await page.locator('#other-agents details').all();
+    // the message for the agent comes first and is the same one the app offers
+    const message = page.locator('pre[aria-label="Message for your agent"]');
+    expect((await message.innerText()).trim()).toBe(cfg.agentSetupMessage);
+    expect(await page.locator('#other-agents a[href="' + cfg.llmsInstallUrl + '"]').count()).toBeGreaterThan(0);
+    // the commands for each agent are folded under "I would rather set it up myself"
+    const manual = page.locator('#other-agents > details').first();
+    expect(await manual.evaluate((el) => (el as HTMLDetailsElement).open)).toBe(false);
+    await manual.locator('> summary').click();
+    const agents = await page.locator('#other-agents details[id]').all();
     expect(agents).toHaveLength(7);
     for (const id of ['claude-code', 'cursor', 'codex', 'vscode', 'gemini', 'windsurf', 'other']) {
       const d = page.locator(`#${id}`);
@@ -359,5 +400,28 @@ describe('agents other than Claude read the folder', () => {
     } finally {
       await context.close();
     }
+  });
+});
+
+describe('the instructions an agent follows to set Loam up', () => {
+  it('are served by the site as plain text, whole, with the real addresses, and are the same text as on GitHub', async () => {
+    const res = await fetch(cfg.llmsInstallUrl.replace(cfg.siteUrl, site.origin));
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toMatch(/^text\/(plain|markdown)/);
+    const text = await res.text();
+    expect(text).toBe(readFileSync(path.join(REPO, 'llms-install.md'), 'utf8'));
+    expect(text).not.toContain('{{');
+    for (const part of [cfg.npmPackage, '.loam/state.json', cfg.installUrl, cfg.githubUrl, 'node --version']) expect(text, part).toContain(part);
+    // the file that goes to the host says plain text for every agent that fetches it
+    expect(readFileSync(path.join(REPO, 'apps/web/dist/_headers'), 'utf8')).toMatch(/\/llms-install\.md\n  Content-Type: text\/plain; charset=utf-8/);
+  });
+
+  it('are linked from the install page, so a person (or an agent) can read them', async () => {
+    const context = await browser.newContext();
+    await context.route(/plausible\.io/, (r) => r.abort());
+    const page = await context.newPage();
+    await page.goto(`${site.origin}/install`, { waitUntil: 'networkidle' });
+    expect(await page.locator(`#other-agents a[href="${cfg.llmsInstallUrl}"]`).first().innerText()).toBe('these instructions');
+    await context.close();
   });
 });
