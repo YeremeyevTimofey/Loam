@@ -43,6 +43,9 @@ describe('starter pack and sync (acceptance 18, 19)', () => {
       for (const name of ['meeting-summary', 'client-bad-news-email', 'weekly-status-report', 'incoming-doc-review', 'meeting-prep', 'task-handoff', 'find-skills']) {
         expect(await page.getByRole('button', { name: `Add ${name}` }).count(), name).toBe(1);
       }
+      // Skills for a kind of work come first, alphabetically; find-skills is last
+      const listed = await page.getByRole('button', { name: /^Add [a-z-]+$/ }).evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')!.slice(4)));
+      expect(listed).toEqual(['client-bad-news-email', 'incoming-doc-review', 'meeting-prep', 'meeting-summary', 'task-handoff', 'weekly-status-report', 'find-skills']);
       await page.getByRole('button', { name: 'Add meeting-summary' }).click();
       await page.getByRole('heading', { name: 'Add “meeting-summary”' }).waitFor();
       await page.getByRole('button', { name: 'Add skill' }).click();

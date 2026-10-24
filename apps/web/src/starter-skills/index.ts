@@ -6,6 +6,9 @@ export interface StarterSkill {
   text: string;
 }
 
+// Skills for a kind of work come first, alphabetically; skills about skills go last.
+const LAST = new Set(['find-skills']);
+
 export const STARTER_SKILLS: StarterSkill[] = Object.entries(files)
   .map(([path, text]) => ({ name: path.replace(/^\.\//, '').replace(/\.md$/, ''), text }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+  .sort((a, b) => Number(LAST.has(a.name)) - Number(LAST.has(b.name)) || a.name.localeCompare(b.name));
