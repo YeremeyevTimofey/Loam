@@ -68,7 +68,7 @@ describe('the loam-mcp npm package', () => {
     cleanup.push(empty);
     const bad = await npx(['--check', '--folder', empty]);
     expect(bad.code).toBe(1);
-    expect(bad.out).toMatch(/Loam knowledge base: NOT yet\. Open the Loam app/);
+    expect(bad.out).toMatch(/Loam knowledge base: NOT yet\. That is fine: your agent can set it up/);
     expect(bad.out).toContain(`Still stuck? Tell us which agent and computer you use: ${site.issuesUrl}`);
     const missing = await npx(['--check', '--folder', path.join(empty, 'nope')]);
     expect(missing.code).toBe(1);
@@ -89,13 +89,41 @@ describe('the loam-mcp npm package', () => {
     await client.connect(transport);
     try {
       const { tools } = await client.listTools();
-      expect(tools).toHaveLength(17);
+      expect(tools).toHaveLength(18);
       const call = async (name: string, args: Record<string, unknown> = {}) =>
         ((await client.callTool({ name, arguments: args })) as { content: { text: string }[] }).content.map((c) => c.text).join('\n');
       expect(await call('loam_overview')).toMatch(/Onboarding interview: not started/);
       writeFileSync(path.join(folder, 'context', 'kiwi.md'), '# Kiwi\n\nThe kiwi account renews in March.\n');
       expect(await call('loam_search', { query: 'kiwi renews' })).toContain('context/kiwi.md');
       expect(stderr).not.toMatch(/unavailable|could not open|unexpected error/);
+    } finally {
+      await client.close();
+    }
+  }, 240_000);
+
+  it('first run in a new, empty folder, as a person would meet it: the agent is told to ask, sets it up, and the short interview starts', async () => {
+    const empty = mkdtempSync(path.join(tmpdir(), 'loam first run-'));
+    cleanup.push(empty);
+    const transport = new StdioClientTransport({ command: 'npx', args: ['-y', '--package', tarball, 'loam-mcp', '--folder', empty], stderr: 'pipe' });
+    const client = new Client({ name: 'npm-test-first-run', version: '0' });
+    await client.connect(transport);
+    try {
+      const call = async (name: string, args: Record<string, unknown> = {}) => {
+        const r = (await client.callTool({ name, arguments: args })) as { content: { text: string }[]; isError?: boolean };
+        return { text: r.content.map((c) => c.text).join('\n'), isError: Boolean(r.isError) };
+      };
+      // "Run my Loam onboarding interview" in a folder nobody has set up
+      const first = await call('loam_get_interview_script');
+      expect(first.isError).toBe(true);
+      expect(first.text).toMatch(/Ask the user whether to set it up here/);
+      expect(first.text).toContain('loam_init');
+      expect((await call('loam_init', { confirm: false })).isError).toBe(true); // asks first
+      const done = await call('loam_init', { confirm: true });
+      expect(done.isError).toBe(false);
+      const script = await call('loam_get_interview_script');
+      expect(script.isError).toBe(false);
+      expect(script.text).toMatch(/\(3–5 minutes\)/);
+      expect(script.text).toMatch(/1\. you — Who you are/);
     } finally {
       await client.close();
     }

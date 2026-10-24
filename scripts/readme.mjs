@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Writes README.md and llms-install.md from docs/templates/*.tmpl. Addresses come from site.config.json and the numbers
+// Writes README.md and llms-install.md (twice: for GitHub and for the site) from docs/templates/*.tmpl. Addresses come from site.config.json and the numbers
 // from the sample knowledge base's summary.json, so neither file can disagree with the site or the product.
-//   node scripts/readme.mjs           write both files
+//   node scripts/readme.mjs           write the files
 //   node scripts/readme.mjs --check   fail if one of them is out of date
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -16,6 +16,7 @@ const values = {
   cursorInstallUrl: `https://cursor.com/install-mcp?name=loam&config=${encodeURIComponent(Buffer.from(cursorServer).toString('base64'))}`,
   appUrl: site.appUrl,
   installUrl: site.installUrl,
+  llmsInstallUrl: site.llmsInstallUrl,
   siteUrl: site.siteUrl,
   siteHost: site.host,
   githubUrl: site.githubUrl,
@@ -39,6 +40,8 @@ const values = {
 const FILES = [
   { template: 'docs/templates/README.md.tmpl', target: 'README.md' },
   { template: 'docs/templates/llms-install.md.tmpl', target: 'llms-install.md' },
+  // The same text, served by the site at /llms-install.md: the message a person sends their agent points there.
+  { template: 'docs/templates/llms-install.md.tmpl', target: 'apps/web/public/llms-install.md' },
 ];
 
 const missing = new Set();

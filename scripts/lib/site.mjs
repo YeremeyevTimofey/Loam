@@ -24,6 +24,10 @@ export function resolveSite(config) {
     downloadUrl: `${siteUrl}${config.download.path}`,
     appUrl: `${siteUrl}/app`,
     installUrl: `${siteUrl}/install`,
+    /** The instructions an AI agent follows to set Loam up. The person only sends the agent this address. */
+    llmsInstallUrl: `${siteUrl}/llms-install.md`,
+    /** The one message a person sends their agent. It reads the instructions at that address and sets Loam up, asking first. */
+    agentSetupMessage: `Set up Loam for me. Follow the instructions at ${siteUrl}/llms-install.md and ask me before you change anything.`,
     npmUrl: `https://www.npmjs.com/package/${config.npmPackage}`,
     host: new URL(siteUrl).host,
   };

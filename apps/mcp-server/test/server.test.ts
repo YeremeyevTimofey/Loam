@@ -4,7 +4,7 @@ import path from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { applyPlan, planScaffold, DEFAULT_INTERVIEW, countWords } from '@loam/core';
+import { applyPlan, planScaffold, APP_URL, DEFAULT_INTERVIEW, countWords } from '@loam/core';
 import { createContext } from '../src/context';
 import { NodeStore } from '../src/node-store';
 import { createLoamServer } from '../src/server';
@@ -76,7 +76,7 @@ describe('tools (acceptance 12)', () => {
         'loam_overview', 'loam_get_process', 'loam_search', 'loam_read', 'loam_list_skills', 'loam_get_skill',
         'loam_import_skill', 'loam_review_skill', 'loam_set_skill_review', 'loam_get_interview_script',
         'loam_save_interview', 'loam_upsert_note', 'loam_record_correction', 'loam_add_example',
-        'loam_generate_skill', 'loam_log_run', 'loam_lint',
+        'loam_generate_skill', 'loam_log_run', 'loam_lint', 'loam_init',
       ].sort(),
     );
     for (const t of tools) {
@@ -93,21 +93,22 @@ describe('interview (acceptance 8, 9, 10, 11)', () => {
     const s = await open();
     try {
       const outline = await s.call('loam_get_interview_script');
-      expect(outline.text).toContain('One question at a time'.toLowerCase().replace('one', 'one'));
-      expect(outline.text).toMatch(/Ask one question at a time/);
-      expect(outline.text).toMatch(/1\. role — Role and context/);
-      expect(outline.text).toMatch(/Start with stage "role"/);
-      expect(outline.text).toMatch(/Dig until you have two numbers/);
-      const role = await s.call('loam_get_interview_script', { stage: 'role' });
-      expect(role.text).toContain("What's your role, and what company or team do you work for?");
-      const day = await s.call('loam_get_interview_script', { stage: 'day-map' });
-      for (const b of DEFAULT_INTERVIEW.branches) expect(day.text).toContain(b.id);
+      expect(outline.text).toMatch(/\(3–5 minutes\)/);
+      expect(outline.text).toMatch(/One question at a time/);
+      expect(outline.text).toMatch(/1\. you — Who you are/);
+      expect(outline.text).toMatch(/Start with stage "you"/);
+      expect(outline.text).toMatch(/how often and how many minutes per run/);
+      const role = await s.call('loam_get_interview_script', { stage: 'you' });
+      expect(role.text).toContain('Who are you at work?');
+      const tasks = await s.call('loam_get_interview_script', { stage: 'tasks' });
+      expect(tasks.text).toContain('Which tasks do you repeat every week or month?');
+      expect(tasks.text).not.toMatch(/Branch /); // no questions by kind of role any more
       expect((await s.call('loam_get_interview_script', { stage: 'nope' })).text).toMatch(/Unknown stage/);
       // criterion 11: change the file, get the new behaviour, no restart
       const file = path.join(s.dir, '.loam', 'interview.json');
-      const edited = { ...DEFAULT_INTERVIEW, title: 'Custom onboarding', stages: DEFAULT_INTERVIEW.stages.map((st) => (st.id === 'role' ? { ...st, questions: ['A brand new first question?'] } : st)) };
+      const edited = { ...DEFAULT_INTERVIEW, title: 'Custom onboarding', stages: DEFAULT_INTERVIEW.stages.map((st) => (st.id === 'you' ? { ...st, questions: ['A brand new first question?'] } : st)) };
       writeFileSync(file, JSON.stringify(edited));
-      const again = await s.call('loam_get_interview_script', { stage: 'role' });
+      const again = await s.call('loam_get_interview_script', { stage: 'you' });
       expect(again.text).toContain('Custom onboarding');
       expect(again.text).toContain('A brand new first question?');
       writeFileSync(file, '{ broken');
@@ -277,7 +278,83 @@ describe('folder boundary (acceptance: path outside the folder is an error)', ()
     try {
       const r = await s.call('loam_overview');
       expect(r.isError).toBe(true);
-      expect(r.text).toMatch(/open https:\/\/loam-ai\.pages\.dev\/app/);
+      expect(r.text).toMatch(/Ask the user whether to set it up here/);
+      expect(r.text).toMatch(/loam_init with confirm: true/);
+      expect(r.text).toContain(s.dir); // says which folder
+      expect(r.text).toContain(`${APP_URL}`); // the app stays an alternative
+    } finally {
+      await s.close();
+    }
+  });
+});
+
+describe('setting a folder up from the agent (loam_init)', () => {
+  const list = async (dir: string) => {
+    const store = new NodeStore(dir);
+    return (await store.listFiles('')).map((e) => e.name).sort();
+  };
+
+  it('asks first: without the user\'s yes it changes nothing', async () => {
+    const s = await open({ scaffold: false });
+    try {
+      const r = await s.call('loam_init', { confirm: false });
+      expect(r.isError).toBe(true);
+      expect(r.text).toMatch(/Do not set anything up yet/);
+      expect(await list(s.dir)).toEqual([]);
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('sets an empty folder up, then the other tools work and the interview can start', async () => {
+    const s = await open({ scaffold: false });
+    try {
+      const r = await s.call('loam_init', { confirm: true });
+      expect(r.isError).toBe(false);
+      expect(r.text).toContain('README.md');
+      expect(r.text).toContain('.loam/interview.json');
+      expect(r.text).toMatch(/Run my Loam onboarding interview/);
+      expect(readFileSync(path.join(s.dir, 'CLAUDE.md'), 'utf8')).toBe('@AGENTS.md\n');
+      expect((await s.call('loam_overview')).isError).toBe(false);
+      expect((await s.call('loam_get_interview_script')).text).toMatch(/Who you are/);
+      // doing it again is harmless and says so
+      const again = await s.call('loam_init', { confirm: true });
+      expect(again.isError).toBe(false);
+      expect(again.text).toMatch(/already a Loam knowledge base/);
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('treats hidden entries as empty, but stops at a folder that holds the user\'s files', async () => {
+    const s = await open({ scaffold: false });
+    try {
+      writeFileSync(path.join(s.dir, '.DS_Store'), 'x');
+      writeFileSync(path.join(s.dir, 'taxes-2025.pdf'), 'keep me');
+      writeFileSync(path.join(s.dir, 'README.md'), 'my own readme');
+      const refused = await s.call('loam_init', { confirm: true });
+      expect(refused.isError).toBe(true);
+      expect(refused.text).toMatch(/not empty/);
+      expect(refused.text).toContain('taxes-2025.pdf');
+      expect(await list(s.dir)).not.toContain('AGENTS.md');
+      // with the user's agreement it adds files next to theirs and never overwrites one
+      const added = await s.call('loam_init', { confirm: true, allow_existing_files: true });
+      expect(added.isError).toBe(false);
+      expect(readFileSync(path.join(s.dir, 'README.md'), 'utf8')).toBe('my own readme');
+      expect(readFileSync(path.join(s.dir, 'taxes-2025.pdf'), 'utf8')).toBe('keep me');
+      expect(await list(s.dir)).toContain('AGENTS.md');
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('is a write tool that says it never talks to anything outside the folder', async () => {
+    const s = await open({ scaffold: false });
+    try {
+      const { tools } = await s.client.listTools();
+      const init = tools.find((t) => t.name === 'loam_init')!;
+      expect(init.annotations).toMatchObject({ readOnlyHint: false, openWorldHint: false });
+      expect(init.description).toMatch(/ask the user first/i);
     } finally {
       await s.close();
     }

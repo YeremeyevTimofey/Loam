@@ -51,7 +51,7 @@ describe('first run with a real folder (acceptance 2, 3, 5)', () => {
       expect(files['AGENTS.md']).toContain('Reading order (token discipline)');
       expect(files['README.md']).toContain('Your Loam knowledge base');
       expect(files['profile.md']).toContain('Not filled in yet');
-      expect(JSON.parse(files['.loam/interview.json']!).stages.map((s: { id: string }) => s.id)).toEqual(['role', 'day-map', 'pain', 'quality', 'glossary', 'artifacts', 'summary']);
+      expect(JSON.parse(files['.loam/interview.json']!).stages.map((s: { id: string }) => s.id)).toEqual(['you', 'tasks', 'focus', 'voice', 'summary']);
       // empty state explains the next step, and the connect block shows the interview line
       expect(await page.getByRole('heading', { name: 'Connect your agent' }).isVisible()).toBe(true);
       expect(await page.getByText('Run my Loam onboarding interview').first().isVisible()).toBe(true);
@@ -113,7 +113,7 @@ describe('first run with a real folder (acceptance 2, 3, 5)', () => {
       await page.getByRole('dialog').waitFor({ state: 'hidden' });
       const after = JSON.parse((await readFolder(page))['.loam/interview.json']!);
       expect(after.title).toBe('Loam onboarding interview');
-      expect(after.version).toBe(1);
+      expect(after.version).toBe(2); // the short interview (version 2)
       // asking again says it is current
       await page.getByRole('button', { name: 'Redo interview' }).click();
       await page.getByRole('button', { name: 'Update interview script' }).click();

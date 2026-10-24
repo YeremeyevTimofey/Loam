@@ -197,6 +197,8 @@ function siteValues(): Plugin {
     analyticsScript: site.analytics.script,
     downloadPath: site.download.path,
     npmPackage: site.npmPackage,
+    llmsInstallUrl: site.llmsInstallUrl,
+    agentSetupMessage: site.agentSetupMessage,
     sarah: renderSarah(summary, { demo, processBase: `${demo}&process=`, skills: `${demo}&screen=skills`, health: `${demo}&screen=health` }),
     installAgents: renderInstallAgents(site.npmPackage, `${site.appUrl}`),
   };

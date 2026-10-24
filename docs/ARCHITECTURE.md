@@ -70,7 +70,7 @@ Loam does not depend on one vendor. Two things make a folder usable by an agent,
 
 `AGENTS.md` has a read-only mode for agents that are not connected through MCP: they can read skills and processes, must not edit the base, and tell the user how to connect Loam. *Health* notices when these instruction files are older than the app and offers a diff-confirmed update; `CLAUDE.md` and `GEMINI.md` are only created when missing, never overwritten (people add their own lines).
 
-**2. Saving to the folder (MCP).** One server, two ways to start it:
+**2. Saving to the folder (MCP).** One server, two ways to start it. The person never has to use a terminal: Claude Desktop installs a file; every other agent is given **one message** (`Set up Loam for me. Follow the instructions at <site>/llms-install.md and ask me before you change anything.`) and does the setup itself: it checks Node (and offers to install it), finds the folder that has `.loam/state.json` (or suggests a new one in Documents, and asks), adds the server to its own settings after showing what it will write, runs `--check`, and says what to do next. The instructions are a file generated from `docs/templates/llms-install.md.tmpl`, served by the site and carried in the repository for installers such as Cline; the technical steps stay available, folded away. The folder itself is set up by the agent through `loam_init` (after asking), so the web app, which only works in Chrome and Edge, is optional.
 
 | Route | For | Notes |
 |---|---|---|
@@ -126,10 +126,13 @@ All tools are prefixed `loam_`. They return readable text and never crash the se
 | `loam_list_skills` · `loam_get_skill` | Compact skill list (under 400 tokens) and one skill. |
 | `loam_import_skill` | Scan, then quarantine (stored as imported, unreviewed). Red flag ⇒ refused, nothing written. |
 | `loam_review_skill` · `loam_set_skill_review` | The user's agent reviews an imported skill; the verdict is stored as information only. |
+| `loam_init` | Sets up the knowledge base in the chosen folder when it is not one yet (the only way into a folder that the web app has not touched). Asks first: `confirm: true` only after the user agreed; a folder that holds other files needs `allow_existing_files: true`; never overwrites; does nothing if the base exists. |
 | `loam_get_interview_script` · `loam_save_interview` | Run the onboarding interview from `.loam/interview.json`; save profile, processes, glossary, entities, progress. |
 | `loam_upsert_note` | Write a markdown note when asked, with history and a diff. Cannot write skills, examples, corrections, `AGENTS.md`/`CLAUDE.md`/`GEMINI.md`, `.loam`, `.claude`, `.agents`. |
 | `loam_record_correction` · `loam_add_example` · `loam_generate_skill` · `loam_log_run` | The learning loop. Every third correction suggests rebuilding the skill. |
 | `loam_lint` | Context Lint report. |
+
+**The interview is short on purpose** (version 2: four questions and a confirmation, three to five minutes; version 1 had 27 questions over seven stages, 15 to 20 minutes). Completion of questionnaires falls after about five minutes, so the script asks for what decides whether a task can be automated (how often, how many minutes, the steps, what a good result is, what must never happen) in as few questions as possible, and has the agent *draft* the process map from the answers and let the user correct it in one reply. It asks for no files during the interview (an example is offered after saving) and not for a timeline of the day. A folder created before version 2 keeps its script until *Update interview script* (scripts with `branches` still load).
 
 The interview script lives in the user's folder (`.loam/interview.json`), so it can be improved and picked up **without reinstalling the extension**. *Overview → Redo interview → Update interview script* replaces it with the bundled version after showing a diff.
 

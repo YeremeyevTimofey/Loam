@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../context';
 import { AGENTS, checkFolder, connectFor, detectOs, type AgentId, type Block, type Os } from '../lib/agents';
 import { cn } from '../lib/cn';
-import { INTERVIEW_COMMAND, ISSUES_URL, MCPB_URL, NPM_PACKAGE, RELEASES_URL } from '../lib/links';
+import { AGENT_SETUP_MESSAGE, INTERVIEW_COMMAND, ISSUES_URL, MCPB_URL, NPM_PACKAGE, RELEASES_URL } from '../lib/links';
 import { recallFolderPath, rememberFolderPath } from '../store/folder';
 import { CodeBlock } from './CodeBlock';
 import { CopyField } from './CopyField';
@@ -97,7 +97,8 @@ export function ConnectAgent({ className }: { className?: string }) {
           </button>
         ))}
       </div>
-      <p className="t-secondary mb-5">{info.blurb}</p>
+
+      {agent === 'claude-desktop' ? <p className="t-secondary mb-5">{info.blurb}</p> : null}
 
       {agent === 'claude-desktop' ? (
         <ol className="mb-6 space-y-5">
@@ -122,67 +123,81 @@ export function ConnectAgent({ className }: { className?: string }) {
           </Step>
         </ol>
       ) : (
-        <ol className="mb-6 space-y-5">
-          <Step n={1} title="Make sure Node is installed">
-            <p className="t-secondary mb-2">
-              {info.name} starts Loam with Node 22 or newer. Run this in a terminal; if it prints v22 or higher, you are set. Otherwise install Node from nodejs.org.
+        <>
+          <div className="mb-6">
+            <p className="mb-1 font-medium">Let {info.name} set Loam up for you</p>
+            <p className="t-secondary mb-3">
+              Open {info.name} and send it this message. It does the setup itself, finds your folder and asks before it changes anything: you only say yes.
             </p>
-            <CopyField text="node --version" />
-          </Step>
-          <Step n={2} title="Tell us where your folder is">
-            <div className="mb-2 flex flex-wrap items-end gap-3">
-              <div className="min-w-0 flex-1 space-y-1">
-                <Label htmlFor="folder-path">Full path of the folder “{store.label}”</Label>
-                <Input
-                  id="folder-path"
-                  value={raw}
-                  onChange={(e) => {
-                    setRaw(e.target.value);
-                    if (persist) void rememberFolderPath(e.target.value);
-                  }}
-                  placeholder={os === 'windows' ? 'C:\\Users\\you\\Documents\\Loam' : '/Users/you/Documents/Loam'}
-                  autoComplete="off"
-                  spellCheck={false}
-                  aria-describedby="folder-help"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="os">System</Label>
-                <select id="os" value={os} onChange={(e) => setOs(e.target.value as Os)} className="h-11 rounded-md border border-line bg-surface px-3 text-base text-ink focus-visible:border-accent">
-                  {(Object.keys(OS_LABEL) as Os[]).map((o) => (
-                    <option key={o} value={o}>
-                      {OS_LABEL[o]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <p id="folder-help" className="t-secondary">
-              {HOW_TO_COPY[os]} Browsers hide this path from websites, which is why it is typed here. It stays on this page and is not sent anywhere.
-            </p>
-            {folder.problem ? (
-              <p role="alert" className="mt-2 rounded-md bg-warning-soft p-3 text-[15px] text-warning-ink">
-                {folder.problem}
-              </p>
-            ) : null}
-          </Step>
-          <Step n={3} title={`Connect ${info.name}`}>
-            {connect ? (
-              <div className="space-y-5">
-                {connect.blocks.map((b) => (
-                  <BlockView key={b.title} block={b} />
-                ))}
-              </div>
-            ) : (
-              <p className="t-secondary">Enter the folder path above and the exact command for {info.name} appears here.</p>
-            )}
-          </Step>
-        </ol>
+            <CopyField text={AGENT_SETUP_MESSAGE} label="Copy message" />
+            <p className="t-secondary mt-2">Loam runs on Node, a small free program. If it is missing, your agent offers to install it.</p>
+          </div>
+          <details className="mb-6 rounded-md border border-line p-4">
+            <summary className="min-h-11 cursor-pointer py-2 font-medium">I would rather set it up myself (for technical users)</summary>
+            <p className="t-secondary mt-2">{info.blurb}</p>
+            <ol className="mt-4 space-y-5">
+              <Step n={1} title="Make sure Node is installed">
+                <p className="t-secondary mb-2">
+                  {info.name} starts Loam with Node 22 or newer. Run this in a terminal; if it prints v22 or higher, you are set. Otherwise install Node from nodejs.org.
+                </p>
+                <CopyField text="node --version" />
+              </Step>
+              <Step n={2} title="Tell us where your folder is">
+                <div className="mb-2 flex flex-wrap items-end gap-3">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <Label htmlFor="folder-path">Full path of the folder “{store.label}”</Label>
+                    <Input
+                      id="folder-path"
+                      value={raw}
+                      onChange={(e) => {
+                        setRaw(e.target.value);
+                        if (persist) void rememberFolderPath(e.target.value);
+                      }}
+                      placeholder={os === 'windows' ? 'C:\\Users\\you\\Documents\\Loam' : '/Users/you/Documents/Loam'}
+                      autoComplete="off"
+                      spellCheck={false}
+                      aria-describedby="folder-help"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="os">System</Label>
+                    <select id="os" value={os} onChange={(e) => setOs(e.target.value as Os)} className="h-11 rounded-md border border-line bg-surface px-3 text-base text-ink focus-visible:border-accent">
+                      {(Object.keys(OS_LABEL) as Os[]).map((o) => (
+                        <option key={o} value={o}>
+                          {OS_LABEL[o]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <p id="folder-help" className="t-secondary">
+                  {HOW_TO_COPY[os]} Browsers hide this path from websites, which is why it is typed here. It stays on this page and is not sent anywhere.
+                </p>
+                {folder.problem ? (
+                  <p role="alert" className="mt-2 rounded-md bg-warning-soft p-3 text-[15px] text-warning-ink">
+                    {folder.problem}
+                  </p>
+                ) : null}
+              </Step>
+              <Step n={3} title={`Connect ${info.name}`}>
+                {connect ? (
+                  <div className="space-y-5">
+                    {connect.blocks.map((b) => (
+                      <BlockView key={b.title} block={b} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="t-secondary">Enter the folder path above and the exact command for {info.name} appears here.</p>
+                )}
+              </Step>
+            </ol>
+          </details>
+        </>
       )}
 
-      <p className="mb-2 font-medium">{agent === 'claude-desktop' ? 'Then tell your agent:' : '4. Then tell your agent:'}</p>
+      <p className="mb-2 font-medium">Then tell your agent:</p>
       <CopyField text={INTERVIEW_COMMAND} />
-      <p className="t-secondary mt-2">The interview takes 15 to 20 minutes. When it’s done, come back here and press Refresh.</p>
+      <p className="t-secondary mt-2">The interview takes about four minutes. When it’s done, come back here and press Refresh.</p>
 
       {connect && connect.after.length > 0 ? (
         <ul className="t-secondary mt-4 list-disc space-y-1 pl-5">

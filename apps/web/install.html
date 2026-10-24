@@ -32,7 +32,7 @@
     <main class="gutter pb-14 pt-8 md:pb-24 md:pt-14">
       <div class="measure">
         <h1 class="t-h1">Connect Loam to your AI agent</h1>
-        <p class="mt-5">Loam works with any AI agent that can run a local MCP server. You only do this once, and it takes a few minutes. You need a folder you already set up in <a href="/app">the Loam app</a>.</p>
+        <p class="mt-5">Loam works with any AI agent that can run a local MCP server. You only do this once, and it takes a few minutes. You do not need anything else first: your agent sets up the folder for you.</p>
         <p class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[15px]" aria-label="Jump to your agent">
           <a href="#claude-desktop" class="inline-flex min-h-11 items-center">Claude Desktop</a>
           <a href="#other-agents" class="inline-flex min-h-11 items-center">Claude Code, Cursor, Codex, VS Code, Gemini CLI, Windsurf, others</a>
@@ -53,12 +53,13 @@
             </li>
             <li>
               <h3 class="t-h3 mb-3">2. Open it with Claude Desktop</h3>
-              <p class="mb-5">Double-click the file, or open Claude Desktop, go to Settings, then Extensions, and drag the <code>loam.mcpb</code> file into that window. When Claude asks whether to install it, choose Install.</p>
+              <p class="mb-4">Double-click the file, or open Claude Desktop, go to Settings, then Extensions, and drag the <code>loam.mcpb</code> file into that window. When Claude asks whether to install it, choose Install.</p>
+              <p class="t-secondary mb-5">Claude shows a warning that the developer is not verified. It does that for every extension installed from a file. Loam only touches the folder you choose, makes no network requests, and its code is <a href="{{githubUrl}}">open to read</a>.</p>
               <img src="/shots/install-2-drag.png" width="1200" height="800" alt="Illustration: dragging loam.mcpb into the Extensions page of Claude Desktop" class="h-auto w-full rounded-lg border border-line" loading="lazy" decoding="async" />
             </li>
             <li>
-              <h3 class="t-h3 mb-3">3. Choose your folder</h3>
-              <p class="mb-5">Claude asks which folder Loam may use. Choose the folder you set up in the Loam app: the one that has a file called <code>AGENTS.md</code> inside. Then turn the extension on.</p>
+              <h3 class="t-h3 mb-3">3. Choose a folder</h3>
+              <p class="mb-5">Claude asks which folder Loam may use. Create or choose an empty folder, for example one called <code>Loam</code> in your Documents. Then turn the extension on. Claude sets the folder up for you when you start.</p>
               <img src="/shots/install-3-folder.png" width="1200" height="800" alt="Illustration: choosing the knowledge base folder in the Loam extension settings" class="h-auto w-full rounded-lg border border-line" loading="lazy" decoding="async" />
             </li>
           </ol>
@@ -66,17 +67,26 @@
 
         <section id="other-agents" class="mt-16" aria-labelledby="oa-h">
           <h2 id="oa-h" class="t-h2">Claude Code, Cursor, Codex, VS Code, Gemini CLI, Windsurf and others</h2>
-          <p class="mt-3">These agents start Loam with one command. You need <a href="https://nodejs.org">Node</a> version 22 or newer: run <code>node --version</code> in a terminal to check. The first start downloads the Loam server (about 15 MB) and can take up to a minute.</p>
-          <p class="mt-3 mb-6">Open yours:</p>
-          {{installAgents}}
-          <p class="mt-6 t-secondary">Any other agent that can run a local (stdio) MCP server works the same way. A chat in a web browser (ChatGPT, Gemini or claude.ai) cannot run a local server, so it cannot save to Loam. You can still give it a process or a skill: open it in <a href="/app">the Loam app</a> and press <strong>Copy for any chat</strong>, then paste the text into the chat. Any agent that opens your folder can also read it by following <code>AGENTS.md</code>.</p>
+          <p class="mt-3">Your agent can set Loam up for you. Open it and send it this message:</p>
+          <div class="relative mt-4"><pre class="m-0 overflow-auto whitespace-pre-wrap break-words rounded-md border border-line bg-bg p-3 text-[15px] leading-6" tabindex="0" aria-label="Message for your agent" data-copy>{{agentSetupMessage}}</pre></div>
+          <p class="mt-4 t-secondary">Your agent follows <a href="{{llmsInstallUrl}}">these instructions</a>: it finds your Loam folder (or suggests a new one), adds Loam to its settings and checks that it works. It asks before it changes anything, so you only say yes. Loam runs on Node, a small free program; if it is missing, your agent offers to install it.</p>
+          <details class="mt-8 rounded-lg border border-line p-4">
+            <summary class="min-h-11 cursor-pointer py-2 text-lg font-semibold">I would rather set it up myself <span class="t-secondary ml-2 font-normal">for technical users</span></summary>
+            <div class="pt-2">
+              <p class="t-secondary">You need <a href="https://nodejs.org">Node</a> version 22 or newer: run <code>node --version</code> in a terminal to check. The first start downloads the Loam server (about 15 MB) and can take up to a minute. Open your agent:</p>
+              <div class="mt-4">
+                {{installAgents}}
+              </div>
+              <p class="mt-6 t-secondary">Any other agent that can run a local (stdio) MCP server works the same way. A chat in a web browser (ChatGPT, Gemini or claude.ai) cannot run a local server, so it cannot save to Loam. You can still give it a process or a skill: open it in <a href="/app">the Loam app</a> and press <strong>Copy for any chat</strong>, then paste the text into the chat. Any agent that opens your folder can also read it by following <code>AGENTS.md</code>.</p>
+            </div>
+          </details>
         </section>
 
         <section class="mt-14 rounded-lg border border-line bg-surface p-4 md:p-6" aria-labelledby="done-h">
           <h2 id="done-h" class="t-h3 mb-2">Check that it works</h2>
           <p class="mb-3">Start a new chat in your agent and type:</p>
           <p class="mb-3"><code class="inline-block rounded-md border border-line bg-bg px-3 py-2">Run my Loam onboarding interview</code></p>
-          <p class="t-secondary">Your agent should start asking about your role and your day. If it doesn’t, check that Loam is switched on in the agent’s MCP settings and that the folder is the right one. Terminal users can run <code>npx -y {{npmPackage}} --check --folder &lt;your folder&gt;</code>, which says what is wrong in plain words. Still stuck? <a href="{{issuesUrl}}">Tell us on GitHub</a> which agent and which computer you use.</p>
+          <p class="t-secondary">Your agent should start asking short questions about your role and your work. If it doesn’t, check that Loam is switched on in the agent’s MCP settings and that the folder is the right one. Terminal users can run <code>npx -y {{npmPackage}} --check --folder &lt;your folder&gt;</code>, which says what is wrong in plain words. Still stuck? <a href="{{issuesUrl}}">Tell us on GitHub</a> which agent and which computer you use.</p>
         </section>
 
         <section class="mt-10" aria-labelledby="privacy-h">

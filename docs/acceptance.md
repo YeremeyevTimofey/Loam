@@ -21,7 +21,7 @@ How to reproduce everything below: `npm run verify`.
 | 9 | After the interview: `profile.md` and ≥ 3 process folders with valid frontmatter | ✅ | server test “saves the interview…”; core `ops.test` |
 | 10 | After Refresh the browser shows the profile and process cards with the right numbers | ✅ | `e2e/app` “shows the profile and process cards…” (base written by the real MCP tools, read by the app) |
 | 11 | Editing `interview.json` changes the interview with no reinstall | ✅ | server test “serves the script from the base… and picks up edits without a restart” |
-| 12 | All tools prefixed `loam_`; no mention of the old working name | 🟡 | `check:rules` (source and manifest); server test lists exactly the 17 tools. The spec does not name the previous working name, so a targeted search was not possible |
+| 12 | All tools prefixed `loam_`; no mention of the old working name | 🟡 | `check:rules` (source and manifest); server test lists exactly the 18 tools. The spec does not name the previous working name, so a targeted search was not possible |
 | 13 | Adding an example via the UI: file in `examples/`, shown, original text unchanged | ✅ | `e2e/app` “adds an example through the preview…” (exact bytes kept, earlier example untouched, nothing in history) |
 | 14 | “Do my <process>”: the agent reads `SKILL.md`, example and corrections and answers in the example's shape | 🟡 | `loam_get_process`, the generated skill (reading order, newest example, corrections first) and `AGENTS.md` are tested. **A real agent's output is not testable here** |
 | 15 | “Remember this correction”: entry in `corrections.md`, counter up, diff shown | ✅ | server test “learning loop through the tools” (the diff is in the tool's reply) |
@@ -106,4 +106,17 @@ For a chat that cannot run Loam (ChatGPT, Gemini or claude.ai in a browser): a p
 | `llms-install.md` is generated and shows the same command as the app | ✅ | generated with the README from `docs/templates`; `check:rules` fails if it is stale; `apps/web/test/agents` compares its JSON with `serverCommand`. Whether Cline follows it was not tried |
 | A click on `/download/loam.mcpb` on a local dev server does not end in a GitHub 404 | ✅ | `e2e/dev-download`: the extension built on this computer is served as a download named `loam.mcpb`, or a plain message says how to build it; the preview server still redirects (`e2e/agents`) |
 | The launch checklist links are real | ✅ | `check:rules`: every relative link and `#heading` in `docs/` exists |
+
+## Added in the "simpler setup and a shorter interview" round
+
+From the first real run of the interview: the install warning, the terminal steps, and an interview that lost the person after four minutes.
+
+| Claim | Status | Evidence |
+|---|---|---|
+| The interview is four questions and a confirmation, three to five minutes, and asks nothing that cannot decide whether a task can be automated | ✅ | `packages/loam-core/test/interview.test` (question count, stages, the wording that must be gone, the guess-and-correct rule, the token cost of a full run: about 2,300 against 3,400 before); `apps/mcp-server/test` serves it stage by stage |
+| Folders created before the change keep working and can switch | ✅ | the same test: a version 1 script with branches still loads and serves its branch questions; an old progress marker starts the new script from the first stage; *Update interview script* replaces it and keeps the old one in history (`e2e/app`) |
+| The agent can set up a new folder itself, after asking | ✅ | `apps/mcp-server/test` (`loam_init`): nothing without the user's yes, an empty folder is set up and then works, hidden files do not count, a folder with the user's files is refused until the user agrees, nothing is overwritten, a second call is harmless, 18 tools in the manifest and over the protocol (`e2e/npm-package`) |
+| Every agent except Claude Desktop is set up by one message, and no terminal is needed | ✅ / 🟡 | `e2e/agents`: the message is shown first, the technical steps are folded away, Copy puts the exact message on the clipboard, the install page shows the same message; `apps/web/test/agents`: the hosted instructions name the same settings files and commands as the app; `e2e/agents`: the site serves `/llms-install.md` whole, as text. **Whether a real agent follows the instructions end to end was not tried** |
+| The Claude Desktop install dialog explains its warning, and the folder step no longer needs the app | ✅ | `scripts/test/mcpb.test` reads the packed manifest: the explanation, the filled-in addresses, the new folder description. The warning itself cannot be removed from our side (the signing feature of the extension format does not work yet; the directory no longer takes extensions) |
+| A visitor in Safari or Firefox is told that the app is optional | ✅ | `e2e/site` / `e2e/app` (the unsupported-browser screen) |
 

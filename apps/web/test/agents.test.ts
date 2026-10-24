@@ -5,6 +5,7 @@ import path from 'node:path';
 import { parse as parseToml } from 'smol-toml';
 import { afterAll, describe, expect, it } from 'vitest';
 import { AGENTS, checkFolder, connectFor, detectOs, quoteArg, serverCommand, type AgentId, type Os } from '../src/app/lib/agents';
+import { AGENT_SETUP_MESSAGE, LLMS_INSTALL_URL } from '../src/app/lib/links';
 
 const PKG = 'loam-mcp';
 const TRICKY = ['/Users/sarah/Loam', '/Users/sarah/My Loam', "/Users/sarah/Sarah's Loam", '/Users/sarah/$HOME/Loam', '/Users/sarah/a`b`/Loam', '/Users/sarah/semi;colon & amp/Loam', '/Users/sarah/Папка Loam', '/Users/sarah/star*glob?/Loam', '~/Loam', '/Users/sarah/"quoted"/Loam'];
@@ -156,5 +157,30 @@ describe('the static buttons and files outside the app agree with the app', () =
     const entry = JSON.parse(json).mcpServers.loam;
     expect(entry).toMatchObject(serverCommand({ os: 'mac', npmPackage: PKG, folder: '/Users/sarah/Loam' }));
     expect(text).toContain('--check --folder');
+  });
+
+  it('the message a person sends their agent points at instructions that the site really serves, and says to ask first', () => {
+    const hosted = readFileSync(path.join(root, 'apps/web/public/llms-install.md'), 'utf8');
+    expect(hosted).toBe(readFileSync(path.join(root, 'llms-install.md'), 'utf8')); // the site and GitHub carry the same text
+    expect(AGENT_SETUP_MESSAGE).toContain(LLMS_INSTALL_URL);
+    expect(LLMS_INSTALL_URL).toMatch(/^https:\/\/[^/]+\/llms-install\.md$/);
+    expect(AGENT_SETUP_MESSAGE).toMatch(/ask me before you change anything/);
+    expect(AGENT_SETUP_MESSAGE.length).toBeLessThan(160); // short enough to type from a phone
+    // what the agent is told to do: check Node, find the folder, ask before writing, check, tell the person what is next
+    for (const part of ['node --version', '.loam/state.json', 'Exactly one found', 'ask before you write it', '--check --folder', 'Run my Loam onboarding interview', 'loam_init']) {
+      expect(hosted.toLowerCase(), part).toContain(part.toLowerCase());
+    }
+    expect(hosted).not.toMatch(/\{\{/);
+  });
+
+  it('the settings files llms-install.md names for each client are the ones the app writes down', () => {
+    const text = readFileSync(path.join(root, 'llms-install.md'), 'utf8');
+    for (const [agent, shown] of [['cursor', '~/.cursor/mcp.json'], ['gemini', '~/.gemini/settings.json'], ['windsurf', '~/.codeium/windsurf/mcp_config.json'], ['vscode', '.vscode/mcp.json'], ['codex', '~/.codex/config.toml']] as const) {
+      const files = cfg(agent, '/Users/sarah/Loam').blocks.filter((b) => b.kind === 'file').map((b) => b.file);
+      expect(files, agent).toContain(shown);
+      expect(text, agent).toContain(shown);
+    }
+    expect(text).toContain(`claude mcp add --transport stdio --scope user loam -- npx -y ${PKG} --folder`);
+    expect(text).toContain(`codex mcp add loam -- npx -y ${PKG} --folder`);
   });
 });

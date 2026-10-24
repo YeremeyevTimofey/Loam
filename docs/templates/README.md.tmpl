@@ -5,7 +5,7 @@
 # Loam
 
 **Work context for AI agents.**<br>
-Answer questions about your workday for 15 minutes. Get a knowledge base on your own computer that Claude, Cursor, Codex, Gemini and other AI agents can actually use.
+Answer four short questions about your work. Get a knowledge base on your own computer that Claude, Cursor, Codex, Gemini and other AI agents can actually use.
 
 [**Download for Claude Desktop**]({{releaseDownloadUrl}}) &nbsp;·&nbsp; [Try the live demo]({{siteUrl}}/app?demo=1) &nbsp;·&nbsp; [Set up another agent]({{siteUrl}}/install) &nbsp;·&nbsp; [Report a problem]({{issuesUrl}})
 
@@ -27,7 +27,7 @@ Answer questions about your workday for 15 minutes. Get a knowledge base on your
 
 Most people have an AI assistant and still paste the same background into every prompt. Loam fixes the cause:
 
-1. **Interviews you, through your own agent.** Your agent asks about your day, one question at a time, for about 15 minutes. Loam never calls a model itself: no API keys.
+1. **Interviews you, through your own agent.** Your agent asks four short questions about your work, one at a time, in about four minutes. Loam never calls a model itself: no API keys.
 2. **Shows what is worth automating.** Your recurring work becomes a map of processes with minutes per run and hours per year, and an honest note on what each one needs.
 3. **Keeps everything as plain files you own.** A folder on your disk: your profile, your processes, examples of good results, corrections, skills.
 4. **Learns from your examples and corrections.** Say "remember this correction" once and the next result is right. After a few runs a process is marked stable.
@@ -37,26 +37,35 @@ No server, no account, nothing leaves your computer.
 
 ## Get started
 
-**1. Set up a folder:** open [{{siteHost}}/app]({{siteUrl}}/app) in Chrome or Edge, choose an empty folder, and Loam fills it in. (Want to look first? [Open the demo]({{siteUrl}}/app?demo=1); it works in any browser.)
+**1. Connect your AI agent.** Loam works with any agent that can run a local [MCP](https://modelcontextprotocol.io) server. You do not need a terminal:
 
-**2. Connect your AI agent.** Loam works with any agent that can run a local [MCP](https://modelcontextprotocol.io) server:
+| Your agent | What to do |
+|---|---|
+| **Claude Desktop** | [**Download loam.mcpb**]({{releaseDownloadUrl}}) and double-click it. Choose an empty folder when Claude asks. The file downloads straight from this repository's releases, and nothing else needs installing |
+| **Claude Code, Codex, Cursor, VS Code, Gemini CLI, Windsurf, Cline and others** | Send your agent this message: `Set up Loam for me. Follow the instructions at {{llmsInstallUrl}} and ask me before you change anything.` It finds your folder, adds Loam to its settings and checks that it works, asking you first |
+| **ChatGPT, Gemini, claude.ai** in a browser | **Copy for any chat** in the app: a process or skill as text to paste. Read-only: these chats cannot run a local server |
 
-| Agent | How | |
-|---|---|---|
-| **Claude Desktop** | [**Download loam.mcpb**]({{releaseDownloadUrl}}) and double-click it | One click. The file downloads straight from this repository's releases; you never need to visit GitHub. Nothing else to install |
-| **Claude Code** | `claude mcp add --transport stdio --scope user loam -- npx -y {{npmPackage}} --folder <path>` | |
-| **Codex** | `codex mcp add loam -- npx -y {{npmPackage}} --folder <path>` | |
-| **Cursor** · **VS Code (Copilot)** | One-click install links in the app | |
-| **Gemini CLI** · **Windsurf** · others | A few lines in the agent's MCP config | |
-| **ChatGPT** · **Gemini** · **claude.ai** in a browser | **Copy for any chat** in the app: a process or skill as text to paste | Read-only. These chats cannot run a local server, so they cannot save corrections back |
+**2. Tell your agent:** `Run my Loam onboarding interview`. Four short questions, about four minutes. If your folder is new, your agent asks first and sets it up itself. Then ask for your work in plain words, for example `Do my weekly client report`.
+
+**3. Optional: open the app** at [{{siteHost}}/app]({{siteUrl}}/app) in Chrome or Edge to see your processes and the hours each takes, and to edit with every change shown first. (Want to look first? [Open the demo]({{siteUrl}}/app?demo=1); it works in any browser.)
+
+<details>
+<summary>Set an agent up by hand (for technical users)</summary>
+
+You need [Node](https://nodejs.org) 22 or newer (`node --version`). Replace `<path>` with the full path of your folder.
+
+| Agent | Command |
+|---|---|
+| **Claude Code** | `claude mcp add --transport stdio --scope user loam -- npx -y {{npmPackage}} --folder <path>` |
+| **Codex** | `codex mcp add loam -- npx -y {{npmPackage}} --folder <path>` |
+| **Cursor** · **VS Code (Copilot)** | One-click install links in the app |
+| **Gemini CLI** · **Windsurf** · others | A few lines in the agent's MCP config |
 
 [![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)]({{cursorInstallUrl}})
 
-That button is for Mac and Linux with your folder at `~/Loam`. For another folder, or on Windows, use the app's **Connect your agent** screen. An AI agent that installs servers for you (Cline, for example) can follow [llms-install.md](llms-install.md).
+That button is for Mac and Linux with your folder at `~/Loam`. For another folder, or on Windows, use the app's **Connect your agent** screen, which writes the exact command or config for your agent and your folder, and the [install guide]({{siteUrl}}/install) shows them step by step. The same instructions your agent follows are in [llms-install.md](llms-install.md).
 
-The app's **Connect your agent** screen writes the exact command or config for your agent and your folder (Mac, Windows and Linux), and the [install guide]({{siteUrl}}/install) shows them step by step. Agents other than Claude Desktop need [Node](https://nodejs.org) 22 or newer; check with `node --version`.
-
-**3. Tell your agent:** `Run my Loam onboarding interview`. Then ask for your work in plain words, for example `Do my weekly client report`.
+</details>
 
 > **Chats in a browser** (ChatGPT, Gemini, claude.ai) cannot run a local server. Open a process or a skill in the app and press **Copy for any chat**: you see exactly what will be copied, tick what to include, and paste it into the chat. It is a one-way copy; the text contains your latest example and corrections, and imported skills are wrapped as data. Any agent that opens the folder can also read it: `AGENTS.md` is read natively by Codex, Cursor, Copilot and Windsurf, and Loam adds `GEMINI.md` for Gemini CLI and copies your skills to `.claude/skills` and `.agents/skills`, where Claude Code, Cursor, Codex, Gemini CLI, Copilot and others look for them.
 

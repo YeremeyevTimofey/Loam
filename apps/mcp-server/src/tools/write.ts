@@ -1,11 +1,45 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { planAddExample, planGenerateProcessSkill, planLogRun, planRecordCorrection, planUpsertNote } from '@loam/core';
+import { isKnowledgeBase, planAddExample, planGenerateProcessSkill, planLogRun, planRecordCorrection, planScaffold, planUpsertNote } from '@loam/core';
 import { z } from 'zod';
 import type { Ctx } from '../context';
 import { commit, defineTool, renderDiff } from './define';
 import { requireBase } from './read';
 
 export function registerWriteTools(server: McpServer, ctx: Ctx): void {
+  defineTool(server, ctx, {
+    name: 'loam_init',
+    title: 'Set up Loam in this folder',
+    description:
+      'Sets up the knowledge base in the folder the user chose when it is not one yet: README.md, AGENTS.md, profile.md, the context files and the interview script. Say which folder and ask the user first; call with confirm: true only after they agree. Never overwrites a file. If the folder already holds other files, ask again and pass allow_existing_files: true only if the user agrees. Does nothing when the knowledge base exists. Afterwards offer to run the onboarding interview.',
+    input: {
+      confirm: z.boolean().describe('true only after the user agreed to set up Loam in this folder'),
+      allow_existing_files: z.boolean().default(false).describe('true only if the folder is not empty and the user agreed to add Loam files next to what is there'),
+    },
+    kind: 'write',
+    handler: async ({ confirm, allow_existing_files }, ready) => {
+      if (await isKnowledgeBase(ready.store)) return 'This folder is already a Loam knowledge base. Nothing to set up. Offer to run the onboarding interview if the profile is empty.';
+      const folder = ready.store.root;
+      if (!confirm) return { text: `Do not set anything up yet. Ask the user: "Set up Loam in the folder ${folder}?" and call loam_init again with confirm: true if they agree.`, isError: true };
+      // Hidden entries (.DS_Store, .git, ...) do not count as content.
+      const existing = (await ready.store.listFiles('')).filter((e) => !e.name.startsWith('.'));
+      if (existing.length > 0 && !allow_existing_files) {
+        const names = existing.slice(0, 6).map((e) => e.name).join(', ');
+        return {
+          text: `The folder ${folder} is not empty (${names}${existing.length > 6 ? ', …' : ''}). Tell the user, and ask whether to add the Loam files next to them (nothing existing is changed) or to choose an empty folder. Call loam_init again with confirm: true and allow_existing_files: true only if they agree.`,
+          isError: true,
+        };
+      }
+      const plan = await planScaffold(ready.store, ready.today());
+      await commit(ready, plan);
+      return [
+        `Loam is set up in ${folder}. Created ${plan.changes.length} files:`,
+        ...plan.changes.map((c) => `- ${c.path}`),
+        '',
+        'Next: offer to run the onboarding interview (it takes about four minutes), or the user can say "Run my Loam onboarding interview" any time.',
+      ].join('\n');
+    },
+  });
+
   defineTool(server, ctx, {
     name: 'loam_upsert_note',
     title: 'Write a note',
