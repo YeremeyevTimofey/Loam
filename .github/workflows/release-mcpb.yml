@@ -17,7 +17,9 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    # macOS, like CI: the extension carries SQLite binaries for macOS and Windows only (Claude Desktop's platforms), so the
+    # test that runs the packed extension needs a machine that has one. On Linux the server falls back to a basic search.
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
