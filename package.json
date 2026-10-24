@@ -4,7 +4,7 @@
   "private": true,
   "description": "Loam — work context for AI agents",
   "license": "MIT",
-  "homepage": "https://loam.dev",
+  "homepage": "https://loam-ai.pages.dev",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/YeremeyevTimofey/Loam.git"

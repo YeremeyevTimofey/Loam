@@ -9,7 +9,7 @@ Loam gives an AI agent the work context of one person: their profile, their recu
 ## Before you install
 
 1. **Node.js 22 or newer.** Run `node --version`. If it is older, or missing, stop and tell the person to install Node 22 or newer from https://nodejs.org. Do not install Node yourself.
-2. **The person's Loam folder.** They create it once in the Loam web app (https://loam.dev/app, in Chrome or Edge); it has a file called `AGENTS.md` inside. **Ask for the full path of that folder. Do not guess it and do not make one up.** If they have no folder yet, ask them to open https://loam.dev/app first.
+2. **The person's Loam folder.** They create it once in the Loam web app (https://loam-ai.pages.dev/app, in Chrome or Edge); it has a file called `AGENTS.md` inside. **Ask for the full path of that folder. Do not guess it and do not make one up.** If they have no folder yet, ask them to open https://loam-ai.pages.dev/app first.
 
 ## Install
 
@@ -37,7 +37,7 @@ Add this entry to the MCP settings (in Cline: MCP Servers → Configure MCP Serv
 npx -y loam-mcp --check --folder "<FULL PATH OF THE LOAM FOLDER>"
 ```
 
-A good answer says `Node … (ok)`, `Loam knowledge base: yes` and a search line. If it says the folder is **not** a knowledge base yet, tell the person to open https://loam.dev/app and choose the same folder, then run the check again. Do not create the files yourself.
+A good answer says `Node … (ok)`, `Loam knowledge base: yes` and a search line. If it says the folder is **not** a knowledge base yet, tell the person to open https://loam-ai.pages.dev/app and choose the same folder, then run the check again. Do not create the files yourself.
 
 ## Then
 

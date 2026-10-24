@@ -277,7 +277,7 @@ describe('folder boundary (acceptance: path outside the folder is an error)', ()
     try {
       const r = await s.call('loam_overview');
       expect(r.isError).toBe(true);
-      expect(r.text).toMatch(/open https:\/\/loam\.dev\/app/);
+      expect(r.text).toMatch(/open https:\/\/loam-ai\.pages\.dev\/app/);
     } finally {
       await s.close();
     }
