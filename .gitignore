@@ -168,3 +168,6 @@ playwright-report
 .idea
 .vscode/*
 !.vscode/extensions.json
+
+# personal notes of the maintainer (plans, career, drafts): never published
+private/
