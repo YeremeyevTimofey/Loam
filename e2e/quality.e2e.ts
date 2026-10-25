@@ -106,9 +106,10 @@ describe('the deployed headers (dist/_headers, built from the template) really w
     expect(headersFor('/')['Content-Security-Policy']).toContain('https://plausible.io');
     const { context, page, violations } = await withHeaders(`${site.origin}/`, '/');
     await page.goto(`${site.origin}/`, { waitUntil: 'networkidle' });
-    expect(await page.evaluate(() => document.fonts.check('600 16px Inter'))).toBe(true);
+    expect(await page.evaluate(() => document.fonts.check('600 16px Geist'))).toBe(true);
     expect(await page.evaluate(() => [...document.images].every((i) => i.naturalWidth > 0))).toBe(true);
-    expect(await page.locator('h1').evaluate((h) => getComputedStyle(h).fontSize)).toBe('48px');
+    // the display heading grows with the screen: 60px, its largest size, at 1280px
+    expect(await page.locator('h1').evaluate((h) => getComputedStyle(h).fontSize)).toBe('60px');
     expect(violations).toEqual([]);
     await context.close();
   });
@@ -306,7 +307,9 @@ describe('colour tokens (acceptance 6, 41)', () => {
   const pairs: [string, string, number][] = [
     ['text', 'bg', 4.5], ['text', 'surface', 4.5], ['text-muted', 'bg', 4], ['text-muted', 'surface', 4], ['text-muted', 'accent-soft', 4],
     ['warning-ink', 'bg', 4.5], ['warning-ink', 'surface', 4.5], ['success-ink', 'bg', 4.5], ['success-ink', 'surface', 4.5],
-    ['on-accent', 'accent', 4.5], ['on-accent', 'accent-hover', 4.5], ['accent', 'bg', 4.5], ['accent', 'surface', 4.5], ['accent', 'accent-soft', 4.5],
+    // lime is a fill with ink on it; text, borders and focus rings in its hue use accent-ink
+    ['on-accent', 'accent', 4.5], ['on-accent', 'accent-hover', 4.5], ['accent-ink', 'bg', 4.5], ['accent-ink', 'surface', 4.5], ['accent-ink', 'accent-soft', 4.5],
+    ['text', 'accent-soft', 4.5], ['bg', 'text', 4.5], ['accent', 'text', 3],
     ['warning', 'bg', 4.5], ['danger', 'bg', 4.5], ['success', 'bg', 4.5], ['warning', 'surface', 4.5], ['danger', 'surface', 4.5], ['success', 'surface', 4.5],
   ];
   const mixOver = (fg: string, bg: string, p: number) => {
@@ -321,6 +324,9 @@ describe('colour tokens (acceptance 6, 41)', () => {
       });
     }
   }
+  it('secondary text on the ink block (bg at 75%) is at least 4.5:1', () => {
+    expect(ratio(mixOver(token('bg'), token('text'), 0.75), token('text'))).toBeGreaterThanOrEqual(4.5);
+  });
   for (const [fg, bg, min] of pairs) {
     it(`${fg} on ${bg} is at least ${min}:1`, () => {
       expect(ratio(token(fg), token(bg))).toBeGreaterThanOrEqual(min);

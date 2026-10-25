@@ -27,7 +27,7 @@ export function ProcessCard({ p }: { p: ProcessInfo }) {
         e.preventDefault();
         go(route);
       }}
-      className="appear block rounded-lg border border-line bg-surface p-4 text-ink no-underline transition-colors duration-150 hover:border-accent hover:no-underline md:p-6"
+      className="appear block rounded-lg border border-line bg-surface p-4 text-ink no-underline transition-colors duration-150 hover:border-soil hover:no-underline md:p-6"
     >
       <div className="mb-1 flex items-start justify-between gap-3">
         <h3 className="t-h3">{p.fm.title}</h3>

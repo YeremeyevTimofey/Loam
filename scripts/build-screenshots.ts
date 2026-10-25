@@ -10,12 +10,12 @@ import { COLORS, PUBLIC, REPO } from './assets/brand';
 const web = path.join(REPO, 'apps/web');
 const server = await preview({ root: web, configFile: path.join(web, 'vite.config.ts'), preview: { port: 0, host: '127.0.0.1' }, logLevel: 'error' });
 const origin = server.resolvedUrls!.local[0]!.replace(/\/$/, '');
-const font = `data:font/woff2;base64,${readFileSync(path.join(PUBLIC, 'fonts/inter-latin-variable.woff2')).toString('base64')}`;
+const font = `data:font/woff2;base64,${readFileSync(path.join(PUBLIC, 'fonts/geist-latin-variable.woff2')).toString('base64')}`;
 const shots = path.join(PUBLIC, 'shots');
 const browser = await chromium.launch();
 
 const fill = (html: string, extra: Record<string, string> = {}) =>
-  Object.entries({ __FONT__: font, __BG__: COLORS.bg, __TEXT__: COLORS.text, __MUTED__: COLORS.muted, __ACCENT__: COLORS.accent, ...extra }).reduce((h, [k, v]) => h.replaceAll(k, v), html);
+  Object.entries({ __FONT__: font, __BG__: COLORS.bg, __TEXT__: COLORS.text, __MUTED__: COLORS.muted, __ACCENT__: COLORS.accentInk, __LIME__: COLORS.accent, __ON_ACCENT__: COLORS.onAccent, __SOFT__: COLORS.accentSoft, ...extra }).reduce((h, [k, v]) => h.replaceAll(k, v), html);
 
 async function app(name: string, url: string, prepare?: (page: Page) => Promise<void>) {
   const page = await browser.newPage({ viewport: { width: 1200, height: 800 }, deviceScaleFactor: 1 });

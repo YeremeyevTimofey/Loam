@@ -49,7 +49,7 @@ export function renderSarah(s: SarahSummary, links: { demo: string; processBase:
   const steps = s.learning.corrections
     .map(
       (c, i) => `<li class="relative border-l border-line pb-6 pl-5 last:pb-0">
-        <span class="absolute -left-[5px] top-2 size-[9px] rounded-full bg-accent" aria-hidden="true"></span>
+        <span class="absolute -left-[5px] top-2 size-[9px] rounded-full bg-accent ring-1 ring-accent-ink/50" aria-hidden="true"></span>
         <p class="t-secondary">${esc(date(c.date))}${c.run !== null ? ` · after run ${c.run}` : ''} · correction ${i + 1}</p>
         <p class="mt-1 font-medium">${esc(c.note)}</p>
         ${c.was && c.should ? `<p class="t-secondary mt-1"><span class="font-medium">Was:</span> ${esc(clip(c.was, 110))}<br><span class="font-medium">Should be:</span> ${esc(clip(c.should, 110))}</p>` : ''}
@@ -73,8 +73,8 @@ export function renderSarah(s: SarahSummary, links: { demo: string; processBase:
 
   return `<section class="gutter pb-14 md:pb-24" aria-labelledby="sarah-h" id="example">
   <div class="wide">
-    <p class="t-secondary mb-2">A fictional example, built from the sample knowledge base you can open yourself</p>
-    <h2 id="sarah-h" class="t-h2 mb-4">Meet ${esc(first)}, an ${esc(s.persona.role.toLowerCase())}</h2>
+    <h2 id="sarah-h" class="t-h2 mb-2">Meet ${esc(first)}, an ${esc(s.persona.role.toLowerCase())}</h2>
+    <p class="t-secondary mb-5">A fictional example, built from the sample knowledge base you can open yourself.</p>
     <p class="mb-3 max-w-[720px]">${esc(first)} looks after six client accounts at ${esc(s.persona.company)}, a 20-person marketing agency. She answered Loam's short interview once. Everything below comes from the files that interview created, and every number is real: open her knowledge base to check.</p>
     <p class="t-secondary mb-10 max-w-[720px]">Her tools: ${esc(s.persona.tools.join(', '))}.</p>
 

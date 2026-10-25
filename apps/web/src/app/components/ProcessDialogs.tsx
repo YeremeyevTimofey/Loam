@@ -65,9 +65,9 @@ export function AddExampleDialog({ proc, open, onOpenChange }: { proc: ProcessIn
             {(['good', 'bad'] as const).map((k) => (
               <label
                 key={k}
-                className={cn('inline-flex h-11 cursor-pointer items-center gap-2 rounded-md border px-4', kind === k ? 'border-accent bg-accent-soft text-accent' : 'border-line')}
+                className={cn('inline-flex h-11 cursor-pointer items-center gap-2 rounded-md border px-4', kind === k ? 'border-accent-ink bg-accent-soft text-accent-ink' : 'border-line')}
               >
-                <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} className="accent-[var(--accent)]" />
+                <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} className="accent-[var(--accent-ink)]" />
                 {k === 'good' ? 'A good one to copy' : 'One to avoid'}
               </label>
             ))}
@@ -127,7 +127,7 @@ export function EditDetailsDialog({ proc, open, onOpenChange }: { proc: ProcessI
     await propose(plan, { title: `Edit “${proc.fm.title}”` });
   };
 
-  const select = 'h-11 w-full rounded-md border border-line bg-surface px-3 text-base text-ink focus-visible:border-accent';
+  const select = 'h-11 w-full rounded-md border border-line bg-surface px-3 text-base text-ink focus-visible:border-accent-ink';
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -220,7 +220,7 @@ export function ViewFilesDialog({ slug, open, onOpenChange }: { slug: string; op
                       type="button"
                       onClick={async () => setSelected({ path, text: await store.readFile(path) })}
                       aria-current={selected?.path === path}
-                      className={cn('min-h-11 w-full break-all rounded-md px-3 py-2 text-left text-[15px] hover:bg-bg', selected?.path === path && 'bg-accent-soft text-accent')}
+                      className={cn('min-h-11 w-full break-all rounded-md px-3 py-2 text-left text-[15px] hover:bg-bg', selected?.path === path && 'bg-accent-soft text-accent-ink')}
                     >
                       {path.replace(`processes/${slug}/`, '')}
                     </button>
