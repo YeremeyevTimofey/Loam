@@ -32,8 +32,8 @@ export function Header({ route }: { route: Route }) {
               onClick={() => go(tab.route)}
               aria-current={current === tab.route.screen ? 'page' : undefined}
               className={cn(
-                'inline-flex h-11 items-center rounded-md px-3 text-base font-medium',
-                current === tab.route.screen ? 'bg-accent-soft text-accent' : 'text-muted hover:text-ink',
+                'inline-flex h-11 items-center rounded-md px-3 text-base font-medium transition-colors duration-150 ease-calm',
+                current === tab.route.screen ? 'bg-accent-soft text-accent-ink' : 'text-muted hover:text-ink',
               )}
             >
               {tab.label}

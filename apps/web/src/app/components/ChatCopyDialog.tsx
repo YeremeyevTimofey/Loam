@@ -125,8 +125,8 @@ export function ChatCopyDialog({ target, onClose }: { target: ChatTarget | null;
                     const n = partTokens.get(p.id);
                     return (
                       <li key={p.id}>
-                        <label className={cn('flex min-h-11 items-start gap-3 rounded-md border px-3 py-2', p.required ? 'border-line bg-bg' : 'cursor-pointer border-line hover:bg-bg', on && !p.required && 'border-accent bg-accent-soft')}>
-                          <input type="checkbox" checked={on} disabled={p.required} onChange={() => toggle(p.id)} className="mt-1 size-4 shrink-0 accent-[var(--accent)]" aria-describedby={p.hint ? `part-hint-${p.id}` : undefined} />
+                        <label className={cn('flex min-h-11 items-start gap-3 rounded-md border px-3 py-2', p.required ? 'border-line bg-bg' : 'cursor-pointer border-line hover:bg-bg', on && !p.required && 'border-accent-ink bg-accent-soft')}>
+                          <input type="checkbox" checked={on} disabled={p.required} onChange={() => toggle(p.id)} className="mt-1 size-4 shrink-0 accent-[var(--accent-ink)]" aria-describedby={p.hint ? `part-hint-${p.id}` : undefined} />
                           <span className="min-w-0 flex-1">
                             <span className="block break-words font-medium">{p.label}</span>
                             {p.hint ? (

@@ -13,6 +13,6 @@ if (folder && typeof (window as { showDirectoryPicker?: unknown }).showDirectory
   folder.setAttribute('aria-describedby', 'cta-note');
   folder.removeAttribute('class');
   folder.className =
-    'inline-flex h-11 items-center justify-center rounded-md border border-line px-5 font-medium leading-none text-ink opacity-50 cursor-not-allowed';
+    'inline-flex h-11 items-center justify-center rounded-md border border-line bg-surface px-5 font-medium leading-none text-ink opacity-50 cursor-not-allowed';
   if (note) note.hidden = false;
 }

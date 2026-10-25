@@ -91,7 +91,7 @@ export function ConnectAgent({ className }: { className?: string }) {
             role="radio"
             aria-checked={agent === a.id}
             onClick={() => setAgent(a.id)}
-            className={cn('inline-flex h-11 items-center rounded-md border px-4 text-base font-medium', agent === a.id ? 'border-accent bg-accent-soft text-accent' : 'border-line text-ink hover:bg-bg')}
+            className={cn('inline-flex h-11 items-center rounded-md border px-4 text-base font-medium', agent === a.id ? 'border-accent-ink bg-accent-soft text-accent-ink' : 'border-line text-ink hover:bg-bg')}
           >
             {a.name}
           </button>
@@ -161,7 +161,7 @@ export function ConnectAgent({ className }: { className?: string }) {
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor="os">System</Label>
-                    <select id="os" value={os} onChange={(e) => setOs(e.target.value as Os)} className="h-11 rounded-md border border-line bg-surface px-3 text-base text-ink focus-visible:border-accent">
+                    <select id="os" value={os} onChange={(e) => setOs(e.target.value as Os)} className="h-11 rounded-md border border-line bg-surface px-3 text-base text-ink focus-visible:border-accent-ink">
                       {(Object.keys(OS_LABEL) as Os[]).map((o) => (
                         <option key={o} value={o}>
                           {OS_LABEL[o]}

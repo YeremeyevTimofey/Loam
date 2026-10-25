@@ -10,7 +10,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preload" href="/fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/geist-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Loam" />
     <meta property="og:title" content="Connect Loam to your AI agent" />
@@ -23,14 +23,14 @@
   </head>
   <body>
     <header class="wide gutter flex h-16 items-center">
-      <a href="/" class="inline-flex h-11 items-center gap-2 text-xl font-semibold tracking-[-0.01em] text-ink no-underline hover:no-underline" aria-label="Loam, home">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="text-accent"><rect x="2" y="4" width="20" height="4" rx="2" fill="currentColor" fill-opacity=".4" /><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor" fill-opacity=".7" /><rect x="2" y="16" width="20" height="4" rx="2" fill="currentColor" fill-opacity="1" /></svg>
+      <a href="/" class="brand inline-flex h-11 items-center gap-2.5 text-xl font-semibold tracking-[-0.025em] text-ink no-underline hover:no-underline" aria-label="Loam, home">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="mark"><rect class="mark-top fill-accent" x="2" y="4" width="20" height="4" rx="2" /><rect class="mark-mid fill-soil" x="2" y="10" width="20" height="4" rx="2" /><rect class="mark-low fill-ink" x="2" y="16" width="20" height="4" rx="2" /></svg>
         Loam
       </a>
     </header>
 
     <main class="gutter pb-14 pt-8 md:pb-24 md:pt-14">
-      <div class="measure">
+      <div class="column">
         <h1 class="t-h1">Connect Loam to your AI agent</h1>
         <p class="mt-5">Loam works with any AI agent that can run a local MCP server. You only do this once, and it takes a few minutes. You do not need anything else first: your agent sets up the folder for you.</p>
         <p class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[15px]" aria-label="Jump to your agent">
@@ -46,7 +46,7 @@
               <h3 class="t-h3 mb-3">1. Download the extension</h3>
               <p class="mb-4">It is one small file called <code>loam.mcpb</code>. It is the part that lets Claude read your folder.</p>
               <p class="mb-5">
-                <a id="download" href="{{downloadPath}}" class="plausible-event-name=Download+Extension inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 font-medium leading-none text-on-accent no-underline transition-colors duration-150 hover:bg-accent-hover hover:no-underline">Download loam.mcpb</a>
+                <a id="download" href="{{downloadPath}}" class="plausible-event-name=Download+Extension inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 font-medium leading-none text-on-accent no-underline transition-[background-color,translate] duration-150 ease-calm hover:bg-accent-hover hover:no-underline active:translate-y-px">Download loam.mcpb</a>
               </p>
               <p class="t-secondary mb-5">Every version, with its checksum, is on the <a href="{{releasesUrl}}">releases page</a>.</p>
               <img src="/shots/install-1-download.png" width="1200" height="800" alt="Illustration: the download button and the saved loam.mcpb file in the Downloads folder" class="h-auto w-full rounded-lg border border-line" loading="lazy" decoding="async" />

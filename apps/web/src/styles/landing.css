@@ -1,3 +1,56 @@
 @import './theme.css';
 
 /* Block rhythm (§12C.3): 96px between blocks on desktop, 56px on phones. The sections carry the padding. */
+
+/*
+ * The landing page's one authored moment, played once on load: the logo's three layers of soil settle,
+ * the lime top layer sprouts, and the same lime marks the promise in the heading. Under a second, and
+ * nothing at all for people who ask for less motion. Content is visible before and after.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .mark rect {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: settle 520ms var(--ease-out) both;
+  }
+  .mark .mark-mid {
+    animation-delay: 90ms;
+  }
+  .mark .mark-top {
+    animation: sprout var(--duration-enter) var(--ease-out) 200ms both;
+  }
+  /* Pointing at the logo lets the top layer grow again. */
+  .brand:hover .mark .mark-top {
+    animation: regrow 520ms var(--ease-out) both;
+  }
+  .hero .hl {
+    animation: sweep var(--duration-enter) var(--ease-out) 420ms both;
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+@keyframes sprout {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes regrow {
+  from {
+    transform: scaleX(0.3);
+  }
+}
+@keyframes sweep {
+  from {
+    background-size: 0% 0.38em;
+  }
+}
+
+/* The closing block is ink: the page ends on its darkest, calmest surface, with the lime action on it. */
+.on-ink :focus-visible {
+  outline-color: var(--accent);
+}

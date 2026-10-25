@@ -10,7 +10,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preload" href="/fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/geist-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Loam" />
     <meta property="og:title" content="Loam — work context for AI agents" />
@@ -26,21 +26,21 @@
   </head>
   <body>
     <header class="wide gutter flex h-16 items-center">
-      <a href="/" class="inline-flex h-11 items-center gap-2 text-xl font-semibold tracking-[-0.01em] text-ink no-underline hover:no-underline" aria-label="Loam, home">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="text-accent"><rect x="2" y="4" width="20" height="4" rx="2" fill="currentColor" fill-opacity=".4" /><rect x="2" y="10" width="20" height="4" rx="2" fill="currentColor" fill-opacity=".7" /><rect x="2" y="16" width="20" height="4" rx="2" fill="currentColor" /></svg>
+      <a href="/" class="brand inline-flex h-11 items-center gap-2.5 text-xl font-semibold tracking-[-0.025em] text-ink no-underline hover:no-underline" aria-label="Loam, home">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="mark"><rect class="mark-top fill-accent" x="2" y="4" width="20" height="4" rx="2" /><rect class="mark-mid fill-soil" x="2" y="10" width="20" height="4" rx="2" /><rect class="mark-low fill-ink" x="2" y="16" width="20" height="4" rx="2" /></svg>
         Loam
       </a>
     </header>
 
     <main>
       <!-- 1. Hero -->
-      <section class="gutter pb-14 pt-10 md:pb-24 md:pt-20" aria-labelledby="hero-h">
-        <div class="measure">
-          <h1 id="hero-h" class="t-h1">Your AI assistant finally knows how you work</h1>
-          <p class="mt-5 text-[17px] md:text-xl">Answer four short questions about your work, about four minutes. Get a knowledge base your AI agents can actually use.</p>
+      <section class="hero gutter pb-16 pt-12 md:pb-28 md:pt-24" aria-labelledby="hero-h">
+        <div class="column">
+          <h1 id="hero-h" class="t-display">Your AI assistant finally knows <span class="hl">how you work</span></h1>
+          <p class="t-lead mt-6 max-w-[36rem]">Answer four short questions about your work, about four minutes. Get a knowledge base your AI agents can actually use.</p>
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a id="cta-demo" href="/app?demo=1" class="plausible-event-name=Hero+Demo inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 font-medium leading-none text-on-accent no-underline transition-colors duration-150 hover:bg-accent-hover hover:no-underline">See a filled example</a>
-            <a id="cta-folder" href="/app" class="plausible-event-name=Hero+Folder inline-flex h-11 items-center justify-center rounded-md border border-line px-5 font-medium leading-none text-ink no-underline transition-colors duration-150 hover:bg-surface hover:no-underline aria-disabled:pointer-events-none aria-disabled:opacity-50">Start with my folder</a>
+            <a id="cta-demo" href="/app?demo=1" class="plausible-event-name=Hero+Demo inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 font-medium leading-none text-on-accent no-underline transition-[background-color,translate] duration-150 ease-calm hover:bg-accent-hover hover:no-underline active:translate-y-px">See a filled example</a>
+            <a id="cta-folder" href="/app" class="plausible-event-name=Hero+Folder inline-flex h-11 items-center justify-center rounded-md border border-line bg-surface px-5 font-medium leading-none text-ink no-underline transition-[border-color,translate] duration-150 ease-calm hover:border-soil hover:no-underline active:translate-y-px aria-disabled:pointer-events-none aria-disabled:opacity-50">Start with my folder</a>
           </div>
           <p id="cta-note" class="t-secondary mt-3" hidden>Works in Chrome or Edge</p>
           <p class="t-secondary mt-4">Chrome or Edge for folder access · Works with Claude, Cursor, Codex, Gemini, VS Code and any MCP-capable agent · Nothing leaves your computer</p>
@@ -49,19 +49,19 @@
 
       <!-- 2. The problem -->
       <section class="gutter pb-14 md:pb-24" aria-labelledby="problem-h">
-        <div class="measure">
+        <div class="column">
           <h2 id="problem-h" class="t-h2 mb-8">Most people have the tool and don’t get the result</h2>
           <dl class="space-y-6">
             <div class="flex items-baseline gap-5 border-t border-line pt-5">
-              <dt class="w-28 shrink-0 text-4xl font-semibold tracking-tight text-accent md:w-36 md:text-5xl">85%</dt>
+              <dt class="w-28 shrink-0 text-4xl font-semibold tracking-[-0.035em] text-ink tabular-nums md:w-36 md:text-5xl">85%</dt>
               <dd>of employees have access to AI tools.</dd>
             </div>
             <div class="flex items-baseline gap-5 border-t border-line pt-5">
-              <dt class="w-28 shrink-0 text-4xl font-semibold tracking-tight text-accent md:w-36 md:text-5xl">25%</dt>
+              <dt class="w-28 shrink-0 text-4xl font-semibold tracking-[-0.035em] text-ink tabular-nums md:w-36 md:text-5xl">25%</dt>
               <dd>use them regularly, pasting the same background into every prompt and getting generic answers back.</dd>
             </div>
             <div class="flex items-baseline gap-5 border-t border-line pt-5">
-              <dt class="w-28 shrink-0 text-4xl font-semibold tracking-tight text-accent md:w-36 md:text-5xl">1 in 3</dt>
+              <dt class="w-28 shrink-0 text-4xl font-semibold tracking-[-0.035em] text-ink tabular-nums md:w-36 md:text-5xl">1 in 3</dt>
               <dd>can say what good use of AI looks like in their own job.</dd>
             </div>
           </dl>
@@ -124,7 +124,7 @@
 
       <!-- 5. Privacy, code and skill safety -->
       <section class="gutter pb-14 md:pb-24" aria-labelledby="privacy-h">
-        <div class="measure">
+        <div class="column">
           <h2 id="privacy-h" class="t-h2 mb-5">Private by design, safe by default</h2>
           <p class="mb-4">Your data never leaves your computer. There is no server, no account and no sign-up: the app is a web page that reads and writes the folder you choose, and nothing else. The code is open, so you can check that.</p>
           <p class="mb-4">Skills from other people are checked before they are added. Anything that deletes files, uses the internet, sends your data out, asks for passwords or tries to change how your AI behaves is refused, with no way to override it. Imported instructions can never write to your folder and can never reach the network.</p>
@@ -139,10 +139,10 @@
 
       <!-- Closing call to action -->
       <section class="gutter pb-14 md:pb-24" aria-label="Get started">
-        <div class="measure rounded-lg border border-line bg-surface p-6 text-center md:p-10">
+        <div class="on-ink wide rounded-lg bg-ink px-6 py-12 text-center text-bg md:px-12 md:py-16">
           <h2 class="t-h2 mb-3">Look around first</h2>
-          <p class="mb-6">The example is a filled-in knowledge base for an account manager. It works in any browser, and nothing you change is saved.</p>
-          <a href="/app?demo=1" class="plausible-event-name=Footer+Demo inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 font-medium leading-none text-on-accent no-underline transition-colors duration-150 hover:bg-accent-hover hover:no-underline">See a filled example</a>
+          <p class="mx-auto mb-7 max-w-[30rem] text-bg/75">The example is a filled-in knowledge base for an account manager. It works in any browser, and nothing you change is saved.</p>
+          <a href="/app?demo=1" class="plausible-event-name=Footer+Demo inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 font-medium leading-none text-on-accent no-underline transition-[background-color,translate] duration-150 ease-calm hover:bg-accent-hover hover:no-underline active:translate-y-px">See a filled example</a>
         </div>
       </section>
     </main>

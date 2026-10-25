@@ -16,6 +16,8 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-soil: var(--soil);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
@@ -34,12 +36,13 @@
   --font-sans: var(--f-sans);
   --font-mono: var(--f-mono);
   --shadow-menu: var(--sh-menu);
+  --ease-calm: var(--ease-out);
 }
 
 @font-face {
-  font-family: 'Inter';
-  src: url('/fonts/inter-latin-variable.woff2') format('woff2-variations');
-  font-weight: 400 600;
+  font-family: 'Geist';
+  src: url('/fonts/geist-latin-variable.woff2') format('woff2');
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -51,18 +54,31 @@
     font-family: var(--f-sans);
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scrollbar-color: color-mix(in srgb, var(--text) 22%, transparent) transparent;
   }
   /* Body text is 16px on phones, 17px on desktop. The root stays 16px so rem spacing stays on the 8px grid. */
   body {
     margin: 0;
     min-height: 100vh;
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.65;
   }
   @media (min-width: 768px) {
     body {
       font-size: 17px;
     }
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p,
+  li,
+  dd {
+    text-wrap: pretty;
   }
   *,
   *::before,
@@ -70,22 +86,29 @@
     border-color: var(--border);
   }
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--accent-ink);
     outline-offset: 2px;
   }
   ::selection {
-    background: var(--accent-soft);
-    color: var(--text);
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  input,
+  textarea {
+    caret-color: var(--accent-ink);
   }
   /* Links inside text are underlined: colour alone must not be the only cue (§12C.5). Buttons and nav opt out. */
   a {
-    color: var(--accent);
+    color: var(--accent-ink);
     text-decoration: underline;
     text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, var(--accent-ink) 45%, transparent);
     text-underline-offset: 3px;
+    transition: text-decoration-color var(--duration) var(--ease-out);
   }
   a:hover {
     text-decoration-thickness: 2px;
+    text-decoration-color: currentColor;
   }
   code,
   kbd,
@@ -111,25 +134,39 @@
 
 /* Typography scale (§12C.2). Headings never end with a full stop and are never all caps. */
 @layer components {
-  .t-h1 {
-    font-size: 34px;
-    line-height: 1.15;
+  /* The landing page's one display size: it grows with the screen, from 36px to 60px. */
+  .t-display {
+    font-size: clamp(2.25rem, 1.35rem + 3.6vw, 3.75rem);
+    line-height: 1.04;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.035em;
+  }
+  .t-h1 {
+    font-size: 32px;
+    line-height: 1.12;
+    font-weight: 600;
+    letter-spacing: -0.03em;
   }
   .t-h2 {
-    font-size: 24px;
-    line-height: 1.2;
+    font-size: 26px;
+    line-height: 1.18;
     font-weight: 600;
+    letter-spacing: -0.025em;
   }
   .t-h3 {
-    font-size: 20px;
+    font-size: 19px;
     line-height: 1.3;
     font-weight: 600;
+    letter-spacing: -0.012em;
+  }
+  .t-lead {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--text-muted);
   }
   .t-secondary {
     font-size: 15px;
-    line-height: 1.5;
+    line-height: 1.6;
     color: var(--text-muted);
   }
   .t-mono {
@@ -139,10 +176,16 @@
   }
   @media (min-width: 768px) {
     .t-h1 {
-      font-size: 48px;
+      font-size: 42px;
     }
     .t-h2 {
-      font-size: 30px;
+      font-size: 34px;
+    }
+    .t-h3 {
+      font-size: 20px;
+    }
+    .t-lead {
+      font-size: 21px;
     }
   }
 
@@ -157,18 +200,39 @@
     max-width: var(--wide);
     margin-inline: auto;
   }
+  /* A reading column on the wide grid: it shares the logo's left edge and keeps lines at the measure. */
+  .column {
+    width: 100%;
+    max-width: var(--wide);
+    margin-inline: auto;
+  }
+  .column > * {
+    max-width: var(--measure);
+  }
   .gutter {
-    padding-inline: 16px;
+    padding-inline: 20px;
   }
   @media (min-width: 768px) {
     .gutter {
-      padding-inline: 24px;
+      padding-inline: 32px;
     }
   }
 
-  /* Motion (§12C.4): opacity and a 4px rise, 150ms. Nothing else moves. */
+  /* Highlighter: lime under ink, the one mark for what matters most on a page. */
+  .hl {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat;
+    background-position: 0 92%;
+    background-size: 100% 0.38em;
+    padding-inline: 0.06em;
+    margin-inline: -0.06em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* Motion (§12C.4): opacity and a 4px rise, quick and calm. Nothing else moves on its own. */
   .appear {
-    animation: appear var(--duration) ease-out both;
+    animation: appear 200ms var(--ease-out) both;
   }
 }
 

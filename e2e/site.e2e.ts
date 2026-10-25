@@ -37,7 +37,7 @@ describe('landing page (acceptance 32-34, 40)', () => {
       // weight without images, font included, under 100 KB
       const weight = sizes.filter((s) => !s.type.startsWith('image/')).reduce((sum, s) => sum + s.bytes, 0);
       expect(weight, JSON.stringify(sizes.map((s) => [s.url.replace(site.origin, ''), s.bytes]))).toBeLessThan(100_000);
-      expect(sizes.some((s) => s.url.endsWith('inter-latin-variable.woff2'))).toBe(true);
+      expect(sizes.some((s) => s.url.endsWith('geist-latin-variable.woff2'))).toBe(true);
       // number on the page comes from the sample base's own report
       const report = await (await page.request.get(`${site.origin}/app/`)).text();
       expect(report).not.toContain('plausible');
@@ -48,7 +48,7 @@ describe('landing page (acceptance 32-34, 40)', () => {
         expect((await page.request.get(`${site.origin}${asset}`)).status(), asset).toBe(200);
       }
       expect(await page.locator('script[src*="plausible"]').count()).toBe(1);
-      expect(await page.evaluate(() => document.fonts.check('600 16px Inter'))).toBe(true);
+      expect(await page.evaluate(() => document.fonts.check('600 16px Geist'))).toBe(true);
     } finally {
       await browser.close();
     }

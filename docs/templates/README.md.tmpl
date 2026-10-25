@@ -132,4 +132,4 @@ More: [development guide](docs/DEVELOPMENT.md) · [architecture](docs/ARCHITECTU
 
 ## License
 
-[MIT](LICENSE). The Inter typeface is under the SIL Open Font License (`apps/web/public/fonts/OFL.txt`).
+[MIT](LICENSE). The Geist typeface is under the SIL Open Font License (`apps/web/public/fonts/OFL.txt`).

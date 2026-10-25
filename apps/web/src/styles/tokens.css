@@ -1,16 +1,22 @@
 /*
- * The design system's single source of values (§12C). Components use these through Tailwind
- * (see theme.css) and never write a colour themselves.
+ * The design system's single source of values (§12C, see DESIGN.md). Components use these through
+ * Tailwind (see theme.css) and never write a colour themselves.
+ *
+ * Neutral paper and ink, plus one bright accent: lime, the sprout that grows out of loam. Lime is a
+ * fill (the logo's top layer, the primary action, highlights, selection) with ink on it. It is never
+ * text on a light ground: text, borders and focus rings in the accent's hue use --accent-ink.
  */
 :root {
   --bg: #fafaf9;
   --surface: #ffffff;
   --text: #18181b;
-  --text-muted: #71717a;
+  --text-muted: #61616a;
   --border: #e4e4e7;
-  --accent: #3f6212;
-  --accent-hover: #365314;
-  --accent-soft: #f7fee7;
+  --accent: #c6f432;
+  --accent-hover: #b4e41c;
+  --accent-soft: #f1fad2;
+  --accent-ink: #46720b;
+  --on-accent: #18181b;
   --warning: #b45309;
   --danger: #b91c1c;
   --success: #15803d;
@@ -23,18 +29,23 @@
   --warning-soft: color-mix(in srgb, var(--warning) 8%, transparent);
   --danger-soft: color-mix(in srgb, var(--danger) 8%, transparent);
   --success-soft: color-mix(in srgb, var(--success) 8%, transparent);
-  --on-accent: #ffffff;
+  /* the logo's middle layer: ink at 38% over the page */
+  --soil: color-mix(in srgb, var(--text) 38%, var(--bg));
 
-  --r-sm: 4px;
-  --r-md: 6px;
-  --r-lg: 8px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
 
-  --sh-menu: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --sh-menu: 0 4px 16px -4px rgba(24, 24, 27, 0.12);
 
-  --f-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --f-mono: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  --f-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --f-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
 
-  --measure: 720px;
-  --wide: 1100px;
+  --measure: 680px;
+  --wide: 1120px;
+
+  /* Motion: quick feedback, one slower entrance on the landing page, a calm deceleration for both. */
   --duration: 150ms;
+  --duration-enter: 700ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }

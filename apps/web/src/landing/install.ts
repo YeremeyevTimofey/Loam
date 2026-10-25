@@ -9,7 +9,7 @@ for (const pre of document.querySelectorAll<HTMLElement>('pre[data-copy]')) {
   if (!wrap || !navigator.clipboard) continue;
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'mt-1 inline-flex h-11 min-w-11 items-center justify-end rounded-md px-2 text-[15px] font-medium text-accent underline underline-offset-4';
+  button.className = 'mt-1 inline-flex h-11 min-w-11 items-center justify-end rounded-md px-2 text-[15px] font-medium text-accent-ink underline underline-offset-4';
   button.textContent = 'Copy';
   button.setAttribute('aria-label', `Copy: ${pre.getAttribute('aria-label') ?? 'text'}`);
   button.addEventListener('click', async () => {
