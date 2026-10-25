@@ -102,6 +102,13 @@ rule('no external fonts, scripts, stylesheets or images referenced from CSS or T
   (code) => grep(code, /@import\s+url\(\s*['"]?https?:|url\(\s*['"]?https?:|fonts\.googleapis|fonts\.gstatic|cdn\.|unpkg\.com|jsdelivr/g),
 ));
 rule('the app page ships a Content-Security-Policy that blocks connections', '§15', existsSync(path.join(root, 'apps/web/dist/app/index.html')) && /connect-src &#39;none&#39;|connect-src 'none'/.test(read(path.join(root, 'apps/web/dist/app/index.html'))) ? [] : ['dist/app/index.html has no connect-src \'none\' (run `npm run build` first)']);
+rule('the service worker stores no page address that ends in index.html (a host redirects it, and a stored redirect breaks every later visit)', '§15', (() => {
+  const file = path.join(root, 'apps/web/dist/sw.js');
+  if (!existsSync(file)) return ['dist/sw.js is missing (run `npm run build`)'];
+  const list = /const PRECACHE = (\[.*?\]);/s.exec(read(file));
+  if (!list) return ['dist/sw.js: the PRECACHE list was not found, so this rule cannot check it'];
+  return JSON.parse(list[1]).filter((u) => /index\.html$/.test(u)).map((u) => `dist/sw.js stores ${u}`);
+})());
 
 // --- acceptance 12: tool names
 rule('every MCP tool is called loam_*', '12', scan(under('apps/mcp-server/src', ['.ts']), (code) =>

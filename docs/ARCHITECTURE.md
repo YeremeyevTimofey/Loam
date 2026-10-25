@@ -171,7 +171,7 @@ Fixes the app can do for you (always with a diff first): sync the agent copies, 
 | No server, no account | No backend dependency (`check:rules`); the site is static files |
 | No analytics in the app | `check:rules`; e2e greps the served `/app/` page. Analytics (Plausible, cookie-free) is on `/` and `/install` only |
 | Only external resource on the landing page is the analytics script | e2e records requests on `/`; fonts and images are self-hosted |
-| Works offline after the first visit | e2e: loads, goes offline, reloads every screen |
+| Works offline after the first visit, and opens again on every later visit | e2e: loads, goes offline, reloads every screen; visits again online on a host that redirects `/app/index.html` (as Cloudflare Pages does) |
 | The server only touches the chosen folder | Server tests: `../`, absolute, `~`, symlink escapes are errors; reads and writes |
 | Other people's skills are checked | 8 malicious fixtures (one per red category + capability cases) refused in core, server and UI tests; the 7 starter skills and everyday text pass |
 | Reviews grant nothing | `check:rules` + tests: capabilities unchanged after a `safe` verdict |
@@ -210,7 +210,7 @@ Things the spec did not settle, or where an installed dependency or a later requ
 | Language of the base | Answers are stored in the language the person used; slugs and field names stay English. |
 | `loam_upsert_note` | Fenced (see the security model); not in the spec, needed so “notes” cannot bypass the scanner. |
 | Screenshots | The four product shots on the landing page come from the real app. The agent chat and the three Claude Desktop steps on `/install` are **drawn illustrations** (labelled so in their alt text); replace them with real screenshots when you have them. |
-| Service worker | Hand-written (no Workbox), contains no `fetch()`. A new version waits until all tabs are closed, so a page never loses the chunks it was built with. |
+| Service worker | Hand-written (no Workbox), contains no `fetch()`. A new version waits until all tabs are closed, so a page never loses the chunks it was built with. The app shell is stored as `/app/`, never `/app/index.html`: Cloudflare Pages redirects the second to the first, and a stored answer that came through a redirect cannot be used for a page visit (Chrome and Safari show an error from the second visit on). `check:rules` and the preview server in e2e guard this. |
 | “Meet Sarah” | An extra block on the landing page (the spec has six), generated at build time from the sample base so it cannot drift from what the demo shows. |
 
 ## Not in the MVP
