@@ -200,6 +200,30 @@ describe('privacy and offline (acceptance 28, 33, 38)', () => {
     await context.close();
   });
 
+  it('opens the app again on every later visit, on a host that redirects /app/index.html (Cloudflare Pages does)', async () => {
+    // A cached answer that came through a redirect cannot be used for a page visit: the browser shows "ERR_FAILED". It only
+    // happens once the worker is active, so a first visit always works and the second one is the one that breaks.
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto(demo(), { waitUntil: 'networkidle' });
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    await page.waitForFunction(async () => (await caches.keys()).some((k) => k.startsWith('loam-app-')), undefined, { timeout: 15_000 });
+    const redirected = await page.evaluate(async () => {
+      const found: string[] = [];
+      for (const name of await caches.keys()) {
+        const cache = await caches.open(name);
+        for (const request of await cache.keys()) if ((await cache.match(request))?.redirected) found.push(new URL(request.url).pathname);
+      }
+      return found;
+    });
+    expect(redirected, 'every cached answer must be a direct one').toEqual([]);
+    for (const url of [demo(), demo('&screen=skills'), `${site.origin}/app/?demo=1`]) {
+      await page.goto(url, { waitUntil: 'load' });
+      await page.getByRole('heading', { level: 1 }).first().waitFor({ timeout: 10_000 });
+    }
+    await context.close();
+  });
+
   it('the service worker contains no network code of its own', () => {
     const sw = readFileSync(path.join(REPO, 'apps/web/dist/sw.js'), 'utf8');
     expect(sw).not.toMatch(/\bfetch\(/);
