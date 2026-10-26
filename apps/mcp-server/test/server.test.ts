@@ -288,6 +288,90 @@ describe('folder boundary (acceptance: path outside the folder is an error)', ()
   });
 });
 
+describe('the folder is found however its path is spelled', () => {
+  // A person types the folder path into a setting. On macOS and Windows capital letters do not matter to the disk, so a path
+  // spelled with other capitals names the same folder and must work. Both the folder and the files in it are compared by
+  // the spelling the disk reports. (The disk of a Linux computer tells the two spellings apart; there the tests do not apply.)
+  const sandbox = () => mkdtempSync(path.join(tmpdir(), 'loam-spelling-'));
+  const baseAt = (folder: string) => {
+    mkdirSync(path.join(folder, '.loam'), { recursive: true });
+    writeFileSync(path.join(folder, '.loam/state.json'), '{"version":1}');
+  };
+
+  it('accepts capital letters that differ from the folder\'s name, for reading and writing', async () => {
+    const parent = sandbox();
+    try {
+      const real = path.join(parent, 'MyKnowledgeBase');
+      baseAt(real);
+      const typed = path.join(parent, 'myknowledgebase');
+      if (!existsSync(typed)) return; // this disk tells the spellings apart
+      const store = new NodeStore(typed);
+      expect(await store.readFile('.loam/state.json')).toContain('"version":1');
+      await store.writeFile('notes.md', '# Note\n');
+      expect(readFileSync(path.join(real, 'notes.md'), 'utf8')).toBe('# Note\n');
+      expect(store.label).toBe('MyKnowledgeBase'); // named as the disk names it, not as it was typed
+    } finally {
+      rmSync(parent, { recursive: true, force: true });
+    }
+  });
+
+  it('accepts capital letters that differ in a folder above it too', async () => {
+    const parent = sandbox();
+    try {
+      const real = path.join(parent, 'Work', 'loam-db');
+      baseAt(real);
+      const typed = path.join(parent, 'work', 'loam-db');
+      if (!existsSync(typed)) return;
+      expect(await new NodeStore(typed).readFile('.loam/state.json')).toContain('"version":1');
+    } finally {
+      rmSync(parent, { recursive: true, force: true });
+    }
+  });
+
+  it('accepts a name with a letter such as "й" written in the other Unicode form', async () => {
+    const parent = sandbox();
+    try {
+      const real = path.join(parent, 'База знаний й ё'.normalize('NFC'));
+      baseAt(real);
+      const typed = path.join(parent, 'База знаний й ё'.normalize('NFD'));
+      if (!existsSync(typed)) return;
+      expect(await new NodeStore(typed).readFile('.loam/state.json')).toContain('"version":1');
+    } finally {
+      rmSync(parent, { recursive: true, force: true });
+    }
+  });
+
+  it('accepts a folder reached through a link to it', async () => {
+    const parent = sandbox();
+    try {
+      baseAt(path.join(parent, 'real'));
+      symlinkSync(path.join(parent, 'real'), path.join(parent, 'alias'));
+      expect(await new NodeStore(path.join(parent, 'alias')).readFile('.loam/state.json')).toContain('"version":1');
+    } finally {
+      rmSync(parent, { recursive: true, force: true });
+    }
+  });
+
+  it('still refuses a real link out of the folder, and says what to check if no link was made', async () => {
+    const parent = sandbox();
+    try {
+      const folder = path.join(parent, 'base');
+      const outside = path.join(parent, 'outside');
+      mkdirSync(folder);
+      mkdirSync(outside);
+      writeFileSync(path.join(outside, 'state.json'), 'TOP SECRET');
+      symlinkSync(outside, path.join(folder, '.loam'));
+      const error = await new NodeStore(folder).readFile('.loam/state.json').then(() => null, (e: Error) => e);
+      expect(error).not.toBeNull();
+      expect(error!.message).toMatch(/leads outside the knowledge base folder \(through a link\)/);
+      expect(error!.message).toMatch(/If you did not make a link, .*written differently/);
+      expect(error!.message).not.toContain('TOP SECRET');
+    } finally {
+      rmSync(parent, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('setting a folder up from the agent (loam_init)', () => {
   const list = async (dir: string) => {
     const store = new NodeStore(dir);
