@@ -20,7 +20,10 @@ export class NodeStore extends BackedStore {
     const resolved = path.resolve(folder);
     let real: string;
     try {
-      real = realpathSync(resolved);
+      // The native version names the folder the way the disk does (capital letters, the form of letters such as "й"), like
+      // fs.promises.realpath does for every file below. The plain version keeps the spelling that was typed, so a path typed
+      // with other capitals looked like a different place and every file was refused as "outside the folder".
+      real = realpathSync.native(resolved);
       if (!statSync(real).isDirectory()) throw new Error('not a directory');
     } catch {
       throw new LoamError(
@@ -45,7 +48,11 @@ export class NodeStore extends BackedStore {
     for (;;) {
       try {
         const real = await fs.realpath(probe);
-        if (!this.inside(real)) throw new LoamError(`"${rel}" leads outside the knowledge base folder (through a link).`);
+        if (!this.inside(real)) {
+          throw new LoamError(
+            `"${rel}" leads outside the knowledge base folder (through a link). If you did not make a link, the folder path in your agent's Loam settings may be written differently from the folder's real name (capital letters count): choose the folder again with the folder picker.`,
+          );
+        }
         return target;
       } catch (error) {
         if (error instanceof LoamError) throw error;
