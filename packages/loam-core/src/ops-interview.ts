@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { AUTOMATIONS, FILE, FREQUENCIES } from './constants';
+import { CONTEXT_FILE, contextFileMd, contextLines, ContextEntryInput, type ContextKind } from './context';
 import { DEFAULT_INTERVIEW, defaultInterviewJson, parseInterview } from './interview';
 import { loadProcess, loadState } from './kb';
 import { newPlan, mergePlans, readOrNull, stage, type Plan } from './plan';
@@ -42,8 +43,11 @@ export const InterviewInput = z.object({
     quality: z.string().optional().describe('What good work looks like to them'),
   }),
   processes: z.array(InterviewProcessInput).default([]),
+  people: z.array(ContextEntryInput).default([]).describe('Colleagues, managers and client contacts the user named: name, how they relate to the user (kind), and what to keep in mind (notes)'),
+  goals: z.array(ContextEntryInput).default([]).describe('What the user is working towards or must get done, with the date if they gave one (in notes)'),
+  metrics: z.array(ContextEntryInput).default([]).describe('Numbers the user is measured on or watches: name, and the target and where to find it (in notes)'),
   glossary: z.array(z.object({ term: z.string(), meaning: z.string() })).default([]),
-  entities: z.array(z.object({ name: z.string(), kind: z.string().default('other'), notes: z.string().default('') })).default([]),
+  entities: z.array(z.object({ name: z.string(), kind: z.string().default('other'), notes: z.string().default('') })).default([]).describe('Clients, projects and systems that come up by name (not people: those go in people)'),
   stage: z.string().optional().describe('Last interview stage completed, so the interview can be resumed'),
   complete: z.boolean().default(false).describe('True on the final save, after the user confirmed the process map'),
 });
@@ -173,7 +177,18 @@ export async function planSaveInterview(
     const next = mergeList(await readOrNull(store, FILE.entities), ENTITIES_TEMPLATE, lines, (l) => ITEM.exec(l)?.[1] ?? l, () => entitiesMd(input.entities));
     await stage(glossaryPlan, store, FILE.entities, next, 'Add clients, projects and systems');
   }
-  plans.push(glossaryPlan);
+  // People, goals and metrics: one line each in their own file, which is created by the first entry
+  const contextPlan = newPlan();
+  const stageContext = async (kind: ContextKind, items: ContextEntryInput[], reason: string) => {
+    if (items.length === 0) return;
+    const lines = contextLines(kind, items);
+    const next = mergeList(await readOrNull(store, CONTEXT_FILE[kind]), '', lines, (l) => ITEM.exec(l)?.[1] ?? l, () => contextFileMd(kind, lines));
+    await stage(contextPlan, store, CONTEXT_FILE[kind], next, reason);
+  };
+  await stageContext('people', input.people, 'Add the people around the user');
+  await stageContext('goals', input.goals, 'Add goals');
+  await stageContext('metrics', input.metrics, 'Add metrics');
+  plans.push(glossaryPlan, contextPlan);
 
   // Progress
   const statePlan = newPlan();

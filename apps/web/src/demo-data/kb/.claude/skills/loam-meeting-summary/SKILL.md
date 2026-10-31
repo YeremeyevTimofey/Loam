@@ -10,7 +10,7 @@ Use this when the user pastes raw notes, a transcript or a list of bullets from 
 ## Before you write
 
 - Read `profile.md` for the user's tone and the way they like to write.
-- If clients or colleagues are named in the notes, look them up in `context/entities.md` so you spell and describe them correctly.
+- If clients or colleagues are named in the notes, call `loam_get_context` with the notes so you spell and describe them correctly.
 
 ## What to produce
 

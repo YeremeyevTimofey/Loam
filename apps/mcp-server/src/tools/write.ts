@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { isKnowledgeBase, planAddExample, planGenerateProcessSkill, planLogRun, planRecordCorrection, planScaffold, planUpsertNote } from '@loam/core';
+import { ContextUpsertInput, isKnowledgeBase, planAddExample, planGenerateProcessSkill, planLogRun, planRecordCorrection, planScaffold, planUpsertContext, planUpsertNote } from '@loam/core';
 import { z } from 'zod';
 import type { Ctx } from '../context';
 import { commit, defineTool, renderDiff } from './define';
@@ -56,6 +56,24 @@ export function registerWriteTools(server: McpServer, ctx: Ctx): void {
       const plan = await planUpsertNote(ready.store, { path, content, reason });
       await commit(ready, plan);
       return `${plan.changes.length ? 'Saved' : 'Nothing to change'} (${reason}).\n\n${renderDiff(plan)}\n\nShow this diff to the user and say which file changed.`;
+    },
+  });
+
+  defineTool(server, ctx, {
+    name: 'loam_upsert_context',
+    title: 'Remember a person, client, goal, metric or term',
+    description:
+      'Adds, updates or removes ONE entry (a line) about a person, a client, project or system, a goal, a metric or a term, ONLY when the user explicitly asks you to remember or change it. Entries are found by name, every other line stays as it was, and the diff is returned. Keep an entry to one or two sentences (up to 60 words); label is what it is to the user ("colleague, creative lead", "client", "goal, by 2026-12-31"); aliases are other names it is called by.',
+    input: { ...ContextUpsertInput.shape, reason: z.string().optional().describe('One short sentence: why this change') },
+    kind: 'write',
+    handler: async ({ reason, ...entry }, ready) => {
+      await requireBase(ready);
+      const result = await planUpsertContext(ready.store, entry, reason);
+      if (result.action === 'missing') return `There is no entry called "${entry.name}" in ${result.file}, so nothing was removed.`;
+      if (result.action === 'unchanged') return `${result.file} already has this entry exactly as given. Nothing to change.`;
+      await commit(ready, result.plan);
+      const verb = { added: 'Added', updated: 'Updated', removed: 'Removed' }[result.action];
+      return `${verb} "${entry.name}" in ${result.file} (${result.fileWords} of ${result.budget} words).\n${result.plan.notes.map((n) => `Note: ${n}\n`).join('')}\n${renderDiff(result.plan)}\n\nShow this diff to the user and say which file changed.`;
     },
   });
 

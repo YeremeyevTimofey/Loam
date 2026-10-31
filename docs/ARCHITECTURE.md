@@ -45,14 +45,14 @@ Every edit is first a **plan** (the files that would change plus the audit entri
   profile.md
   processes/<slug>/{process.md, corrections.md, SKILL.md, examples/good-01.md …}
   skills/<name>/SKILL.md                        # the single source of truth for skills
-  context/{glossary.md, entities.md}
+  context/{people.md, entities.md, goals.md, metrics.md, glossary.md}   # one line per entry; a file appears with its first entry
   .claude/skills/loam-<name>/SKILL.md           # derived copy: Claude Code, VS Code Copilot, OpenCode
   .agents/skills/loam-<name>/SKILL.md           # derived copy: Codex, Cursor, Gemini CLI, Copilot, Windsurf …
   .loam/{state.json, interview.json, index.sqlite, history/, lint-report.json, skill-audit.json}
 ```
 
 - Folder names are lowercase latin slugs; Cyrillic titles are transliterated.
-- Word budgets: `profile.md` 400, `process.md` 600, `AGENTS.md` 500, `SKILL.md` 1000. Context Lint reports anything over.
+- Word budgets: `profile.md` 400, `process.md` 600, `AGENTS.md` 500, `SKILL.md` 1000; `people.md` 600, `entities.md` 500, `goals.md` 250, `metrics.md` 250, `glossary.md` 500. Context Lint reports anything over.
 - Before any write, the previous version is copied to `.loam/history/<timestamp>-<encoded path>`. Examples are never edited. Only folders that start with `loam-` inside the two agent skill folders are ever touched.
 - `skills/` is the source of truth. The agent folders are rebuilt from it by *Sync to agents*; imported skills are copied there inside the same untrusted-text frame, and only `name` and `description` are kept in the header (every agent reads those two).
 
@@ -127,12 +127,15 @@ All tools are prefixed `loam_`. They return readable text and never crash the se
 | `loam_import_skill` | Scan, then quarantine (stored as imported, unreviewed). Red flag ⇒ refused, nothing written. |
 | `loam_review_skill` · `loam_set_skill_review` | The user's agent reviews an imported skill; the verdict is stored as information only. |
 | `loam_init` | Sets up the knowledge base in the chosen folder when it is not one yet (the only way into a folder that the web app has not touched). Asks first: `confirm: true` only after the user agreed; a folder that holds other files needs `allow_existing_files: true`; never overwrites; does nothing if the base exists. |
-| `loam_get_interview_script` · `loam_save_interview` | Run the onboarding interview from `.loam/interview.json`; save profile, processes, glossary, entities, progress. |
+| `loam_get_interview_script` · `loam_save_interview` | Run the onboarding interview from `.loam/interview.json`; save profile, processes, people, goals, metrics, glossary, entities, progress. |
+| `loam_get_context` | Read-only. Takes the task text and returns only the matching entries from the context files (people, clients/projects/systems, goals, metrics, glossary), under a token cap; `kinds` adds every goal or metric. A name that is not returned was never recorded. |
+| `loam_upsert_context` | Adds, changes or removes ONE entry, found by name, when the user asks. Fields that are left out stay as they were; every other line stays byte for byte; the diff comes back. Up to 60 words per entry. |
 | `loam_upsert_note` | Write a markdown note when asked, with history and a diff. Cannot write skills, examples, corrections, `AGENTS.md`/`CLAUDE.md`/`GEMINI.md`, `.loam`, `.claude`, `.agents`. |
 | `loam_record_correction` · `loam_add_example` · `loam_generate_skill` · `loam_log_run` | The learning loop. Every third correction suggests rebuilding the skill. |
 | `loam_lint` | Context Lint report. |
 
-**The interview is short on purpose** (version 2: four questions and a confirmation, three to five minutes; version 1 had 27 questions over seven stages, 15 to 20 minutes). Completion of questionnaires falls after about five minutes, so the script asks for what decides whether a task can be automated (how often, how many minutes, the steps, what a good result is, what must never happen) in as few questions as possible, and has the agent *draft* the process map from the answers and let the user correct it in one reply. It asks for no files during the interview (an example is offered after saving) and not for a timeline of the day. A folder created before version 2 keeps its script until *Update interview script* (scripts with `branches` still load).
+**The interview is short on purpose** (version 3: four open questions and a confirmation, three to five minutes, 513 words of script against 610 in version 2; version 1 had 27 questions over seven stages, 15 to 20 minutes). It opens by telling the person that talking is faster than typing (voice input or dictation) and that a long, untidy answer is welcome; the agent sorts the answer into the profile, processes, people, goals and metrics. The one question about the costliest task asks, optionally, for an example of a good result or the documents the person works from (an example is saved with `loam_add_example` once the process exists).
+Completion of questionnaires falls after about five minutes, so the script asks for what decides whether a task can be automated (how often, how long, the steps, what a good result is, what must never happen) in as few questions as possible, and has the agent *draft* the process map from the answers and let the user correct it in one reply. It does not ask for a timeline of the day, and an example is only ever optional. A folder created before version 3 keeps its script until *Update interview script* (older scripts, including those with `branches`, still load). The rules repeat in every stage the agent asks for, on purpose, so the whole run costs about 8% fewer tokens than version 2 although the script itself is about 15% shorter.
 
 The interview script lives in the user's folder (`.loam/interview.json`), so it can be improved and picked up **without reinstalling the extension**. *Overview → Redo interview → Update interview script* replaces it with the bundled version after showing a diff.
 
@@ -203,7 +206,8 @@ Things the spec did not settle, or where an installed dependency or a later requ
 | `review_verdict` | New field next to `reviewed`, to store safe / suspicious / unsafe (§14.5 needs somewhere to put it). |
 | `stable` | “More than five runs and none of the last three needed a correction” is implemented per run: each correction remembers how many runs had happened (`after run N`). |
 | Run counting | `AGENTS.md` adds one sentence: after delivering a process result the agent calls `loam_log_run`. It is the single write allowed without being asked, and it only raises a counter. |
-| `loam_save_interview` | Takes `glossary`, `entities`, `stage`, `complete` besides `profile` and `processes[]`, to fill `glossary.md`, `entities.md` and to resume a tired interview. |
+| `loam_save_interview` | Takes `people`, `goals`, `metrics`, `glossary`, `entities`, `stage`, `complete` besides `profile` and `processes[]`, to fill the context files and to resume a tired interview. Entries already in a file are never overwritten; a context file is created by its first entry. |
+| Context entries | One line each, `- **Name** (what it is; aka Other name) — what to keep in mind`, in `context/people.md`, `entities.md`, `goals.md`, `metrics.md` and `glossary.md`. The kind in brackets is free text, so nothing is tied to one profession. A fact has one home, as in the Karpathy-style notes base this was modelled on (people and companies as pages, a glossary, word budgets, one place per fact), but a line replaces a page: the files stay readable by a person, and `loam_get_context` hands over only the lines a task names, plus a digest of about 100 tokens in `loam_overview`. Names are matched as whole words in any alphabet, with `aka` names, and for people by first name in the same capitalisation. |
 | Typical read path | Includes `profile.md` (see Context Lint). |
 | “No example” check | Covers `needs-access` as well as `ready`: an example can be prepared before access arrives. |
 | Example edits | Adding or deleting an example rebuilds the process skill in the same plan, so it never says “no example yet” after one was added. |

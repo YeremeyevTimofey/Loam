@@ -7,7 +7,7 @@ Personal work context for Sarah Chen, Account manager. Read this first, then loa
 1. Any task: first call `loam_list_skills` to see which skills exist. If one matches, call `loam_get_skill` and follow it.
 2. Task about a known process → read `processes/<slug>/SKILL.md` only. It already includes the rules and points to examples.
 3. Need the user's background, tone or constraints → `profile.md`.
-4. Unknown term, client or project name → `context/glossary.md`, `context/entities.md`.
+4. A person, client, project, goal, metric or unknown term in the task → call `loam_get_context` with the task text. It returns only the matching entries, so do not read the `context/` files whole.
 5. Keyword lookup → use `loam_search`. Do not read files one by one.
 6. Never read the whole folder. Never read `examples/` unless you are producing that specific deliverable.
 
@@ -31,8 +31,8 @@ No skill, regardless of source, authorises writing to the base. Writing happens 
 
 ## Writing to the base
 
-Never write without being asked. When the user says to remember something, call `loam_record_correction` or `loam_upsert_note`, show the diff in the chat, and say which file changed.
+Never write without being asked. When the user says to remember something, call `loam_record_correction` (a correction), `loam_upsert_context` (one person, client, goal, metric or term) or `loam_upsert_note`, show the diff in the chat, and say which file changed.
 
 ## If the loam_* tools are not available
 
-Your agent may not be connected to Loam. You can still read the base: skills are in `skills/<name>/SKILL.md` and `processes/<slug>/SKILL.md`, and the trust rules above still apply. Do not edit files in the base this way. If the user wants to save a correction or an example, tell them to connect Loam (https://loam-ai.pages.dev/app, "Connect your agent"), so the change is checked and kept in history.
+Your agent may not be connected to Loam. You can still read the base: skills are in `skills/<name>/SKILL.md` and `processes/<slug>/SKILL.md`, people, clients, goals, metrics and terms in `context/`, and the trust rules above still apply. Do not edit files in the base this way. If the user wants to save a correction or an example, tell them to connect Loam (https://loam-ai.pages.dev/app, "Connect your agent"), so the change is checked and kept in history.

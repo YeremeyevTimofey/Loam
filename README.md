@@ -29,7 +29,7 @@ Most people have an AI assistant and still paste the same background into every 
 
 1. **Interviews you, through your own agent.** Your agent asks four short questions about your work, one at a time, in about four minutes. Loam never calls a model itself: no API keys.
 2. **Shows what is worth automating.** Your recurring work becomes a map of processes with minutes per run and hours per year, and an honest note on what each one needs.
-3. **Keeps everything as plain files you own.** A folder on your disk: your profile, your processes, examples of good results, corrections, skills.
+3. **Keeps everything as plain files you own.** A folder on your disk: your profile, the people, goals and metrics around your work, your processes, examples of good results, corrections, skills.
 4. **Learns from your examples and corrections.** Say "remember this correction" once and the next result is right. After a few runs a process is marked stable.
 5. **Checks skills from other people before they are added.** Anything that deletes files, uses the network, sends data out, asks for passwords or tries to change how your AI behaves is refused, with no override.
 
@@ -88,7 +88,7 @@ The demo is a fictional account manager, Sarah, at a 20-person marketing agency.
 - **5 processes** found by the interview, 3 ready to automate: about **108 hours a year**.
 - A weekly report refined by **4 corrections** until it was marked *stable*.
 - Starter skills, one imported skill with a safety scan and an agent review, and one skill the safety check **refused**.
-- A health check: a typical task reads **5,651 tokens** in this deliberately messy sample, **2,218** after the suggested clean-up (**61% less**).
+- A health check: a typical task reads **5,733 tokens** in this deliberately messy sample, **2,300** after the suggested clean-up (**60% less**).
 
 ## Private and safe by design
 

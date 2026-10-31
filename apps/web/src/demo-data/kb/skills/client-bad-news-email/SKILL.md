@@ -18,7 +18,7 @@ Use this when the user has to tell a client about a delay, a miss or a problem.
 ## Before you write
 
 - Read `profile.md` for the user's tone and how they sign off.
-- Look the client up in `context/entities.md`. If it says how they like to be addressed or what is sensitive for them, follow it.
+- Look the client up with `loam_get_context`. If it says how they like to be addressed or what is sensitive for them, follow it.
 - If you do not know what happened, what the new date is or what is being done about it, ask the user. Do not fill gaps with guesses.
 
 ## Structure: four short paragraphs

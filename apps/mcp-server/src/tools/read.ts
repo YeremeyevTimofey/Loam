@@ -2,12 +2,17 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
   AUTOMATION_LABEL,
   APP_URL,
+  CONTEXT_KINDS,
+  contextDigest,
   FREQUENCY_LABEL,
   LoamError,
+  loadContext,
   loadKb,
   isKnowledgeBase,
   normalizeRelPath,
   parseSkill,
+  roughTokens,
+  selectContext,
   skillStatus,
   wrapImported,
   type KbSnapshot,
@@ -32,7 +37,7 @@ export function processLine(p: ProcessInfo): string {
   return `- ${p.slug}: ${f.title} | ${FREQUENCY_LABEL[f.frequency].toLowerCase()}, ${f.minutes_per_run} min, ${hoursText(p.hours)} | ${AUTOMATION_LABEL[f.automation].toLowerCase()} | ${state}`;
 }
 
-export function overviewText(label: string, snap: KbSnapshot): string {
+export function overviewText(label: string, snap: KbSnapshot, contextLine: string | null = null): string {
   const lines: string[] = [`Loam knowledge base "${label}".`];
   const p = snap.profile;
   if (p && !p.empty) {
@@ -40,6 +45,7 @@ export function overviewText(label: string, snap: KbSnapshot): string {
     lines.push(`Owner: ${who || 'not set'}${p.fm.industry ? ` (${p.fm.industry})` : ''}.`);
     if (p.fm.tools.length) lines.push(`Tools: ${p.fm.tools.join(', ')}.`);
   } else lines.push('Owner: profile not filled in yet.');
+  if (contextLine) lines.push(contextLine);
   const status = snap.state?.interview.status ?? 'not_started';
   lines.push(`Onboarding interview: ${status.replace('_', ' ')}.`);
   if (status === 'not_started') lines.push('If the user wants to start, they say "Run my Loam onboarding interview": call loam_get_interview_script.');
@@ -65,7 +71,36 @@ export function registerReadTools(server: McpServer, ctx: Ctx): void {
     kind: 'read',
     handler: async (_args, ready) => {
       await requireBase(ready);
-      return overviewText(ready.store.label, await loadKb(ready.store, ready.today()));
+      return overviewText(ready.store.label, await loadKb(ready.store, ready.today()), contextDigest(await loadContext(ready.store)));
+    },
+  });
+
+  defineTool(server, ctx, {
+    name: 'loam_get_context',
+    title: 'Get what the base knows about people, clients, goals and metrics',
+    description:
+      'Call this when a task names a person, client, project, system or term, or depends on the user\'s goals or metrics. Pass the task text (or just the names): it returns only the matching entries from people, clients/projects/systems, goals, metrics and the glossary, which costs far less than reading those files. Add kinds to also get every goal or metric, for example when the task is about priorities. A name that is not returned was never recorded: say so, do not guess.',
+    input: {
+      text: z.string().default('').describe('The request, or just the names to look up'),
+      kinds: z.array(z.enum(CONTEXT_KINDS)).default([]).describe('Also return every entry of these kinds, e.g. ["goals","metrics"]'),
+      max_tokens: z.number().int().min(100).max(3000).default(800).describe('Upper limit for the answer'),
+    },
+    kind: 'read',
+    handler: async ({ text, kinds, max_tokens }, ready) => {
+      await requireBase(ready);
+      const loaded = await loadContext(ready.store);
+      if (loaded.entries.length === 0) {
+        return 'Nothing is saved about people, clients, goals or metrics yet. They are saved by the onboarding interview, or when the user asks you to remember one (loam_upsert_context). Do not guess.';
+      }
+      if (!text.trim() && kinds.length === 0) {
+        return `${contextDigest(loaded) ?? ''}\nPass the task text, or kinds, to get entries.`.trim();
+      }
+      const answer = selectContext(loaded, { text, kinds, maxTokens: max_tokens });
+      if (answer.returned === 0) {
+        return `No entry matches this text. A person, client or term that is not returned was never recorded: say so instead of guessing, and offer to remember it (loam_upsert_context) if the user tells you about it.\n${contextDigest(loaded) ?? ''}`.trim();
+      }
+      const more = answer.left > 0 ? `\n\n${answer.left} more matching entr${answer.left === 1 ? 'y was' : 'ies were'} left out to stay under ${max_tokens} tokens. Name fewer things or raise max_tokens.` : '';
+      return `${answer.returned} entr${answer.returned === 1 ? 'y' : 'ies'}, about ${roughTokens(answer.text)} tokens. This is what the user wrote down; do not add to it.\n\n${answer.text}${more}`;
     },
   });
 

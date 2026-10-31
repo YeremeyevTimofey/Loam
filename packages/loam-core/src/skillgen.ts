@@ -85,7 +85,7 @@ export function generateProcessSkill(input: {
           ? `1. Read the newest good example, \`${newestGood.path}\`, and match its structure, length and tone.`
           : `1. There is no example yet in \`processes/${slug}/examples/\`. Ask the user for one if the result matters.`,
         `2. Read \`processes/${slug}/corrections.md\`. Corrections override everything else, including the example.`,
-        '3. Take tone and constraints from `profile.md` and names from `context/entities.md`.',
+        '3. Take tone and constraints from `profile.md`. For the people, clients, goals and terms the task involves, call `loam_get_context` with the task text.',
       ].join('\n'),
     );
     if (steps.length) parts.push(['## Steps', '', ...steps.map((s, i) => `${i + 1}. ${s}`)].join('\n'));

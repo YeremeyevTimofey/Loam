@@ -17,7 +17,7 @@ Use this when the user is passing a task or a client to a colleague, for a holid
 ## Before you write
 
 - Read `profile.md` for the user's tone. A handoff should sound like them, only clearer.
-- Check `context/entities.md` for the correct names of the client, project and systems involved.
+- Call `loam_get_context` with the names of the client, project and systems involved, and of the colleague who takes over.
 - Ask the user for anything you cannot find in what they gave you. A handoff with holes is worse than a short one.
 
 ## Structure

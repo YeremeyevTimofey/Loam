@@ -3,8 +3,8 @@
   "files": [
     {
       "path": "AGENTS.md",
-      "tokens": 606,
-      "words": 414
+      "tokens": 671,
+      "words": 456
     },
     {
       "path": "context/entities.md",
@@ -17,9 +17,24 @@
       "words": 195
     },
     {
+      "path": "context/goals.md",
+      "tokens": 156,
+      "words": 113
+    },
+    {
+      "path": "context/metrics.md",
+      "tokens": 102,
+      "words": 68
+    },
+    {
+      "path": "context/people.md",
+      "tokens": 199,
+      "words": 140
+    },
+    {
       "path": "processes/client-onboarding-brief/SKILL.md",
-      "tokens": 424,
-      "words": 260
+      "tokens": 441,
+      "words": 272
     },
     {
       "path": "processes/client-onboarding-brief/process.md",
@@ -28,8 +43,8 @@
     },
     {
       "path": "processes/contract-negotiation/SKILL.md",
-      "tokens": 340,
-      "words": 217
+      "tokens": 357,
+      "words": 229
     },
     {
       "path": "processes/contract-negotiation/process.md",
@@ -38,8 +53,8 @@
     },
     {
       "path": "processes/meeting-follow-up/SKILL.md",
-      "tokens": 395,
-      "words": 240
+      "tokens": 412,
+      "words": 252
     },
     {
       "path": "processes/meeting-follow-up/corrections.md",
@@ -53,8 +68,8 @@
     },
     {
       "path": "processes/monthly-invoice-check/SKILL.md",
-      "tokens": 365,
-      "words": 231
+      "tokens": 382,
+      "words": 243
     },
     {
       "path": "processes/monthly-invoice-check/process.md",
@@ -63,8 +78,8 @@
     },
     {
       "path": "processes/weekly-client-report/SKILL.md",
-      "tokens": 679,
-      "words": 433
+      "tokens": 696,
+      "words": 445
     },
     {
       "path": "processes/weekly-client-report/corrections.md",
@@ -83,7 +98,7 @@
     },
     {
       "path": "skills/client-bad-news-email/SKILL.md",
-      "tokens": 421,
+      "tokens": 422,
       "words": 255
     },
     {
@@ -93,16 +108,16 @@
     },
     {
       "path": "skills/meeting-summary/SKILL.md",
-      "tokens": 415,
+      "tokens": 416,
       "words": 267
     },
     {
       "path": "skills/weekly-status-report/SKILL.md",
-      "tokens": 391,
-      "words": 244
+      "tokens": 421,
+      "words": 267
     }
   ],
-  "totalTokens": 12258,
+  "totalTokens": 12897,
   "typical": {
     "files": [
       "AGENTS.md",
@@ -110,16 +125,16 @@
       "processes/weekly-client-report/SKILL.md",
       "processes/weekly-client-report/examples/good-02.md"
     ],
-    "tokens": 5651,
+    "tokens": 5733,
     "runsPerMonth": 27.2,
-    "monthlyUsd": 0.4605565
+    "monthlyUsd": 0.4672395
   },
   "checks": [
     {
       "rule": "cost",
       "name": "What a typical task costs",
       "status": "ok",
-      "summary": "A typical task (instructions, profile, one skill, one example) reads about 5,651 tokens — roughly $0.46 a month at your usage (at $3 per million tokens)."
+      "summary": "A typical task (instructions, profile, one skill, one example) reads about 5,733 tokens — roughly $0.47 a month at your usage (at $3 per million tokens)."
     },
     {
       "rule": "budget",
@@ -181,7 +196,7 @@
       "rule": "budget",
       "severity": "high",
       "title": "profile.md is 3,242 words — the limit is 400",
-      "detail": "Your AI reads this file in full, so it costs 3,916 tokens each time and buries what matters. Keep only your role, tools and tone here. Move details about clients and projects to context/entities.md.",
+      "detail": "Your AI reads this file in full, so it costs 3,916 tokens each time and buries what matters. Keep only your role, tools and tone here. Move details about people, clients, projects, goals and metrics to the files in context/.",
       "files": [
         "profile.md"
       ]
@@ -240,12 +255,12 @@
     }
   ],
   "savings": {
-    "beforeTokens": 12258,
-    "afterTokens": 8515,
-    "percent": 31,
-    "typicalBefore": 5651,
-    "typicalAfter": 2218,
-    "typicalPercent": 61,
+    "beforeTokens": 12897,
+    "afterTokens": 9154,
+    "percent": 29,
+    "typicalBefore": 5733,
+    "typicalAfter": 2300,
+    "typicalPercent": 60,
     "items": [
       {
         "label": "Remove repeated paragraphs",

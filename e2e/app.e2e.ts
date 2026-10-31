@@ -113,7 +113,7 @@ describe('first run with a real folder (acceptance 2, 3, 5)', () => {
       await page.getByRole('dialog').waitFor({ state: 'hidden' });
       const after = JSON.parse((await readFolder(page))['.loam/interview.json']!);
       expect(after.title).toBe('Loam onboarding interview');
-      expect(after.version).toBe(2); // the short interview (version 2)
+      expect(after.version).toBe(3); // the short, open interview (version 3)
       // asking again says it is current
       await page.getByRole('button', { name: 'Redo interview' }).click();
       await page.getByRole('button', { name: 'Update interview script' }).click();

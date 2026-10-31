@@ -15,9 +15,9 @@
   "numbers": {
     "readyCount": 3,
     "readyHours": 108,
-    "typicalBefore": 5651,
-    "typicalAfter": 2218,
-    "typicalPercent": 61
+    "typicalBefore": 5733,
+    "typicalAfter": 2300,
+    "typicalPercent": 60
   },
   "processes": [
     {
