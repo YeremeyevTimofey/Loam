@@ -17,7 +17,7 @@ Use this when the user pastes a contract, a brief, a request, a policy or any do
 ## Before you write
 
 - Read `profile.md` to know the user's role, so you can judge what is relevant to them.
-- If the document names a client, a project or a system, check `context/entities.md`.
+- If the document names a client, a project, a person or a system, call `loam_get_context` with those names.
 
 ## What to produce
 

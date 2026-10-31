@@ -14,7 +14,7 @@ After almost every client or internal call I send a short follow-up: what we dec
 
 1. Read the newest good example, `processes/meeting-follow-up/examples/good-01.md`, and match its structure, length and tone.
 2. Read `processes/meeting-follow-up/corrections.md`. Corrections override everything else, including the example.
-3. Take tone and constraints from `profile.md` and names from `context/entities.md`.
+3. Take tone and constraints from `profile.md`. For the people, clients, goals and terms the task involves, call `loam_get_context` with the task text.
 
 ## Steps
 

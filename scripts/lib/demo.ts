@@ -28,7 +28,7 @@ export const SUMMARY_FILE = path.join(REPO, 'apps/web/src/demo-data/summary.json
 /** Files written by people. Everything else under kb/ is derived from these by the core code. */
 const AUTHORED = [
   /^profile\.md$/,
-  /^context\/(glossary|entities)\.md$/,
+  /^context\/(glossary|entities|people|goals|metrics)\.md$/,
   /^skills\/competitor-snapshot\/SKILL\.md$/,
   /^processes\/[^/]+\/(process|corrections)\.md$/,
   /^processes\/[^/]+\/examples\/[^/]+$/,

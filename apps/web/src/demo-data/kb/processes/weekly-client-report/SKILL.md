@@ -14,7 +14,7 @@ Every Friday I write a one-page report for each tier-one client. It says how the
 
 1. Read the newest good example, `processes/weekly-client-report/examples/good-02.md`, and match its structure, length and tone.
 2. Read `processes/weekly-client-report/corrections.md`. Corrections override everything else, including the example.
-3. Take tone and constraints from `profile.md` and names from `context/entities.md`.
+3. Take tone and constraints from `profile.md`. For the people, clients, goals and terms the task involves, call `loam_get_context` with the task text.
 
 ## Steps
 

@@ -56,6 +56,12 @@ const interview = {
   ],
   glossary: [{ term: 'MRR', meaning: 'Monthly recurring revenue' }],
   entities: [{ name: 'Acme', kind: 'client', notes: 'Prefers short emails' }],
+  people: [
+    { name: 'Marco Rossi', kind: 'colleague, creative lead', notes: 'Needs briefs a day ahead.' },
+    { name: 'Lena', kind: 'manager', notes: 'Reviews anything a client sees for the first time.' },
+  ],
+  goals: [{ name: 'Keep the three biggest accounts', kind: 'goal, by 2026-12-31', notes: 'The spring budget is the risk.' }],
+  metrics: [{ name: 'Reports sent on time', kind: 'metric', notes: 'Target: every Friday by 15:00.' }],
   stage: 'summary',
   complete: true,
 };
@@ -76,7 +82,7 @@ describe('tools (acceptance 12)', () => {
         'loam_overview', 'loam_get_process', 'loam_search', 'loam_read', 'loam_list_skills', 'loam_get_skill',
         'loam_import_skill', 'loam_review_skill', 'loam_set_skill_review', 'loam_get_interview_script',
         'loam_save_interview', 'loam_upsert_note', 'loam_record_correction', 'loam_add_example',
-        'loam_generate_skill', 'loam_log_run', 'loam_lint', 'loam_init',
+        'loam_generate_skill', 'loam_log_run', 'loam_lint', 'loam_init', 'loam_get_context', 'loam_upsert_context',
       ].sort(),
     );
     for (const t of tools) {
@@ -84,7 +90,9 @@ describe('tools (acceptance 12)', () => {
       expect((t.description ?? '').length).toBeGreaterThan(40);
       expect(t.annotations?.openWorldHint).toBe(false);
     }
-    expect(tools.filter((t) => t.annotations?.readOnlyHint).length).toBeGreaterThanOrEqual(7);
+    expect(tools.filter((t) => t.annotations?.readOnlyHint).length).toBeGreaterThanOrEqual(8);
+    expect(tools.find((t) => t.name === 'loam_get_context')?.annotations?.readOnlyHint).toBe(true);
+    expect(tools.find((t) => t.name === 'loam_upsert_context')?.annotations?.readOnlyHint).toBe(false);
   });
 });
 
@@ -94,14 +102,18 @@ describe('interview (acceptance 8, 9, 10, 11)', () => {
     try {
       const outline = await s.call('loam_get_interview_script');
       expect(outline.text).toMatch(/\(3–5 minutes\)/);
-      expect(outline.text).toMatch(/One question at a time/);
+      expect(outline.text).toMatch(/one at a time/);
       expect(outline.text).toMatch(/1\. you — Who you are/);
       expect(outline.text).toMatch(/Start with stage "you"/);
-      expect(outline.text).toMatch(/how often and how many minutes per run/);
+      expect(outline.text).toMatch(/voice input/);
+      expect(outline.text).toMatch(/as fully as you like, in any order/);
       const role = await s.call('loam_get_interview_script', { stage: 'you' });
-      expect(role.text).toContain('Who are you at work?');
+      expect(role.text).toContain('Tell me about your work');
+      expect(role.text).toContain('who you work with most');
       const tasks = await s.call('loam_get_interview_script', { stage: 'tasks' });
-      expect(tasks.text).toContain('Which tasks do you repeat every week or month?');
+      expect(tasks.text).toContain('Which tasks repeat every week or month?');
+      const focus = await s.call('loam_get_interview_script', { stage: 'focus' });
+      expect(focus.text).toContain('If you can, share an example of a good result or the documents you work from');
       expect(tasks.text).not.toMatch(/Branch /); // no questions by kind of role any more
       expect((await s.call('loam_get_interview_script', { stage: 'nope' })).text).toMatch(/Unknown stage/);
       // criterion 11: change the file, get the new behaviour, no restart
@@ -120,7 +132,7 @@ describe('interview (acceptance 8, 9, 10, 11)', () => {
     }
   });
 
-  it('saves the interview: profile, three processes, glossary, entities, progress; overview reflects it', async () => {
+  it('saves the interview: profile, three processes, people, goals, metrics, glossary, entities, progress; overview reflects it', async () => {
     const s = await open();
     try {
       const before = await s.call('loam_overview');
@@ -130,14 +142,18 @@ describe('interview (acceptance 8, 9, 10, 11)', () => {
       expect(saved.text).toContain('Interview saved and marked complete.');
       expect(saved.text).toContain('weekly-client-report: Weekly client report — ~33.3 h/year, ready to automate (new)');
       expect(saved.text).toContain('contract-negotiation: Contract negotiation — ~18 h/year, manual only (new)');
-      for (const f of ['profile.md', 'context/glossary.md', 'context/entities.md', 'processes/weekly-client-report/process.md', 'processes/weekly-client-report/SKILL.md', 'processes/weekly-client-report/corrections.md', '.claude/skills/loam-weekly-client-report/SKILL.md']) {
+      expect(saved.text).toContain('Context saved: 2 people, 1 goal, 1 metric.');
+      for (const f of ['profile.md', 'context/glossary.md', 'context/entities.md', 'context/people.md', 'context/goals.md', 'context/metrics.md', 'processes/weekly-client-report/process.md', 'processes/weekly-client-report/SKILL.md', 'processes/weekly-client-report/corrections.md', '.claude/skills/loam-weekly-client-report/SKILL.md']) {
         expect(existsSync(path.join(s.dir, f)), f).toBe(true);
       }
       expect(readFileSync(path.join(s.dir, 'processes/weekly-client-report/process.md'), 'utf8')).toMatch(/^---\ntype: process\nslug: weekly-client-report\ntitle: Weekly client report\nfrequency: weekly\nminutes_per_run: 40\nautomation: ready\ninputs: \[CRM export\]/);
       const overview = await s.call('loam_overview');
       expect(overview.text).toContain('Owner: Sarah Chen, Account manager at Northlight (Marketing agency).');
       expect(overview.text).toContain('- weekly-client-report: Weekly client report | weekly, 40 min, ~33.3 h/year | ready to automate | 0 runs, 0 corrections');
-      expect(approxTokens(overview.text)).toBeLessThan(500);
+      expect(overview.text).toContain('Context: 2 people, 1 client, project or system, 1 goal, 1 metric, 1 term.');
+      expect(overview.text).toContain('Goals: Keep the three biggest accounts.');
+      expect(overview.text).toContain('call loam_get_context with the task text');
+      expect(approxTokens(overview.text)).toBeLessThan(560);
       expect((await s.call('loam_get_interview_script')).text).toMatch(/Status: complete/);
     } finally {
       await s.close();
@@ -150,6 +166,115 @@ describe('interview (acceptance 8, 9, 10, 11)', () => {
       const r = await s.call('loam_save_interview', { profile: { name: 'x' }, processes: [{ title: 'A', frequency: 'weekly', automation: 'ready' }] });
       expect(r.isError).toBe(true);
       expect(r.text.length).toBeGreaterThan(10);
+    } finally {
+      await s.close();
+    }
+  });
+});
+
+describe('people, clients, goals and metrics through the tools', () => {
+  it('says so, instead of guessing, while nothing is saved', async () => {
+    const s = await open();
+    try {
+      const r = await s.call('loam_get_context', { text: 'Write to Marco' });
+      expect(r.isError).toBe(false);
+      expect(r.text).toMatch(/Nothing is saved about people, clients, goals or metrics yet/);
+      expect(r.text).toMatch(/Do not guess/);
+      expect((await s.call('loam_overview')).text).not.toMatch(/Context:/);
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('returns only the entries a task names, the goals and metrics when asked, and says when a name is not known', async () => {
+    const s = await open();
+    try {
+      await s.call('loam_save_interview', interview);
+      const marco = await s.call('loam_get_context', { text: 'Prepare the call with Marco and Acme.' });
+      expect(marco.isError).toBe(false);
+      expect(marco.text).toMatch(/^2 entries, about \d+ tokens\. This is what the user wrote down; do not add to it\./);
+      expect(marco.text).toContain('**Marco Rossi** (colleague, creative lead) — Needs briefs a day ahead.');
+      expect(marco.text).toContain('**Acme** (client) — Prefers short emails');
+      expect(marco.text).not.toContain('Lena');
+      expect(marco.text).not.toContain('Keep the three biggest accounts');
+
+      const priorities = await s.call('loam_get_context', { kinds: ['goals', 'metrics'] });
+      expect(priorities.text).toContain('**Keep the three biggest accounts** (goal, by 2026-12-31)');
+      expect(priorities.text).toContain('**Reports sent on time** (metric)');
+      expect(priorities.text).not.toContain('Marco');
+
+      const unknown = await s.call('loam_get_context', { text: 'Write to Jonas' });
+      expect(unknown.isError).toBe(false);
+      expect(unknown.text).toMatch(/No entry matches this text/);
+      expect(unknown.text).toMatch(/never recorded: say so instead of guessing/);
+
+      const bare = await s.call('loam_get_context', {});
+      expect(bare.text).toMatch(/Pass the task text, or kinds, to get entries/);
+      expect(approxTokens(marco.text)).toBeLessThan(150); // the point: a slice, not the files
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('remembers one entry when asked, shows the one-line diff, and the next lookup finds it', async () => {
+    const s = await open();
+    try {
+      await s.call('loam_save_interview', interview);
+      const before = readFileSync(path.join(s.dir, 'context/people.md'), 'utf8');
+      const added = await s.call('loam_upsert_context', { kind: 'people', name: 'Dana Okoye', label: 'colleague, paid media', notes: 'Owns the ad budgets.', aliases: ['Dana'], reason: 'The user asked' });
+      expect(added.isError, added.text).toBe(false);
+      expect(added.text).toMatch(/^Added "Dana Okoye" in context\/people\.md \(\d+ of 600 words\)\./);
+      expect(added.text).toContain('+- **Dana Okoye** (colleague, paid media; aka Dana) — Owns the ad budgets.');
+      expect(added.text).toMatch(/Show this diff to the user/);
+      const after = readFileSync(path.join(s.dir, 'context/people.md'), 'utf8');
+      expect(after.startsWith(before.trimEnd())).toBe(true); // nothing before the new line moved
+      expect((await s.call('loam_get_context', { text: 'Ask Dana about pacing' })).text).toContain('Owns the ad budgets.');
+      expect((await s.call('loam_overview')).text).toContain('Context: 3 people');
+
+      const updated = await s.call('loam_upsert_context', { kind: 'people', name: 'dana okoye', notes: 'Owns the ad budgets and pacing.' });
+      expect(updated.text).toMatch(/^Updated "dana okoye"/);
+      const line = readFileSync(path.join(s.dir, 'context/people.md'), 'utf8').split('\n').filter((l) => /dana/i.test(l));
+      expect(line).toEqual(['- **dana okoye** (colleague, paid media; aka Dana) — Owns the ad budgets and pacing.']); // only the notes changed
+
+      const same = await s.call('loam_upsert_context', { kind: 'people', name: 'dana okoye', notes: 'Owns the ad budgets and pacing.' });
+      expect(same.text).toMatch(/already has this entry exactly as given/);
+
+      const removed = await s.call('loam_upsert_context', { kind: 'people', name: 'Dana Okoye', remove: true });
+      expect(removed.text).toMatch(/^Removed "Dana Okoye"/);
+      expect(readFileSync(path.join(s.dir, 'context/people.md'), 'utf8')).not.toContain('Dana');
+      expect((await s.call('loam_upsert_context', { kind: 'people', name: 'Dana Okoye', remove: true })).text).toMatch(/nothing was removed/);
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('refuses an entry that is a page, and an invalid kind, without touching the folder', async () => {
+    const s = await open();
+    try {
+      await s.call('loam_save_interview', interview);
+      const before = readFileSync(path.join(s.dir, 'context/people.md'), 'utf8');
+      const long = await s.call('loam_upsert_context', { kind: 'people', name: 'Marco Rossi', notes: Array.from({ length: 80 }, (_, i) => `word${i}`).join(' ') });
+      expect(long.isError).toBe(true);
+      expect(long.text).toMatch(/up to 60/);
+      const bad = await s.call('loam_upsert_context', { kind: '../etc/passwd', name: 'x', notes: 'x' });
+      expect(bad.isError).toBe(true);
+      expect(readFileSync(path.join(s.dir, 'context/people.md'), 'utf8')).toBe(before);
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('a folder whose interview script is from a newer Loam says to update the extension, not to press a button that cannot help', async () => {
+    const s = await open();
+    try {
+      writeFileSync(path.join(s.dir, '.loam', 'interview.json'), JSON.stringify({ version: 99, title: 'x', stages: 'a new shape' }));
+      const r = await s.call('loam_get_interview_script');
+      expect(r.isError).toBe(true);
+      expect(r.text).toMatch(/version 99.*newer Loam than this extension/);
+      expect(r.text).toMatch(/update the Loam extension/);
+      expect(r.text).not.toMatch(/Update interview script/);
+      writeFileSync(path.join(s.dir, '.loam', 'interview.json'), '{ broken');
+      expect((await s.call('loam_get_interview_script')).text).toMatch(/Update interview script/); // damaged is still damaged
     } finally {
       await s.close();
     }

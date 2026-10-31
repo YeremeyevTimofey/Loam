@@ -76,11 +76,19 @@
     },
     {
       "name": "loam_save_interview",
-      "description": "Save the interview results: profile, processes, glossary, entities."
+      "description": "Save the interview results: profile, processes, people, goals, metrics, glossary, entities."
     },
     {
       "name": "loam_upsert_note",
       "description": "Write a markdown note when you ask; keeps the old version and shows the diff."
+    },
+    {
+      "name": "loam_get_context",
+      "description": "The entries about the people, clients, goals and metrics a task involves, without reading whole files."
+    },
+    {
+      "name": "loam_upsert_context",
+      "description": "Remember one person, client, goal, metric or term when you ask; changes one line and shows the diff."
     },
     {
       "name": "loam_record_correction",

@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
   AUTOMATION_LABEL,
+  DEFAULT_INTERVIEW,
   FILE,
   FREQUENCY_LABEL,
   InterviewInput,
@@ -27,9 +28,17 @@ export function registerInterviewTools(server: McpServer, ctx: Ctx): void {
     handler: async ({ stage }, ready) => {
       await requireBase(ready);
       let script;
+      let raw = '';
       try {
-        script = parseInterview(await ready.store.readFile(FILE.interview));
+        raw = await ready.store.readFile(FILE.interview);
+        script = parseInterview(raw);
       } catch {
+        const version = Number((/"version"\s*:\s*(\d+)/.exec(raw) ?? [])[1]);
+        if (version > DEFAULT_INTERVIEW.version) {
+          throw new LoamError(
+            `This folder's interview script (version ${version}) was written by a newer Loam than this extension, which reads up to version ${DEFAULT_INTERVIEW.version}. Ask the user to update the Loam extension in their agent (the newest one is on the Loam download page).`,
+          );
+        }
         throw new LoamError('The interview script (.loam/interview.json) is missing or damaged. Ask the user to open the Loam app and press "Update interview script".');
       }
       const snap = await loadKb(ready.store, ready.today());
@@ -46,7 +55,7 @@ export function registerInterviewTools(server: McpServer, ctx: Ctx): void {
     name: 'loam_save_interview',
     title: 'Save the interview results',
     description:
-      'Saves what the interview found: creates profile.md, a folder for each process (description, empty corrections, a first skill), the glossary and the entities list. Safe to call several times: existing processes are updated by slug and keep their runs, corrections and examples. Call it with complete: true only after the user confirmed the process map. If the user gets tired, call it with what you have and the stage you reached.',
+      'Saves what the interview found: creates profile.md, a folder for each process (description, empty corrections, a first skill), the people, goals and metrics the user named (one short line each), the glossary and the entities list. Safe to call several times: existing processes are updated by slug and keep their runs, corrections and examples. Call it with complete: true only after the user confirmed the process map. If the user gets tired, call it with what you have and the stage you reached.',
     input: InterviewInput.shape,
     kind: 'write',
     handler: async (args, ready) => {
@@ -64,6 +73,12 @@ export function registerInterviewTools(server: McpServer, ctx: Ctx): void {
           lines.push(`- ${s.slug}: ${s.title} — ${s.hours === null ? 'hours per year unknown' : `~${s.hours} h/year`}, ${AUTOMATION_LABEL[s.automation].toLowerCase()} (${s.created ? 'new' : 'updated'})`);
         }
       }
+      const counts = [
+        [args.people?.length ?? 0, 'person', 'people'],
+        [args.goals?.length ?? 0, 'goal', 'goals'],
+        [args.metrics?.length ?? 0, 'metric', 'metrics'],
+      ].filter(([n]) => Number(n) > 0);
+      if (counts.length) lines.push('', `Context saved: ${counts.map(([n, one, many]) => `${n} ${n === 1 ? one : many}`).join(', ')}.`);
       lines.push(...plan.notes.map((n) => `Note: ${n}`));
       if (args.complete) {
         lines.push(

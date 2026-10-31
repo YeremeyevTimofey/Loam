@@ -89,7 +89,7 @@ describe('the loam-mcp npm package', () => {
     await client.connect(transport);
     try {
       const { tools } = await client.listTools();
-      expect(tools).toHaveLength(18);
+      expect(tools).toHaveLength(20);
       const call = async (name: string, args: Record<string, unknown> = {}) =>
         ((await client.callTool({ name, arguments: args })) as { content: { text: string }[] }).content.map((c) => c.text).join('\n');
       expect(await call('loam_overview')).toMatch(/Onboarding interview: not started/);

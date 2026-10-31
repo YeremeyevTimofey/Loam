@@ -14,7 +14,7 @@ Before the invoices go out on the first working day, I check that the hours on e
 
 1. There is no example yet in `processes/monthly-invoice-check/examples/`. Ask the user for one if the result matters.
 2. Read `processes/monthly-invoice-check/corrections.md`. Corrections override everything else, including the example.
-3. Take tone and constraints from `profile.md` and names from `context/entities.md`.
+3. Take tone and constraints from `profile.md`. For the people, clients, goals and terms the task involves, call `loam_get_context` with the task text.
 
 ## Steps
 

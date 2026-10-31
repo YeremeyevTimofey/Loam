@@ -17,7 +17,7 @@ Use this when the user wants a weekly update for a manager, a client or a team, 
 ## Before you write
 
 - Read `profile.md` for the user's tone and the usual length of their reports.
-- If a project or client name appears, check `context/entities.md` for the correct name and anything the reader cares about.
+- If a project or client name appears, call `loam_get_context` with it for the correct name and anything the reader cares about. Ask for the goals and metrics too (kinds: goals, metrics), so the report speaks to what the user is measured on.
 
 ## Structure
 

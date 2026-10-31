@@ -17,7 +17,7 @@ Use this when the user is about to meet someone and asks for help preparing. The
 ## Before you write
 
 - Read `profile.md` for the user's role and the outcomes they usually want from meetings.
-- Look up each participant and each company or project mentioned in `context/entities.md`. Use only what is written there. If a participant is not listed, say so instead of describing them.
+- Call `loam_get_context` with the names of the participants and of each company or project mentioned. Use only what it returns. If a participant is not there, say so instead of describing them.
 - Use `loam_search` for earlier notes on the same topic or person if the user asks you to build on them.
 
 ## What to produce

@@ -1,4 +1,5 @@
 import { BUDGET_WORDS, FILE, NO_INVENTING, PLACEHOLDER, PRICE_PER_MTOK_USD, STALE_DAYS } from './constants';
+import { CONTEXT_FILE, CONTEXT_KINDS, CONTEXT_WORD_BUDGET, MAX_ENTRY_WORDS } from './context';
 import { daysBetween } from './dates';
 import { countWords, parseDoc } from './frontmatter';
 import { loadKb, type KbSnapshot, type ProcessInfo } from './kb';
@@ -96,14 +97,21 @@ const BUDGET: Partial<Record<Kind, number>> = {
 };
 
 const BUDGET_HINT: Partial<Record<Kind, string>> = {
-  profile: 'Keep only your role, tools and tone here. Move details about clients and projects to context/entities.md.',
+  profile: 'Keep only your role, tools and tone here. Move details about people, clients, projects, goals and metrics to the files in context/.',
   process: 'Keep the description short. Move long reference material into a file in context/ and mention it by name.',
   skill: 'Cut repeated rules and long examples. Move reference text into context/ and point to it.',
+  context: `Keep one short line per entry (up to ${MAX_ENTRY_WORDS} words) and remove entries that no longer matter.`,
   'generated-skill': 'Delete older corrections that no longer apply, then rebuild the skill.',
   agents: 'AGENTS.md is written by Loam. Restore it from the app instead of editing it by hand.',
 };
 
 const n = (x: number) => x.toLocaleString('en-US');
+
+/** Word limit of the people, entities, goals, metrics and glossary files. */
+const contextLimit = (path: string): number | undefined => {
+  const kind = CONTEXT_KINDS.find((k) => CONTEXT_FILE[k] === path);
+  return kind ? CONTEXT_WORD_BUDGET[kind] : undefined;
+};
 
 // ---------------------------------------------------------------- paragraphs
 
@@ -278,13 +286,16 @@ export async function runLint(store: KbStore, options: LintOptions): Promise<Lin
   // 2. budget ----------------------------------------------------------
   for (const f of fileInfo) {
     const kind = kinds.get(f.path)!;
-    const limit = BUDGET[kind];
+    const limit = BUDGET[kind] ?? contextLimit(f.path);
     if (!limit || f.words <= limit) continue;
     add({
       rule: 'budget',
       severity: f.words > limit * 2 ? 'high' : 'medium',
       title: `${f.path} is ${n(f.words)} words — the limit is ${n(limit)}`,
-      detail: `Your AI reads this file in full, so it costs ${n(f.tokens)} tokens each time and buries what matters. ${BUDGET_HINT[kind] ?? ''}`.trim(),
+      detail:
+        kind === 'context'
+          ? `This file costs ${n(f.tokens)} tokens whenever it is read in full, which is what an agent without Loam does. ${BUDGET_HINT[kind] ?? ''}`.trim()
+          : `Your AI reads this file in full, so it costs ${n(f.tokens)} tokens each time and buries what matters. ${BUDGET_HINT[kind] ?? ''}`.trim(),
       files: [f.path],
       goto: kind === 'process' ? { screen: 'process', slug: f.path.split('/')[1], label: 'Open process' } : undefined,
     });

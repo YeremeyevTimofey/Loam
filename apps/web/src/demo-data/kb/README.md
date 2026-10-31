@@ -15,7 +15,7 @@ After that, ask your agent for your recurring work in plain words, for example `
 - `profile.md` — who you are and how you like to work
 - `processes/` — one folder per recurring task: a description, examples of good results, and your corrections
 - `skills/` — reusable skills: the starter pack, ones built from your processes, and ones you imported
-- `context/` — your glossary and the names of clients, projects and systems
+- `context/` — what your assistant should know about the people, clients, projects, goals, metrics and terms around your work: one short line each, in `people.md`, `entities.md`, `goals.md`, `metrics.md` and `glossary.md`. A file appears when its first entry is saved
 - `AGENTS.md` — the protocol your agent follows. Leave it alone unless you know why
 - `.loam/` — Loam's own files: interview script, search index, history of changes
 - `.claude/skills/` and `.agents/skills/` — copies of your skills for agents that read files (Claude Code, Cursor, Codex, Gemini CLI, Copilot and others). Loam overwrites only the folders that start with `loam-`

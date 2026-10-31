@@ -1,4 +1,5 @@
-import { MAX_SKILL_RULES, PLACEHOLDER } from './constants';
+import { FILE, MAX_SKILL_RULES, PLACEHOLDER } from './constants';
+import { type ContextEntry, type ContextKind, isMentioned, parseContextFile, roughTokens } from './context';
 import { parseDoc } from './frontmatter';
 import { loadProcess, loadProfile } from './kb';
 import { readOrNull } from './plan';
@@ -21,9 +22,6 @@ import { LoamError, NotFoundError, type KbStore } from './types';
 export const CHAT_TOKENS_WARN = 6000;
 /** Names and terms files up to this size are copied whole; bigger ones only where the text mentions the name. */
 const NAMES_INLINE_TOKENS = 600;
-
-/** Cheap size estimate for defaults. The dialog shows real token counts from the tokenizer. */
-export const roughTokens = (text: string): number => Math.ceil(text.length / 4);
 
 export interface ChatPart {
   id: string;
@@ -105,27 +103,15 @@ async function aboutParts(store: KbStore): Promise<{ parts: ChatPart[]; notices:
 }
 
 interface NameEntry {
-  name: string;
+  entry: ContextEntry;
   line: string;
   group: 'Names' | 'Terms';
 }
 
-/** Bullet lines of context/entities.md and context/glossary.md. The template's placeholder is skipped. */
-function parseNames(text: string | null, group: NameEntry['group']): NameEntry[] {
-  if (!text) return [];
-  const entries: NameEntry[] = [];
-  for (const raw of text.replace(/\r\n?/g, '\n').split('\n')) {
-    const m = /^\s*[-*+]\s+(.+?)\s*$/.exec(raw);
-    if (!m?.[1] || m[1].includes(PLACEHOLDER)) continue;
-    const name = /\*\*(.+?)\*\*/.exec(m[1])?.[1] ?? m[1].split(/\s[—–-]\s|:/)[0] ?? m[1];
-    entries.push({ name: name.trim(), line: `- ${m[1]}`, group });
-  }
-  return entries;
+/** Bullet lines of the people, entities and glossary files. The template's placeholder is skipped. */
+function parseNames(kind: ContextKind, text: string | null, group: NameEntry['group']): NameEntry[] {
+  return parseContextFile(kind, text).map((entry) => ({ entry, line: `- ${entry.text}`, group }));
 }
-
-const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const mentions = (haystack: string, name: string) =>
-  name.length >= 2 && new RegExp(`(?:^|[^\\p{L}\\p{N}])${escapeRe(name)}(?![\\p{L}\\p{N}])`, 'iu').test(haystack);
 
 function namesText(entries: NameEntry[]): string {
   const groups = (['Names', 'Terms'] as const).map((g) => ({ g, items: entries.filter((e) => e.group === g) })).filter((x) => x.items.length);
@@ -137,14 +123,18 @@ function namesText(entries: NameEntry[]): string {
 }
 
 async function namesParts(store: KbStore, searchIn: string): Promise<ChatPart[]> {
-  const all = [...parseNames(await readOrNull(store, 'context/entities.md'), 'Names'), ...parseNames(await readOrNull(store, 'context/glossary.md'), 'Terms')];
+  const all = [
+    ...parseNames('people', await readOrNull(store, FILE.people), 'Names'),
+    ...parseNames('entities', await readOrNull(store, FILE.entities), 'Names'),
+    ...parseNames('glossary', await readOrNull(store, FILE.glossary), 'Terms'),
+  ];
   if (all.length === 0) return [];
   const count = (n: number) => `${n} entr${n === 1 ? 'y' : 'ies'}`;
   const everything = namesText(all);
   if (roughTokens(everything) <= NAMES_INLINE_TOKENS) {
     return [{ id: 'names', label: 'Names and terms', hint: `Clients, colleagues and terms from your notes (${count(all.length)}).`, text: everything, on: true }];
   }
-  const hit = all.filter((e) => mentions(searchIn, e.name));
+  const hit = all.filter((e) => isMentioned(e.entry, searchIn));
   const rest = all.filter((e) => !hit.includes(e));
   if (hit.length === 0) {
     return [{ id: 'names', label: 'Names and terms', hint: `${count(all.length)}. Off because none of them appears in the text above and the list is long.`, text: everything, on: false }];
