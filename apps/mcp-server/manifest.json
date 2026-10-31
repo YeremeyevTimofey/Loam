@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "loam",
   "display_name": "Loam",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Work context for AI agents: connects your Loam knowledge base folder to Claude Desktop.",
   "long_description": "Loam keeps what your AI assistant needs to know about your work in a folder on your computer: your profile, your recurring processes, examples of good results, corrections and skills. This extension lets Claude Desktop read that folder and, when you ask, remember corrections and examples. To start, choose an empty folder when Claude asks, then tell Claude: Run my Loam onboarding interview. It takes about four minutes.\n\nAbout the warning above: Claude shows it for every extension that is installed from a file. Loam's code only touches the folder you choose, makes no network requests, and is open for you to read at {{githubUrl}}. (Using Cursor, Codex, VS Code, Gemini CLI or another agent? See {{installUrl}}: you can ask your agent to set it up for you.)",
   "author": {
