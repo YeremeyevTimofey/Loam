@@ -69,12 +69,14 @@ Also enable *Private vulnerability reporting* (Settings → Security) so `SECURI
 2. Add your domain to the project (Custom domains).
 3. Push to `main`: `deploy-web.yml` runs the checks, builds, and deploys `apps/web/dist`. It contains `_headers` (security headers and the strict Content-Security-Policy for `/app`) and `_redirects` (the download address, below), both written from `site.config.json`.
 
-## 5. The first release (the download button and the npm package)
+## 5. A release (the download button and the npm package)
+
+First put the same version number in `package.json`, `apps/mcp-server/package.json` and `apps/mcp-server/manifest.json` (`check:rules` enforces it; the other two workspace packages follow), run `npm install` and `npm run verify`, and merge. Then publish the package by hand the first time (see below), and tag the merged commit of `main`:
 
 ```bash
-# version numbers must match in package.json, apps/mcp-server/package.json and apps/mcp-server/manifest.json (check:rules enforces it)
-git tag v0.1.0
-git push origin v0.1.0
+git fetch origin
+git tag v0.1.1 origin/main          # a tag on origin/main, not on a stale local branch
+git push origin v0.1.1
 ```
 
 `release-mcpb.yml` then:
@@ -83,7 +85,18 @@ git push origin v0.1.0
 2. runs the tests, packs `loam.mcpb` and the npm package, and starts the packed extension over stdio as a last check;
 3. writes `loam.mcpb.sha256` and a signed **build attestation**;
 4. creates the GitHub Release with `loam.mcpb` and the checksum attached;
-5. publishes `loam-mcp` to npm with provenance.
+5. publishes `loam-mcp` to npm with provenance, **only if the secret `NPM_TOKEN` is set**. Without it the step prints a notice and is skipped, and the run stays green (the release of step 4 is already made).
+
+The first time (the package does not exist on npm yet), publish it by hand from the merged commit, logged in with two-factor authentication, and check it:
+
+```bash
+npm login
+npm run pack:npm
+npm publish apps/mcp-server/dist/npm --access public
+npm view loam-mcp name version       # shows the name and the version you published
+```
+
+The version on npm must be the one of the tag. Later releases can publish without a token: see "Trusted publishing" in npm's documentation, then remove the secret.
 
 ## 6. List the server in the official MCP Registry
 

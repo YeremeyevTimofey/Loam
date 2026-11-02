@@ -1,9 +1,11 @@
 name: Release
 
-# Push a tag like v0.1.0 to publish a release. It does three things:
+# Push a tag like v0.1.1 to publish a release. It does three things:
 #   1. GitHub Release with loam.mcpb (+ checksum + build attestation). The site's download button leads to
 #      https://github.com/<owner>/<repo>/releases/latest/download/loam.mcpb, which GitHub serves straight as a download.
 #   2. npm: publishes the loam-mcp package that Claude Code, Cursor, Codex, VS Code, Gemini CLI and others start with npx.
+#      Without the secret NPM_TOKEN this step is skipped with a notice (the release above is already made), so the run stays
+#      green. Publish the package by hand then (docs/PUBLISHING.md, section 5), or set the secret.
 #   3. Nothing else: the website is deployed by deploy-web.yml.
 # Needs the secret NPM_TOKEN (an npm "automation" token with publish rights for the package).
 on:
@@ -53,4 +55,9 @@ jobs:
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish apps/mcp-server/dist/npm --access public --provenance
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::notice title=npm package not published::The secret NPM_TOKEN is not set. The GitHub Release is made. Publish loam-mcp by hand (docs/PUBLISHING.md, section 5) or set the secret."
+            exit 0
+          fi
+          npm publish apps/mcp-server/dist/npm --access public --provenance
