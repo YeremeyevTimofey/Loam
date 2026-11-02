@@ -15,8 +15,8 @@
   "numbers": {
     "readyCount": 3,
     "readyHours": 108,
-    "typicalBefore": 5733,
-    "typicalAfter": 2300,
+    "typicalBefore": 5696,
+    "typicalAfter": 2263,
     "typicalPercent": 60
   },
   "processes": [
@@ -119,14 +119,6 @@
   },
   "skills": [
     {
-      "name": "client-bad-news-email",
-      "source": "starter",
-      "description": "Draft an email telling a client about a delay or a problem - the fact, the reason without excuses, what we do, when they hear next",
-      "scanner": "pass",
-      "reviewed": true,
-      "verdict": null
-    },
-    {
       "name": "competitor-snapshot",
       "source": "imported",
       "description": "Build a one-page snapshot of a competitor from the notes and links the user pastes in",
@@ -135,19 +127,43 @@
       "verdict": "safe"
     },
     {
-      "name": "meeting-summary",
-      "source": "starter",
-      "description": "Turn raw meeting notes into a structured summary with decisions, owners, deadlines and open questions",
-      "scanner": "pass",
-      "reviewed": true,
+      "name": "client-onboarding-brief",
+      "source": "generated",
+      "description": "Produce \"Client onboarding brief\" the way this user wants it, using their examples and corrections.",
+      "scanner": null,
+      "reviewed": false,
       "verdict": null
     },
     {
-      "name": "weekly-status-report",
-      "source": "starter",
-      "description": "Write a weekly status report - done, in progress, risks and what is needed from the reader",
-      "scanner": "pass",
-      "reviewed": true,
+      "name": "contract-negotiation",
+      "source": "generated",
+      "description": "Produce \"Contract negotiation\" the way this user wants it, using their examples and corrections.",
+      "scanner": null,
+      "reviewed": false,
+      "verdict": null
+    },
+    {
+      "name": "meeting-follow-up",
+      "source": "generated",
+      "description": "Produce \"Meeting follow-up\" the way this user wants it, using their examples and corrections.",
+      "scanner": null,
+      "reviewed": false,
+      "verdict": null
+    },
+    {
+      "name": "monthly-invoice-check",
+      "source": "generated",
+      "description": "Produce \"Monthly invoice check\" the way this user wants it, using their examples and corrections.",
+      "scanner": null,
+      "reviewed": false,
+      "verdict": null
+    },
+    {
+      "name": "weekly-client-report",
+      "source": "generated",
+      "description": "Produce \"Weekly client report\" the way this user wants it, using their examples and corrections.",
+      "scanner": null,
+      "reviewed": false,
       "verdict": null
     }
   ],

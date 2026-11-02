@@ -62,7 +62,7 @@ export function renderSarah(s: SarahSummary, links: { demo: string; processBase:
       const tags =
         k.source === 'imported'
           ? `${badge('warning', 'Imported')}${k.scanner === 'warn' ? badge('warning', 'Scan warning') : badge('success', 'Scan passed')}${k.reviewed ? badge(k.verdict === 'safe' ? 'success' : 'warning', `Reviewed: ${k.verdict ?? 'yes'}`) : badge('warning', 'Not reviewed')}`
-          : `${badge('neutral', 'Starter')}${badge('muted', 'Read only')}`;
+          : `${badge('neutral', k.source === 'generated' ? 'Built from her process' : 'Added earlier')}${badge('muted', 'Read only')}`;
       return `<li class="rounded-lg border border-line bg-surface p-4">
         <p class="font-medium">${esc(k.name)}</p>
         <p class="t-secondary mt-1">${esc(clip(k.description, 120))}</p>
@@ -95,6 +95,7 @@ export function renderSarah(s: SarahSummary, links: { demo: string; processBase:
     <p class="mb-10 max-w-[720px]">Since then, ${s.learning.runs - (s.learning.corrections.at(-1)?.run ?? 0)} runs in a row needed no change, so Loam marks the process <strong>stable</strong>. She never edited a file by hand.</p>
 
     <h3 class="t-h3 mb-3">3. Her skills, and a safety check on every one that comes from outside</h3>
+    <p class="mb-5 max-w-[720px]">A skill is a saved how-to for one kind of work. Every process ${esc(first)} described got one, built from her own answers. One more came from outside.</p>
     <ul class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">${skillCards}</ul>
     <p class="mb-10 max-w-[720px]">${imported ? `“${esc(imported.name)}” came from outside, so Loam scanned it, flagged that it is long, and stored it as read-only, like every imported skill. Her own agent then reviewed it and called it safe: a note for her, which never changes what the skill may do. ` : ''}${refused ? `Another one, “${esc(refused.skill)}”, was refused: ${esc(REFUSAL_WHY[refused.reason] ?? 'it failed the safety check')}. There is no “add anyway”.` : ''}</p>
 

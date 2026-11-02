@@ -14,6 +14,7 @@ export * from './process';
 export * from './scoring';
 export * from './skillgen';
 export * from './skills';
+export * from './skill-find';
 export * from './scanner';
 export * from './audit';
 export * from './interview';

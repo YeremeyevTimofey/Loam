@@ -47,6 +47,10 @@
       "description": "Read one text file inside the knowledge base folder."
     },
     {
+      "name": "loam_find_skill",
+      "description": "Find the skill for a task in your own words: yours, built from your processes, or imported."
+    },
+    {
       "name": "loam_list_skills",
       "description": "List all skills with source, permissions and review state."
     },
@@ -85,6 +89,10 @@
     {
       "name": "loam_get_context",
       "description": "The entries about the people, clients, goals and metrics a task involves, without reading whole files."
+    },
+    {
+      "name": "loam_add_process",
+      "description": "Add one recurring task as a process, and build its skill, when you ask."
     },
     {
       "name": "loam_upsert_context",

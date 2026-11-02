@@ -14,7 +14,7 @@ After that, ask your agent for your recurring work in plain words, for example `
 
 - `profile.md` — who you are and how you like to work
 - `processes/` — one folder per recurring task: a description, examples of good results, and your corrections
-- `skills/` — reusable skills: the starter pack, ones built from your processes, and ones you imported
+- `skills/` — skills you imported. The skill Loam builds from each of your processes sits next to the process, in `processes/`
 - `context/` — what your assistant should know about the people, clients, projects, goals, metrics and terms around your work: one short line each, in `people.md`, `entities.md`, `goals.md`, `metrics.md` and `glossary.md`. A file appears when its first entry is saved
 - `AGENTS.md` — the protocol your agent follows. Leave it alone unless you know why
 - `.loam/` — Loam's own files: interview script, search index, history of changes

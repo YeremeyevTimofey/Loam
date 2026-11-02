@@ -3,9 +3,11 @@ import {
   buildReviewPrompt,
   describeRefusal,
   LoamError,
+  loadKb,
   loadSkills,
   planImportSkill,
   planSetSkillReview,
+  renderFindSkill,
   renderSkillList,
   skillStatus,
   wrapImported,
@@ -29,10 +31,27 @@ async function findSkill(ready: Ready, name: string) {
 
 export function registerSkillTools(server: McpServer, ctx: Ctx): void {
   defineTool(server, ctx, {
+    name: 'loam_find_skill',
+    title: 'Find the skill for a task',
+    description:
+      'Call this first for any task, and whenever the user asks whether you can do something or whether there is a skill for it. Pass the task in the user\'s own words. Returns the skills that fit, best first (their own, built from their processes, and imported ones), each with how to use it. If none fits it lists all skills and gives the steps: say what is missing, offer to add a process (loam_add_process), or import one the user brings (scanned first). It never installs anything. Then call loam_get_skill and follow the skill.',
+    input: {
+      task: z.string().min(2).describe('What the user wants done, in their own words'),
+      limit: z.number().int().min(1).max(8).default(3).describe('How many skills to return at most'),
+    },
+    kind: 'read',
+    handler: async ({ task, limit }, ready) => {
+      await requireBase(ready);
+      const snap = await loadKb(ready.store, ready.today());
+      return renderFindSkill(task, snap.skills, snap.processes, limit);
+    },
+  });
+
+  defineTool(server, ctx, {
     name: 'loam_list_skills',
     title: 'List skills',
     description:
-      'Call this first for any task. Lists every skill (name, one-line description, source, permissions, review state), including skills built from the user\'s processes. If one matches the task, call loam_get_skill and follow it. Under 400 tokens.',
+      'Lists every skill (name, one-line description, source, permissions, review state), including skills built from the user\'s processes. To pick the one for a task use loam_find_skill; use this when the user asks what skills they have. Under 400 tokens.',
     input: {},
     kind: 'read',
     handler: async (_args, ready) => {

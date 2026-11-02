@@ -87,8 +87,8 @@ The demo is a fictional account manager, Sarah, at a 20-person marketing agency.
 
 - **5 processes** found by the interview, 3 ready to automate: about **108 hours a year**.
 - A weekly report refined by **4 corrections** until it was marked *stable*.
-- Starter skills, one imported skill with a safety scan and an agent review, and one skill the safety check **refused**.
-- A health check: a typical task reads **5,733 tokens** in this deliberately messy sample, **2,300** after the suggested clean-up (**60% less**).
+- A skill built from each of her processes, one imported skill with a safety scan and an agent review, and one skill the safety check **refused**.
+- A health check: a typical task reads **5,696 tokens** in this deliberately messy sample, **2,263** after the suggested clean-up (**60% less**).
 
 ## Private and safe by design
 
@@ -107,7 +107,7 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#privacy-each-claim-and-how-
 
 | Folder | What is in it |
 |---|---|
-| [`apps/web/`](apps/web) | landing page, install guide, the app (React), [sample knowledge base](apps/web/src/demo-data/kb), [starter skills](apps/web/src/starter-skills) |
+| [`apps/web/`](apps/web) | landing page, install guide, the app (React), [sample knowledge base](apps/web/src/demo-data/kb) |
 | [`apps/mcp-server/`](apps/mcp-server) | the MCP server, packed as `loam.mcpb` (Claude Desktop) and as the npm package [`loam-mcp`](https://www.npmjs.com/package/loam-mcp) |
 | [`packages/loam-core/`](packages/loam-core) | schema, scanner, lint, skill generation: shared by the app and the server |
 | [`e2e/`](e2e) · [`scripts/`](scripts) | browser tests (Chromium, Firefox, WebKit) and build tooling |

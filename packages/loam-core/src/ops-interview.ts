@@ -11,7 +11,7 @@ import { annualHours } from './scoring';
 import type { ProcessFrontmatter } from './schema';
 import { exampleInfo, generateProcessSkill, sortExamples } from './skillgen';
 import { ENTITIES_TEMPLATE, entitiesMd, GLOSSARY_TEMPLATE, glossaryMd } from './templates';
-import type { KbStore } from './types';
+import { LoamError, type KbStore } from './types';
 import { walk } from './walk';
 
 export const InterviewProcessInput = z.object({
@@ -73,6 +73,120 @@ function mergeList(existing: string | null, template: string, items: string[], k
   return `${base}\n${fresh.join('\n')}\n`;
 }
 
+/** The folder name of a process: the one asked for if it is valid, otherwise made from the title. */
+export const processSlug = (item: { title: string; slug?: string }): string => (item.slug && isSlug(item.slug) ? item.slug : slugify(item.title) || 'process');
+
+/**
+ * One process as a plan: its description, empty corrections and a first skill. A process with the same folder name is
+ * updated and keeps its runs, corrections and examples. `taken` holds the names already used in the same plan, so two
+ * processes with one title in one interview get different folders.
+ */
+export async function planUpsertProcess(
+  store: KbStore,
+  item: InterviewProcessInput,
+  today: string,
+  taken: Set<string> = new Set(),
+): Promise<{ plan: Plan; saved: SavedProcess }> {
+  const plan = newPlan();
+  let slug = processSlug(item);
+  const base = slug;
+  for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`;
+  taken.add(slug);
+
+  const path = `processes/${slug}/process.md`;
+  const exists = await store.exists(path);
+  let doc: ProcessDoc;
+  if (exists) {
+    const old = await loadProcess(store, slug, today);
+    doc = { ...old.doc, fm: { ...old.fm } };
+  } else {
+    doc = {
+      fm: { type: 'process', slug, title: item.title, frequency: item.frequency, minutes_per_run: item.minutes_per_run, automation: item.automation, inputs: [], output: 'document', runs: 0, corrections: 0, updated: today },
+      sections: [],
+    };
+  }
+  doc.fm = {
+    ...doc.fm,
+    title: item.title,
+    frequency: item.frequency,
+    minutes_per_run: item.minutes_per_run,
+    automation: item.automation,
+    inputs: item.inputs.length ? item.inputs : doc.fm.inputs,
+    output: item.output || doc.fm.output,
+    updated: today,
+  };
+  if (item.frequency === 'ad-hoc' && item.runs_per_year !== undefined) doc.fm.runs_per_year = item.runs_per_year;
+  if (item.frequency !== 'ad-hoc') delete doc.fm.runs_per_year;
+
+  const text: Record<SectionKey, string> = {
+    what: item.what,
+    steps: item.steps.map((s, i) => `${i + 1}. ${s.replace(/^\s*\d+[.)]\s*/, '')}`).join('\n'),
+    good: item.good,
+    constraints: item.constraints,
+    takes: item.takes,
+  };
+  for (const key of Object.keys(text) as SectionKey[]) {
+    if (text[key].trim()) doc = setSection(doc, key, text[key]);
+  }
+
+  await stage(plan, store, path, buildProcess(doc), `${exists ? 'Update' : 'Add'} process "${item.title}"`);
+  const corrPath = `processes/${slug}/corrections.md`;
+  const corrExisting = await readOrNull(store, corrPath);
+  if (corrExisting === null) await stage(plan, store, corrPath, emptyCorrections(item.title));
+  const examples = sortExamples((await walk(store, `processes/${slug}/examples`)).map((f) => exampleInfo(f.path)));
+  await stage(
+    plan,
+    store,
+    `processes/${slug}/SKILL.md`,
+    generateProcessSkill({ doc, corrections: parseCorrections(corrExisting ?? ''), examples, today }),
+    `Build the skill for "${item.title}"`,
+  );
+  if (item.frequency === 'ad-hoc' && item.runs_per_year === undefined) {
+    plan.notes.push(`"${item.title}" is ad-hoc without runs_per_year, so its hours per year are unknown.`);
+  }
+  return { plan, saved: { slug, title: item.title, created: !exists, hours: annualHours(doc.fm), automation: doc.fm.automation } };
+}
+
+/**
+ * What the agent tells the person about skills, right after the interview: what a skill is, which ones were built from their
+ * answers (the two that save the most hours first), and how to find, add and remove one. The names and numbers are the real ones.
+ */
+export function skillsIntroForAgent(saved: { title: string; hours: number | null }[]): string {
+  const byHours = [...saved].sort((a, b) => (b.hours ?? 0) - (a.hours ?? 0));
+  const top = byHours.slice(0, 2).map((p) => `"${p.title}"${p.hours === null ? '' : ` (~${p.hours} h/year)`}`);
+  const rest = byHours.slice(2).map((p) => `"${p.title}"`);
+  const built =
+    saved.length === 0
+      ? '- No process was saved, so there is no skill yet. A skill appears for every process they describe.'
+      : `- Loam built ${saved.length === 1 ? 'one' : saved.length} from their answers, one per process. ${top.join(' and ')} ${top.length > 1 ? 'save' : 'saves'} the most time${rest.length ? `; the other${rest.length > 1 ? 's are' : ' is'} ${rest.join(', ')}` : ''}.`;
+  return [
+    'When you explain skills (after the receipt, before the first win), say it in two or three short sentences, without jargon:',
+    '- A skill is a saved how-to for one kind of work. Your agent reads it before it does that work, so the person does not have to explain it again.',
+    built,
+    '- They can ask: "find a skill for …" (you look through their skills first), "add a process for …" (you ask how often and how long, then build its skill), or bring one someone else made (on the Skills screen of the Loam app, or pasted to you; it is checked first). An imported skill can be removed on the Skills screen; a skill built from a process stays as long as its process does.',
+  ].join('\n');
+}
+
+export const AddProcessInput = InterviewProcessInput.extend({
+  replace: z.boolean().default(false).describe('true only if a process with this name exists and the user wants it changed; its runs, corrections and examples are kept'),
+});
+export type AddProcessInput = z.infer<typeof AddProcessInput>;
+
+/**
+ * Adds ONE process (and builds its skill) after the interview, without touching the interview's progress.
+ * A name that is taken is refused unless the user asked for a change.
+ */
+export async function planAddProcess(store: KbStore, rawInput: AddProcessInput, today: string): Promise<{ plan: Plan; saved: SavedProcess }> {
+  const { replace, ...item } = AddProcessInput.parse(rawInput);
+  const slug = processSlug(item);
+  if (!replace && (await store.exists(`processes/${slug}/process.md`))) {
+    throw new LoamError(
+      `There is already a process "${slug}". To add a different one, give it another title. To change this one, ask the user and call again with replace: true (its runs, corrections and examples are kept).`,
+    );
+  }
+  return planUpsertProcess(store, item, today);
+}
+
 export async function planSaveInterview(
   store: KbStore,
   rawInput: InterviewInput,
@@ -103,65 +217,11 @@ export async function planSaveInterview(
   );
 
   // Processes
-  const processPlan = newPlan();
+  let processPlan = newPlan();
   for (const item of input.processes) {
-    let slug = item.slug && isSlug(item.slug) ? item.slug : slugify(item.title) || 'process';
-    const base = slug;
-    for (let n = 2; used.has(slug); n++) slug = `${base}-${n}`;
-    used.add(slug);
-
-    const path = `processes/${slug}/process.md`;
-    const exists = await store.exists(path);
-    let doc: ProcessDoc;
-    if (exists) {
-      const old = await loadProcess(store, slug, today);
-      doc = { ...old.doc, fm: { ...old.fm } };
-    } else {
-      doc = {
-        fm: { type: 'process', slug, title: item.title, frequency: item.frequency, minutes_per_run: item.minutes_per_run, automation: item.automation, inputs: [], output: 'document', runs: 0, corrections: 0, updated: today },
-        sections: [],
-      };
-    }
-    doc.fm = {
-      ...doc.fm,
-      title: item.title,
-      frequency: item.frequency,
-      minutes_per_run: item.minutes_per_run,
-      automation: item.automation,
-      inputs: item.inputs.length ? item.inputs : doc.fm.inputs,
-      output: item.output || doc.fm.output,
-      updated: today,
-    };
-    if (item.frequency === 'ad-hoc' && item.runs_per_year !== undefined) doc.fm.runs_per_year = item.runs_per_year;
-    if (item.frequency !== 'ad-hoc') delete doc.fm.runs_per_year;
-
-    const text: Record<SectionKey, string> = {
-      what: item.what,
-      steps: item.steps.map((s, i) => `${i + 1}. ${s.replace(/^\s*\d+[.)]\s*/, '')}`).join('\n'),
-      good: item.good,
-      constraints: item.constraints,
-      takes: item.takes,
-    };
-    for (const key of Object.keys(text) as SectionKey[]) {
-      if (text[key].trim()) doc = setSection(doc, key, text[key]);
-    }
-
-    await stage(processPlan, store, path, buildProcess(doc), `${exists ? 'Update' : 'Add'} process "${item.title}"`);
-    const corrPath = `processes/${slug}/corrections.md`;
-    const corrExisting = await readOrNull(store, corrPath);
-    if (corrExisting === null) await stage(processPlan, store, corrPath, emptyCorrections(item.title));
-    const examples = sortExamples((await walk(store, `processes/${slug}/examples`)).map((f) => exampleInfo(f.path)));
-    await stage(
-      processPlan,
-      store,
-      `processes/${slug}/SKILL.md`,
-      generateProcessSkill({ doc, corrections: parseCorrections(corrExisting ?? ''), examples, today }),
-      `Build the skill for "${item.title}"`,
-    );
-    saved.push({ slug, title: item.title, created: !exists, hours: annualHours(doc.fm), automation: doc.fm.automation });
-    if (item.frequency === 'ad-hoc' && item.runs_per_year === undefined) {
-      processPlan.notes.push(`"${item.title}" is ad-hoc without runs_per_year, so its hours per year are unknown.`);
-    }
+    const one = await planUpsertProcess(store, item, today, used);
+    processPlan = mergePlans(processPlan, one.plan);
+    saved.push(one.saved);
   }
   plans.push(processPlan);
 

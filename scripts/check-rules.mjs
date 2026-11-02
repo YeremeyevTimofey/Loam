@@ -33,7 +33,7 @@ const scan = (files, test) => files.flatMap((f) => {
 const grep = (code, re) => [...code.matchAll(re)].map((m) => m[0].slice(0, 80));
 
 const under = (dir, exts) => (existsSync(path.join(root, dir)) ? walk(path.join(root, dir)).filter((f) => exts.some((e) => f.endsWith(e))) : []);
-const webSrc = under('apps/web/src', ['.ts', '.tsx', '.css']).filter((f) => !/demo-data|starter-skills/.test(f));
+const webSrc = under('apps/web/src', ['.ts', '.tsx', '.css']).filter((f) => !/demo-data/.test(f));
 const appCode = under('apps/web/src/app', ['.ts', '.tsx']);
 const coreCode = under('packages/loam-core/src', ['.ts']);
 const serverCode = under('apps/mcp-server/src', ['.ts']);
@@ -168,7 +168,7 @@ rule('writes outside the base are impossible: NodeStore checks real paths', '§7
 
 // --- addresses live in site.config.json only
 const ADDRESS_FILES = [
-  ...under('apps/web/src', ['.ts', '.tsx']).filter((f) => !/demo-data|starter-skills/.test(f)),
+  ...under('apps/web/src', ['.ts', '.tsx']).filter((f) => !/demo-data/.test(f)),
   ...under('apps/mcp-server/src', ['.ts']),
   ...under('apps/mcp-server/scripts', ['.mjs']),
   ...under('packages/loam-core/src', ['.ts']).filter((f) => !f.endsWith('constants.ts')),

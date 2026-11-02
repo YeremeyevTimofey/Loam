@@ -56,8 +56,8 @@ export function overviewText(label: string, snap: KbSnapshot, contextLine: strin
   } else lines.push('', 'No processes yet.');
   const library = snap.skills.filter((s) => s.kind === 'library');
   const imported = library.filter((s) => s.fm.source === 'imported').length;
-  lines.push('', `Skills: ${library.length} in the library${imported ? ` (${imported} imported)` : ''} and ${snap.skills.length - library.length} built from processes. Call loam_list_skills before any task.`);
-  lines.push('Read order: loam_list_skills → loam_get_skill / loam_get_process → profile.md only if needed. Never read the whole folder.');
+  lines.push('', `Skills: ${library.length} in the library${imported ? ` (${imported} imported)` : ''} and ${snap.skills.length - library.length} built from processes. Call loam_find_skill with the task before any task.`);
+  lines.push('Read order: loam_find_skill → loam_get_skill / loam_get_process → profile.md only if needed. Never read the whole folder.');
   return lines.join('\n');
 }
 

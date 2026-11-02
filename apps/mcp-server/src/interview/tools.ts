@@ -11,6 +11,7 @@ import {
   parseInterview,
   planSaveInterview,
   renderInterview,
+  skillsIntroForAgent,
 } from '@loam/core';
 import { z } from 'zod';
 import type { Ctx } from '../context';
@@ -83,7 +84,9 @@ export function registerInterviewTools(server: McpServer, ctx: Ctx): void {
       if (args.complete) {
         lines.push(
           '',
-          'Next: suggest starter skills that fit these processes (meeting-summary, client-bad-news-email, weekly-status-report, incoming-doc-review, meeting-prep, task-handoff). The user adds them on the Skills screen of the Loam app. Tell them to press Refresh in the app to see their profile and processes.',
+          skillsIntroForAgent(saved),
+          '',
+          'Tell them they can press Refresh in the Loam app (Chrome or Edge) to see their profile and processes.',
         );
       }
       return lines.join('\n');
