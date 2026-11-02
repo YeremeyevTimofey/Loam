@@ -44,6 +44,29 @@ async function pickAgent(page: Page, name: string): Promise<void> {
   if (name !== 'Claude Desktop') await openManual(page);
 }
 const setSystem = (page: Page, label: string) => page.getByLabel('System').selectOption({ label });
+/**
+ * The app saves the typed path to IndexedDB in the background, so a reload straight after typing can beat the last write
+ * and bring back the previous text. Wait until the saved text is the typed text before reloading.
+ */
+const waitForSavedPath = (page: Page, text: string) =>
+  page.waitForFunction(
+    (expected) =>
+      new Promise<boolean>((resolve) => {
+        const open = indexedDB.open('keyval-store');
+        open.onerror = () => resolve(false);
+        open.onsuccess = () => {
+          const db = open.result;
+          if (!db.objectStoreNames.contains('keyval')) return resolve(false);
+          const read = db.transaction('keyval').objectStore('keyval').get('loam:folder-path');
+          read.onsuccess = () => {
+            db.close();
+            resolve(read.result === expected);
+          };
+          read.onerror = () => resolve(false);
+        };
+      }),
+    text,
+  );
 const codeBlocks = (page: Page) => page.locator('pre[aria-label]').allInnerTexts();
 
 describe('Connect your agent works for more than Claude (the new positioning)', () => {
@@ -165,6 +188,7 @@ describe('Connect your agent works for more than Claude (the new positioning)', 
       await page.getByRole('alert').filter({ hasText: 'Windows-style' }).waitFor();
       await input.fill('/Users/sarah/Loam');
       expect(await page.getByRole('alert').count()).toBe(0);
+      await waitForSavedPath(page, '/Users/sarah/Loam');
       await page.reload({ waitUntil: 'networkidle' });
       await page.getByRole('button', { name: /Continue with Loam/ }).click();
       await page.getByRole('heading', { name: 'Connect your agent' }).waitFor();
