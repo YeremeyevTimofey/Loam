@@ -12,8 +12,8 @@
   "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json" },
   "dependencies": {
     "diff": "^9.0.0",
-    "gpt-tokenizer": "^4.0.0",
+    "gpt-tokenizer": "^4.1.0",
     "gray-matter": "^4.0.3",
-    "zod": "^4.6.5"
+    "zod": "^4.6.7"
   }
 }
