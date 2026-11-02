@@ -36,35 +36,41 @@ const paste = async (page: Page, text: string) => {
   await page.getByRole('button', { name: 'Check it' }).click();
 };
 
-describe('starter pack and sync (acceptance 18, 19)', () => {
-  it('lists the seven starter skills, adds one by copying it, syncs with the loam- prefix and leaves the user\'s own skill alone', async () => {
+const toneChecker = '---\nname: Tone Checker\ndescription: Check a draft for tone and suggest two small changes\nlicense: MIT\n---\n\n# Tone checker\n\nRead the draft and point out where the tone slips.\n';
+
+async function addToneChecker(page: Page) {
+  await paste(page, toneChecker);
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Add to my base' }).click();
+  await dialog.waitFor({ state: 'hidden' });
+  await page.locator('h3', { hasText: 'tone-checker' }).waitFor();
+}
+
+describe('what a skill is, and sync (acceptance 18, 19)', () => {
+  it('explains what a skill is and how to find, add and remove one, has no starter pack, and syncs with the loam- prefix without touching the user\'s own skill', async () => {
     const { page, close } = await skillsScreen();
     try {
-      for (const name of ['meeting-summary', 'client-bad-news-email', 'weekly-status-report', 'incoming-doc-review', 'meeting-prep', 'task-handoff', 'find-skills']) {
-        expect(await page.getByRole('button', { name: `Add ${name}` }).count(), name).toBe(1);
-      }
-      // Skills for a kind of work come first, alphabetically; find-skills is last
-      const listed = await page.getByRole('button', { name: /^Add [a-z-]+$/ }).evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')!.slice(4)));
-      expect(listed).toEqual(['client-bad-news-email', 'incoming-doc-review', 'meeting-prep', 'meeting-summary', 'task-handoff', 'weekly-status-report', 'find-skills']);
-      await page.getByRole('button', { name: 'Add meeting-summary' }).click();
-      await page.getByRole('heading', { name: 'Add “meeting-summary”' }).waitFor();
-      await page.getByRole('button', { name: 'Add skill' }).click();
-      await page.getByRole('dialog').waitFor({ state: 'hidden' });
+      await page.getByRole('heading', { name: 'What is a skill?' }).waitFor();
+      const section = page.locator('section', { has: page.getByRole('heading', { name: 'Add skills' }) });
+      for (const line of ['Find one.', 'Add one.', 'Remove one.']) expect(await section.getByText(line).count(), line).toBe(1);
+      expect(await section.getByText('Ask your agent: “find a skill for …”').count()).toBe(1);
+      expect(await section.getByText('Ask your agent: “add a process for …”').count()).toBe(1);
+      expect(await section.getByText('A skill built from a process stays as long as its process does.').count()).toBe(1);
+      expect(await page.getByRole('heading', { name: 'Starter pack' }).count()).toBe(0);
+      expect(await page.getByRole('button', { name: /^Add [a-z-]+$/ }).count()).toBe(0);
+      await page.getByText(/No skills yet\. Loam builds one from every process you describe/).waitFor();
+
+      await addToneChecker(page);
       const files = await readFolder(page);
-      const stored = files['skills/meeting-summary/SKILL.md']!;
-      expect(stored).toContain('source: starter');
-      expect(stored).toContain('reviewed: true');
-      expect(stored).toContain('scanner: pass');
-      expect(stored).toContain('# Meeting summary');
-      expect(files['.claude/skills/loam-meeting-summary/SKILL.md']).toContain('name: loam-meeting-summary');
+      expect(files['skills/tone-checker/SKILL.md']).toContain('source: imported');
+      expect(files['.claude/skills/loam-tone-checker/SKILL.md']).toContain('name: loam-tone-checker');
       expect(files['.claude/skills/my-own-skill/SKILL.md']).toBe('---\nname: my-own-skill\ndescription: Mine\n---\nMy own instructions.\n');
-      expect(await page.getByRole('button', { name: 'meeting-summary is already added' }).isDisabled()).toBe(true);
 
       // Sync repairs a damaged copy and reports how many files it touched
-      await writeFolder(page, { '.claude/skills/loam-meeting-summary/SKILL.md': 'tampered' });
+      await writeFolder(page, { '.claude/skills/loam-tone-checker/SKILL.md': 'tampered' });
       await page.getByRole('button', { name: 'Sync to agents' }).click();
       await page.getByText('1 file updated in .claude/skills and .agents/skills.').waitFor();
-      expect((await readFolder(page))['.claude/skills/loam-meeting-summary/SKILL.md']).toContain('name: loam-meeting-summary');
+      expect((await readFolder(page))['.claude/skills/loam-tone-checker/SKILL.md']).toContain('name: loam-tone-checker');
       expect((await readFolder(page))['.claude/skills/my-own-skill/SKILL.md']).toContain('My own instructions.');
       await page.getByRole('button', { name: 'Sync to agents' }).click();
       await page.getByText('Agent skills are already up to date.').waitFor();
@@ -78,18 +84,16 @@ describe('deleting a skill', () => {
   it('removes the skill and its agent copy, and nothing else (19)', async () => {
     const { page, close } = await skillsScreen();
     try {
-      await page.getByRole('button', { name: 'Add meeting-summary' }).click();
-      await page.getByRole('button', { name: 'Add skill' }).click();
-      await page.getByRole('dialog').waitFor({ state: 'hidden' });
-      expect((await readFolder(page))['.claude/skills/loam-meeting-summary/SKILL.md']).toBeTruthy();
-      await page.getByRole('button', { name: 'Delete meeting-summary' }).click();
+      await addToneChecker(page);
+      expect((await readFolder(page))['.claude/skills/loam-tone-checker/SKILL.md']).toBeTruthy();
+      await page.getByRole('button', { name: 'Delete tone-checker' }).click();
       await page.getByRole('button', { name: 'Delete', exact: true }).click();
       await page.getByRole('dialog').waitFor({ state: 'hidden' });
       const files = await readFolder(page);
-      expect(files['skills/meeting-summary/SKILL.md']).toBeUndefined();
-      expect(files['.claude/skills/loam-meeting-summary/SKILL.md']).toBeUndefined();
+      expect(files['skills/tone-checker/SKILL.md']).toBeUndefined();
+      expect(files['.claude/skills/loam-tone-checker/SKILL.md']).toBeUndefined();
       expect(files['.claude/skills/my-own-skill/SKILL.md']).toContain('My own instructions.');
-      expect(Object.keys(files).some((k) => k.startsWith('.loam/history/') && k.includes('meeting-summary'))).toBe(true);
+      expect(Object.keys(files).some((k) => k.startsWith('.loam/history/') && k.includes('tone-checker'))).toBe(true);
       await page.getByRole('button', { name: 'View audit log' }).click();
       const rows = (await page.getByRole('dialog').locator('tbody tr').allInnerTexts()).join('\n');
       expect(rows).toMatch(/Deleted/);

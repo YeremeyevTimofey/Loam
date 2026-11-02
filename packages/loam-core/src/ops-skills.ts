@@ -116,25 +116,6 @@ export async function planImportSkill(
   return result;
 }
 
-/** Adds one of the bundled starter skills. It still goes through the scanner as a safety net. */
-export async function planAddStarterSkill(
-  store: KbStore,
-  starter: { name: string; text: string },
-  today: string,
-): Promise<Plan> {
-  const plan = newPlan();
-  const skill = parseSkill(`starter/${starter.name}.md`, starter.text, 'library');
-  if (skill.fm.source !== 'starter') throw new LoamError(`"${starter.name}" is not a starter skill.`);
-  if (await store.exists(`skills/${skill.name}/SKILL.md`)) throw new LoamError(`"${skill.name}" is already in your skills.`);
-  const scan = scanSkill({ text: starter.text, body: skill.body, description: skill.fm.description, license: skill.fm.license, capabilities: skill.fm.capabilities, source: 'starter', frontmatterKeys: Object.keys(parseDoc(starter.text).data) });
-  if (scan.verdict === 'fail') throw new LoamError(`The starter skill "${starter.name}" failed the safety scan. This is a bug in Loam.`);
-  const fm: SkillFrontmatter = { ...skill.fm, origin: 'bundled', imported_at: today, reviewed: true, scanner: 'pass' };
-  const text = buildSkill(fm, skill.body);
-  await stage(plan, store, `skills/${skill.name}/SKILL.md`, text, `Add the starter skill "${skill.name}"`);
-  plan.audit.push(await makeAuditEntry({ action: 'import', skill: skill.name, source: 'starter', scanner: 'pass', verdict: null, content: text, detail: 'origin: bundled' }));
-  return plan;
-}
-
 export async function planDeleteSkill(store: KbStore, name: string): Promise<Plan> {
   const path = `skills/${name}/SKILL.md`;
   const raw = await readOrNull(store, path);

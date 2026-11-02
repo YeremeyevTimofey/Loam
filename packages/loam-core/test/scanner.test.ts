@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseDoc } from '../src/frontmatter';
 import { scanSkill, type RedCategory } from '../src/scanner';
-import { fixture, starterSkills } from './helpers';
+import { fixture } from './helpers';
 
 function scan(text: string, source: 'imported' | 'starter' | 'generated' = 'imported', profileText?: string) {
   const { data, body } = parseDoc(text);
@@ -115,13 +115,6 @@ describe('scanner: ordinary writing is not blocked', () => {
     expect(r.red, JSON.stringify(r.red)).toHaveLength(0);
     expect(r.verdict).toBe('pass');
   });
-  for (const skill of starterSkills()) {
-    it(`starter skill ${skill.name} passes with no flags at all`, () => {
-      const r = scan(skill.text, 'starter');
-      expect(r.red, JSON.stringify(r.red)).toHaveLength(0);
-      expect(r.yellow, JSON.stringify(r.yellow)).toHaveLength(0);
-    });
-  }
 });
 
 describe('scanner: yellow flags (acceptance 22)', () => {

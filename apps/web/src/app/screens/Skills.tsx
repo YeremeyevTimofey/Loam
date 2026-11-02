@@ -1,6 +1,5 @@
 import {
   applyPlan,
-  planAddStarterSkill,
   planDeleteSkill,
   planImportSkill,
   planSyncAgentSkills,
@@ -20,7 +19,6 @@ import { Textarea } from '../components/ui/input';
 import { NewTabLink } from '../components/NewTabLink';
 import { commitPlan, useApp } from '../context';
 import { repoFile } from '../lib/links';
-import { STARTER_SKILLS } from '../../starter-skills';
 
 const MAX_FILE = 100_000;
 
@@ -75,7 +73,7 @@ function SkillCard({ skill, onView, onReview, onCopy }: { skill: Skill; onView: 
   );
 }
 
-/** Screen 4 (§14.7): the library, the starter pack, safe import, sync to agents, audit log. */
+/** Screen 4 (§14.7): the library, what a skill is and how to find, add and remove one, safe import, sync to agents, audit log. */
 export function SkillsScreen() {
   const { snap, store, today, propose, refresh } = useApp();
   const [viewing, setViewing] = useState<Skill | null>(null);
@@ -93,7 +91,6 @@ export function SkillsScreen() {
 
   const library = snap.skills.filter((s) => s.kind === 'library');
   const generated = snap.skills.filter((s) => s.kind === 'process');
-  const have = new Set(library.map((s) => s.name));
   const profileText = snap.profile?.raw;
 
   const analyse = async (content: string, origin: 'file' | 'paste') => {
@@ -149,7 +146,7 @@ export function SkillsScreen() {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div className="measure !mx-0">
           <h1 className="t-h1">Skills</h1>
-          <p className="t-secondary mt-2">Skills tell your agent how to do a kind of task. Add the ones you want; anything from outside is checked first. “Sync to agents” copies them where Claude Code, Cursor, Codex, Gemini CLI, Copilot and other agents look for skills. <NewTabLink inline href={repoFile('docs/ARCHITECTURE.md#skills-and-the-security-model')}>How the safety check works</NewTabLink>.</p>
+          <p className="t-secondary mt-2">Skills tell your agent how to do a kind of task. Loam builds one from every process you describe; anything from outside is checked first. “Sync to agents” copies them where Claude Code, Cursor, Codex, Gemini CLI, Copilot and other agents look for skills. <NewTabLink inline href={repoFile('docs/ARCHITECTURE.md#skills-and-the-security-model')}>How the safety check works</NewTabLink>.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={() => void sync()} disabled={busy}>
@@ -181,7 +178,7 @@ export function SkillsScreen() {
         </h2>
         {library.length === 0 ? (
           <Card>
-            <p>No skills yet. Add some from the starter pack below, or import one you found.</p>
+            <p>No skills yet. Loam builds one from every process you describe to your agent in the interview. You can also import one you found.</p>
           </Card>
         ) : (
           <div className="grid gap-4 min-[900px]:grid-cols-2">
@@ -209,30 +206,19 @@ export function SkillsScreen() {
         </h2>
         <Card className="mb-4">
           <h3 className="t-h3 mb-1 flex items-center gap-2">
-            <BookOpen size={20} aria-hidden /> Starter pack
+            <BookOpen size={20} aria-hidden /> What is a skill?
           </h3>
-          <p className="t-secondary mb-4">Skills written and reviewed by us. Each one is added to your folder with one click.</p>
-          <ul className="divide-y divide-line">
-            {STARTER_SKILLS.map((s) => {
-              const desc = /^description:\s*(.+)$/m.exec(s.text)?.[1] ?? '';
-              const added = have.has(s.name);
-              return (
-                <li key={s.name} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium">{s.name}</div>
-                    <div className="t-secondary">{desc}</div>
-                  </div>
-                  <Button
-                    variant={added ? 'secondary' : 'primary'}
-                    disabled={added || busy}
-                    aria-label={added ? `${s.name} is already added` : `Add ${s.name}`}
-                    onClick={async () => propose(await planAddStarterSkill(store, s, today), { title: `Add “${s.name}”`, description: 'This starter skill is copied into your skills folder.', applyLabel: 'Add skill' })}
-                  >
-                    {added ? 'Added' : 'Add'}
-                  </Button>
-                </li>
-              );
-            })}
+          <p className="mb-3">A skill is a saved how-to for one kind of work. Your agent reads it before it does that work, so you do not have to explain it again.</p>
+          <ul className="grid gap-2 text-[15px]">
+            <li>
+              <span className="font-medium">Find one.</span> Ask your agent: “find a skill for …”. Your skills are listed above.
+            </li>
+            <li>
+              <span className="font-medium">Add one.</span> Ask your agent: “add a process for …”. Loam asks how often and how long, then builds the skill. Or import one someone else made, below.
+            </li>
+            <li>
+              <span className="font-medium">Remove one.</span> An imported skill has a Delete button on its card. A skill built from a process stays as long as its process does.
+            </li>
           </ul>
         </Card>
         <Card>

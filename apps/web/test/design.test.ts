@@ -6,7 +6,7 @@ const WEB = path.resolve(import.meta.dirname, '..');
 const files = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
     const full = path.join(dir, name);
-    if (statSync(full).isDirectory()) return /demo-data|starter-skills/.test(name) ? [] : files(full);
+    if (statSync(full).isDirectory()) return /demo-data/.test(name) ? [] : files(full);
     return /\.(tsx?|css)$/.test(name) ? [full] : [];
   });
 const sources = [...files(path.join(WEB, 'src')), ...['index.html', 'install.html', '404.html', 'app/index.html'].map((f) => path.join(WEB, f))];

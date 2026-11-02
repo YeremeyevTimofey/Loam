@@ -161,10 +161,14 @@ describe('demo mode works everywhere (acceptance 35, 36, 37)', () => {
         expect(await page.locator('main a[href*="process="]').count()).toBe(5);
         await page.getByRole('button', { name: 'Skills' }).first().click();
         await page.getByRole('heading', { name: 'Your skills' }).waitFor();
-        for (const skill of ['meeting-summary', 'weekly-status-report', 'client-bad-news-email', 'competitor-snapshot']) {
+        expect(await page.getByRole('heading', { name: 'competitor-snapshot', exact: true }).count()).toBe(1);
+        expect(await page.getByRole('heading', { name: 'What is a skill?' }).count()).toBe(1);
+        expect(await page.getByText('Starter', { exact: true }).count()).toBe(0); // no starter pack any more
+        // the skills Loam built from her five processes sit in a folded section
+        await page.getByText('Skills built from your processes (5)').click();
+        for (const skill of ['weekly-client-report', 'meeting-follow-up', 'client-onboarding-brief', 'monthly-invoice-check', 'contract-negotiation']) {
           expect(await page.getByRole('heading', { name: skill, exact: true }).count(), skill).toBe(1);
         }
-        expect(await page.getByText('Starter', { exact: true }).count()).toBe(3);
         expect(await page.getByText('Imported', { exact: true }).count()).toBe(1);
         expect(errors).toEqual([]);
       } finally {

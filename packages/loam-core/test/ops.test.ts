@@ -5,7 +5,6 @@ import {
   applyPlan,
   parseDoc,
   planAddExample,
-  planAddStarterSkill,
   planDeleteCorrection,
   planDeleteExample,
   planDeleteSkill,
@@ -29,7 +28,7 @@ import {
   REPO_URL,
   type Plan,
 } from '../src';
-import { fixture, freshBase, starterSkills, TODAY } from './helpers';
+import { addSampleSkill, fixture, freshBase, TODAY } from './helpers';
 
 const apply = async (store: MemoryStore, plan: Plan) => applyPlan(store, plan);
 
@@ -246,28 +245,13 @@ describe('learning loop (acceptance 13, 15, 16, 17)', () => {
 });
 
 describe('skills: storage, import and sync (acceptance 18-20, 27)', () => {
-  it('adds a starter skill by copying it into skills/<name>/SKILL.md and logs it', async () => {
-    const store = await freshBase();
-    const starter = starterSkills().find((s) => s.name === 'meeting-summary')!;
-    await apply(store, await planAddStarterSkill(store, starter, TODAY));
-    const { skills } = await loadSkills(store);
-    expect(skills).toHaveLength(1);
-    expect(skills[0]!.fm).toMatchObject({ name: 'meeting-summary', source: 'starter', capabilities: ['read'], reviewed: true, scanner: 'pass', origin: 'bundled', imported_at: TODAY });
-    await expect(planAddStarterSkill(store, starter, TODAY)).rejects.toThrow(/already/);
-    expect((await readAudit(store))[0]).toMatchObject({ action: 'import', skill: 'meeting-summary', source: 'starter' });
-  });
-  it('all seven starter skills can be added', async () => {
-    const store = await freshBase();
-    for (const s of starterSkills()) await apply(store, await planAddStarterSkill(store, s, TODAY));
-    expect((await loadSkills(store)).skills).toHaveLength(7);
-  });
   it('syncs to .claude/skills with the loam- prefix and leaves the user\'s own skills alone', async () => {
     const store = await freshBase();
     await store.writeFile('.claude/skills/my-own-skill/SKILL.md', '---\nname: my-own-skill\n---\nMine.\n');
     await store.writeFile('.claude/skills/my-own-skill/notes.txt', 'keep');
     await store.writeFile('.claude/skills/loamy-but-not-ours/SKILL.md', 'keep');
     await apply(store, (await planSaveInterview(store, interview(), TODAY)).plan);
-    for (const s of starterSkills().filter((x) => ['meeting-summary', 'task-handoff'].includes(x.name))) await apply(store, await planAddStarterSkill(store, s, TODAY));
+    for (const name of ['meeting-summary', 'task-handoff']) await addSampleSkill(store, name);
     const sync = await planSyncAgentSkills(store);
     expect(sync.notes[0]).toMatch(/files? updated/);
     await apply(store, sync);
@@ -290,7 +274,7 @@ describe('skills: storage, import and sync (acceptance 18-20, 27)', () => {
     const input = interview();
     input.processes = [{ ...input.processes[0]!, title: 'Meeting summary' }];
     await apply(store, (await planSaveInterview(store, input, TODAY)).plan);
-    await apply(store, await planAddStarterSkill(store, starterSkills().find((s) => s.name === 'meeting-summary')!, TODAY));
+    await addSampleSkill(store, 'meeting-summary');
     await apply(store, await planSyncAgentSkills(store));
     expect(await store.exists('.claude/skills/loam-meeting-summary/SKILL.md')).toBe(true);
     expect(await store.exists('.claude/skills/loam-process-meeting-summary/SKILL.md')).toBe(true);
@@ -365,7 +349,7 @@ describe('skills: storage, import and sync (acceptance 18-20, 27)', () => {
   });
   it('lists skills compactly (acceptance 26)', async () => {
     const store = await freshBase();
-    for (const s of starterSkills()) await apply(store, await planAddStarterSkill(store, s, TODAY));
+    for (const name of ['meeting-summary', 'task-handoff', 'meeting-prep', 'weekly-status-report', 'client-bad-news-email', 'incoming-doc-review']) await addSampleSkill(store, name);
     await apply(store, (await planImportSkill(store, { content: goodImport, origin: 'paste', today: TODAY })).plan);
     const list = renderSkillList((await loadSkills(store)).skills);
     expect(list).toContain('tone-checker');

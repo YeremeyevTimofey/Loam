@@ -147,6 +147,26 @@ export async function planUpsertProcess(
   return { plan, saved: { slug, title: item.title, created: !exists, hours: annualHours(doc.fm), automation: doc.fm.automation } };
 }
 
+/**
+ * What the agent tells the person about skills, right after the interview: what a skill is, which ones were built from their
+ * answers (the two that save the most hours first), and how to find, add and remove one. The names and numbers are the real ones.
+ */
+export function skillsIntroForAgent(saved: { title: string; hours: number | null }[]): string {
+  const byHours = [...saved].sort((a, b) => (b.hours ?? 0) - (a.hours ?? 0));
+  const top = byHours.slice(0, 2).map((p) => `"${p.title}"${p.hours === null ? '' : ` (~${p.hours} h/year)`}`);
+  const rest = byHours.slice(2).map((p) => `"${p.title}"`);
+  const built =
+    saved.length === 0
+      ? '- No process was saved, so there is no skill yet. A skill appears for every process they describe.'
+      : `- Loam built ${saved.length === 1 ? 'one' : saved.length} from their answers, one per process. ${top.join(' and ')} ${top.length > 1 ? 'save' : 'saves'} the most time${rest.length ? `; the other${rest.length > 1 ? 's are' : ' is'} ${rest.join(', ')}` : ''}.`;
+  return [
+    'When you explain skills (after the receipt, before the first win), say it in two or three short sentences, without jargon:',
+    '- A skill is a saved how-to for one kind of work. Your agent reads it before it does that work, so the person does not have to explain it again.',
+    built,
+    '- They can ask: "find a skill for …" (you look through their skills first), "add a process for …" (you ask how often and how long, then build its skill), or bring one someone else made (on the Skills screen of the Loam app, or pasted to you; it is checked first). An imported skill can be removed on the Skills screen; a skill built from a process stays as long as its process does.',
+  ].join('\n');
+}
+
 export const AddProcessInput = InterviewProcessInput.extend({
   replace: z.boolean().default(false).describe('true only if a process with this name exists and the user wants it changed; its runs, corrections and examples are kept'),
 });

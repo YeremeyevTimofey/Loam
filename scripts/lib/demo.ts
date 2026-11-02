@@ -10,7 +10,6 @@ import {
   planImportSkill,
   loadKb,
   MemoryStore,
-  planAddStarterSkill,
   planGenerateProcessSkill,
   planSyncAgentSkills,
   README_MD,
@@ -20,7 +19,6 @@ import { runLint } from '../../packages/loam-core/src/lint';
 
 export const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 export const KB_DIR = path.join(REPO, 'apps/web/src/demo-data/kb');
-export const STARTER_DIR = path.join(REPO, 'apps/web/src/starter-skills');
 export const DEMO_TODAY = '2026-10-11';
 /** Facts about the sample for the landing page (kept outside kb/ so it is not loaded into the demo store). */
 export const SUMMARY_FILE = path.join(REPO, 'apps/web/src/demo-data/summary.json');
@@ -41,13 +39,6 @@ export function walkDir(dir: string, base = dir): string[] {
     return statSync(full).isDirectory() ? walkDir(full, base) : [path.relative(base, full).split(path.sep).join('/')];
   });
 }
-
-// Dates the sample base "happened" on. The audit log needs times; they are fixed so the output is reproducible.
-const STARTERS: [string, string, string][] = [
-  ['meeting-summary', '2026-09-15', '2026-09-15T09:12:00.000Z'],
-  ['weekly-status-report', '2026-09-15', '2026-09-15T09:13:00.000Z'],
-  ['client-bad-news-email', '2026-09-22', '2026-09-22T14:02:00.000Z'],
-];
 
 const REFUSED_SKILL = `---
 name: inbox-cleaner
@@ -82,12 +73,6 @@ export async function buildDemoBase(): Promise<Map<string, string>> {
   );
 
   const audit: AuditEntry[] = [];
-  for (const [name, date, time] of STARTERS) {
-    const plan = await planAddStarterSkill(store, { name, text: readFileSync(path.join(STARTER_DIR, `${name}.md`), 'utf8') }, date);
-    await applyPlan(store, { ...plan, audit: [] });
-    audit.push(...plan.audit.map((e) => ({ ...e, time })));
-  }
-
   const snap = await loadKb(store, DEMO_TODAY);
   for (const proc of snap.processes) {
     const plan = await planGenerateProcessSkill(store, proc.slug, proc.fm.updated);
@@ -162,9 +147,7 @@ export async function buildDemoSummary(base: Map<string, string>) {
       stable: weekly.stable,
       corrections: [...weekly.corrections].reverse().map((c) => ({ date: c.date, run: c.run, note: c.note, was: c.was ?? null, should: c.should ?? null })),
     },
-    skills: snap.skills
-      .filter((s) => s.kind === 'library')
-      .map((s) => ({ name: s.name, source: s.fm.source, description: s.fm.description, scanner: s.fm.scanner ?? null, reviewed: s.fm.reviewed, verdict: s.fm.review_verdict ?? null })),
+    skills: snap.skills.map((s) => ({ name: s.name, source: s.fm.source, description: s.fm.description, scanner: s.fm.scanner ?? null, reviewed: s.fm.reviewed, verdict: s.fm.review_verdict ?? null })),
     safety: {
       refused: audit.filter((e) => e.action === 'reject').map((e) => ({ skill: e.skill, reason: e.detail ?? '' })),
       reviews: audit.filter((e) => e.action === 'review').length,

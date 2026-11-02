@@ -123,6 +123,7 @@ All tools are prefixed `loam_`. They return readable text and never crash the se
 | `loam_get_process` | `process.md`, path of the newest example, all corrections. |
 | `loam_search` | BM25 search (SQLite FTS5). Falls back to a plain keyword scan if the native module cannot load. |
 | `loam_read` | Read one text file inside the folder. Imported skills come back inside the warning frame. |
+| `loam_find_skill` | Read-only. The skill that fits a task, found by the words of the task (whole words and their endings, in any alphabet; a word in a name or process title counts more than one in a description). Returns the best fits with how to use them; when nothing fits it lists every skill, so the agent can judge, and gives the steps: say what is missing, add a process (`loam_add_process`), or import one the user brings (scanned first); never install anything. |
 | `loam_list_skills` · `loam_get_skill` | Compact skill list (under 400 tokens) and one skill. |
 | `loam_import_skill` | Scan, then quarantine (stored as imported, unreviewed). Red flag ⇒ refused, nothing written. |
 | `loam_review_skill` · `loam_set_skill_review` | The user's agent reviews an imported skill; the verdict is stored as information only. |
@@ -177,7 +178,7 @@ Fixes the app can do for you (always with a diff first): sync the agent copies, 
 | Only external resource on the landing page is the analytics script | e2e records requests on `/`; fonts and images are self-hosted |
 | Works offline after the first visit, and opens again on every later visit | e2e: loads, goes offline, reloads every screen; visits again online on a host that redirects `/app/index.html` (as Cloudflare Pages does) |
 | The server only touches the chosen folder | Server tests: `../`, absolute, `~`, symlink escapes are errors; reads and writes; the folder may be typed with other capitals or another Unicode form of a letter (the disk's own spelling is used), and a real link out of it is still refused |
-| Other people's skills are checked | 8 malicious fixtures (one per red category + capability cases) refused in core, server and UI tests; the 7 starter skills and everyday text pass |
+| Other people's skills are checked | 8 malicious fixtures (one per red category + capability cases) refused in core, server and UI tests; the skills Loam writes itself and everyday text pass |
 | Reviews grant nothing | `check:rules` + tests: capabilities unchanged after a `safe` verdict |
 | “Copy for any chat” is one-way and shows what leaves | The exact text is previewed, equals the clipboard and the download; a store that refuses every write still builds it; the folder is identical before and after (e2e); `check:rules` forbids writes in that code; keys and passwords are flagged first |
 
