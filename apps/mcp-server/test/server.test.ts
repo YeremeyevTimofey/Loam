@@ -112,8 +112,14 @@ describe('interview (acceptance 8, 9, 10, 11)', () => {
       expect(role.text).toContain('who you work with most');
       const tasks = await s.call('loam_get_interview_script', { stage: 'tasks' });
       expect(tasks.text).toContain('Which tasks repeat every week or month?');
+      expect(tasks.text).toContain('about how many hours a year they add up to');
       const focus = await s.call('loam_get_interview_script', { stage: 'focus' });
       expect(focus.text).toContain('If you can, share an example of a good result or the documents you work from');
+      const summary = await s.call('loam_get_interview_script', { stage: 'summary' });
+      expect(summary.text).toContain('Tell them what you remembered');
+      expect(summary.text).toContain('ask "what do you remember about me?"');
+      expect(summary.text).toContain('offer a first win: do the top process now');
+      expect(outline.text).toMatch(/After each answer, say in one line what you noted/);
       expect(tasks.text).not.toMatch(/Branch /); // no questions by kind of role any more
       expect((await s.call('loam_get_interview_script', { stage: 'nope' })).text).toMatch(/Unknown stage/);
       // criterion 11: change the file, get the new behaviour, no restart

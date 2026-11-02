@@ -1,13 +1,13 @@
 {
-  "version": 3,
+  "version": 4,
   "title": "Loam onboarding interview",
   "minutes": "3–5",
   "rules": [
-    "Before the first question tell the person, once: \"Talking is faster than typing. If you can, use your app's voice input or your computer's dictation, and answer as fully as you like, in any order. The more you tell me, the better your base will be.\"",
-    "Four open questions and one confirmation, about four minutes, one at a time. Never ask for a structured answer or cut a long one short: sort it out yourself.",
-    "Offer a guess for what is missing (\"weekly, about 40 minutes: right?\") instead of asking again. Ask for missing numbers once, in one message.",
+    "Before the first question tell the person, once: \"Talking is faster than typing: use voice input or dictation if you can, and answer as fully as you like, in any order. The more you tell me, the better your base will be.\"",
+    "Four open questions and a confirmation, one at a time. Never ask for a structured answer or cut a long one short: sort it out yourself. After each answer, say in one line what you noted.",
+    "Guess what is missing (\"weekly, about 40 minutes: right?\") rather than ask again; ask for missing numbers once.",
     "Do not sell AI. If a process automates badly, say so and why.",
-    "If the person is tired, save progress (loam_save_interview with the stage) and offer to continue later.",
+    "If the person is tired, save progress and offer to continue later.",
     "Any language is fine; folder and field names stay in English."
   ],
   "branches": [],
@@ -15,31 +15,32 @@
     {
       "id": "you",
       "title": "Who you are",
-      "goal": "Role, tools, the people around them and their aims.",
+      "goal": "Role, tools, people and aims.",
       "questions": [
         "Tell me about your work: who you are, where you work, the apps you use daily, who you work with most (colleagues, clients), and what you aim for or are measured on."
       ],
       "uses_branch": false,
       "instructions": [
-        "Note the people (name, relation, what to keep in mind), goals and metrics from the answer: one or two sentences each."
+        "Note the people (name, relation, what to keep in mind), goals and metrics: one or two sentences each."
       ]
     },
     {
       "id": "tasks",
       "title": "What repeats",
-      "goal": "The recurring tasks, with how often and how long: the core of the map.",
+      "goal": "Recurring tasks: how often, how long.",
       "questions": [
         "Which tasks repeat every week or month? For each: roughly how often, how long it takes, and what it involves."
       ],
       "uses_branch": false,
       "instructions": [
-        "Ask once, in one message, for missing frequency or minutes. Skip one-off work."
+        "Ask once, in one message, for missing frequency or minutes; skip one-off work.",
+        "Then say about how many hours a year they add up to: minutes × runs per year ÷ 60 (daily 250, weekly 50, monthly 12; ad-hoc: ask for runs_per_year)."
       ]
     },
     {
       "id": "focus",
       "title": "The one that costs most",
-      "goal": "Steps, a good result and what must never happen, for the costliest task.",
+      "goal": "Steps, a good result, what must never happen.",
       "questions": [
         "Which of these costs you the most time or irritates you most? Walk me through it: the steps, what a good result looks like, what must never happen. If you can, share an example of a good result or the documents you work from."
       ],
@@ -52,7 +53,7 @@
     {
       "id": "voice",
       "title": "Voice and names",
-      "goal": "The tone of their writing, and names an outsider would not know.",
+      "goal": "Tone, and names an outsider would not know.",
       "questions": [
         "How should your texts sound (tone, language, sign-off)? And which clients, projects, systems and abbreviations should your assistant know by name?"
       ],
@@ -62,15 +63,15 @@
     {
       "id": "summary",
       "title": "Confirm and save",
-      "goal": "Turn the answers into a process map, let the user correct it, save it.",
+      "goal": "Draft the map, let the user correct it, save it.",
       "questions": [],
       "uses_branch": false,
       "instructions": [
-        "Draft the map yourself. Per process: title, frequency (daily, weekly, monthly or ad-hoc), minutes per run, automation (ready, needs-access or manual-only), inputs, output, steps, what good looks like, constraints, what it takes. Mark guesses.",
-        "Hours a year = minutes × runs per year ÷ 60 (daily 250, weekly 50, monthly 12; ad-hoc: ask for runs_per_year). Say honestly what automating each takes: access, review, risk.",
+        "Draft the map yourself: per process the fields loam_save_interview asks for. Mark guesses. Say honestly what automating each takes: access, review, risk.",
         "Show the map, ready processes first by hours a year, with the people, goals and metrics, and let the user correct all of it in one reply.",
         "Call loam_save_interview with everything and complete: true, then save any example.",
-        "Then offer the matching starter skills."
+        "Tell them what you remembered (processes, people, goals, metrics), that it is a folder on their computer, and that they can say \"change X\" (you show it first) or ask \"what do you remember about me?\".",
+        "Then offer a first win: do the top process now. Ask for this week's input (never invent it), write a first version, ask what to fix, and remember each fix (loam_record_correction)."
       ]
     }
   ]
