@@ -25,7 +25,7 @@ describe('demo base (§13.3)', async () => {
   it('skills are exported for every agent: .claude/skills and .agents/skills carry the same files, GEMINI.md points to AGENTS.md', () => {
     const under = (root: string) => [...base.keys()].filter((k) => k.startsWith(`${root}/`)).map((k) => k.slice(root.length)).sort();
     expect(under('.agents/skills')).toEqual(under('.claude/skills'));
-    expect(under('.agents/skills')).toHaveLength(9);
+    expect(under('.agents/skills')).toHaveLength(6); // five built from her processes and the imported one
     expect(base.get('GEMINI.md')).toBe('@AGENTS.md\n');
   });
 
@@ -92,9 +92,9 @@ describe('demo base (§13.3)', async () => {
     expect(lines.length).toBeLessThanOrEqual(4);
   });
 
-  it('has four skills in the library: three starter, one imported and reviewed', () => {
+  it('has one skill in the library, imported and reviewed, and no starter skill', () => {
     const library = snap.skills.filter((s) => s.kind === 'library');
-    expect(library.map((s) => `${s.name}:${s.fm.source}`).sort()).toEqual(['client-bad-news-email:starter', 'competitor-snapshot:imported', 'meeting-summary:starter', 'weekly-status-report:starter']);
+    expect(library.map((s) => `${s.name}:${s.fm.source}`)).toEqual(['competitor-snapshot:imported']);
     expect(library.find((s) => s.name === 'competitor-snapshot')!.fm).toMatchObject({ reviewed: true, review_verdict: 'safe', scanner: 'warn' });
     expect(snap.skills.filter((s) => s.kind === 'process')).toHaveLength(5);
   });

@@ -3,14 +3,13 @@ import {
   applyPlan,
   InterviewInput,
   planAddExample,
-  planAddStarterSkill,
   planImportSkill,
   planSaveInterview,
   planSyncAgentSkills,
   planUpdateProfile,
 } from '../src';
 import { planFixDuplicates, planTouchProcess, runLint } from '../src/lint';
-import { freshBase, starterSkills, TODAY } from './helpers';
+import { addSampleSkill, freshBase, TODAY } from './helpers';
 
 const para = (seed: string) =>
   `${seed} We always keep the agency voice friendly, specific and short, and we never promise a date the team has not confirmed with the client in writing first.`;
@@ -36,7 +35,7 @@ async function messyBase() {
   // an unreviewed import, and a skill with no description
   await applyPlan(store, (await planImportSkill(store, { content: '---\nname: tone-checker\ndescription: Check a draft for tone and suggest changes\nlicense: MIT\n---\n\nCheck the tone.\n', origin: 'paste', today: TODAY })).plan);
   await applyPlan(store, (await planImportSkill(store, { content: '---\nname: no-desc\ndescription: ""\nlicense: MIT\n---\n\nSummarise.\n', origin: 'paste', today: TODAY })).plan);
-  await applyPlan(store, await planAddStarterSkill(store, starterSkills()[0]!, TODAY));
+  await addSampleSkill(store, 'meeting-summary');
   await applyPlan(store, await planSyncAgentSkills(store));
   return store;
 }

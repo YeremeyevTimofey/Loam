@@ -2,36 +2,6 @@
   "version": 1,
   "entries": [
     {
-      "action": "import",
-      "skill": "meeting-summary",
-      "source": "starter",
-      "scanner": "pass",
-      "verdict": null,
-      "detail": "origin: bundled",
-      "time": "2026-09-15T09:12:00.000Z",
-      "hash": "99300d473b77854896ff99ed00ca7e67019ff05e2eecc571d31469edc800934a"
-    },
-    {
-      "action": "import",
-      "skill": "weekly-status-report",
-      "source": "starter",
-      "scanner": "pass",
-      "verdict": null,
-      "detail": "origin: bundled",
-      "time": "2026-09-15T09:13:00.000Z",
-      "hash": "1c41860bfd405a91bc09657b4d683e47359308d8e2191df6656fbcd569281cf6"
-    },
-    {
-      "action": "import",
-      "skill": "client-bad-news-email",
-      "source": "starter",
-      "scanner": "pass",
-      "verdict": null,
-      "detail": "origin: bundled",
-      "time": "2026-09-22T14:02:00.000Z",
-      "hash": "cc9ee14e5defdf17995fcf23e2713b4e4b386f2eb347d6dd44ccd5e9e0f784c6"
-    },
-    {
       "time": "2026-09-22T15:40:00.000Z",
       "action": "import",
       "skill": "competitor-snapshot",
@@ -57,9 +27,9 @@
       "source": "sync",
       "scanner": null,
       "verdict": null,
-      "detail": "18 files updated",
+      "detail": "12 files updated",
       "time": "2026-09-22T15:53:00.000Z",
-      "hash": "76113f90ab719016776dd966aa808e8911ac3e03929609c6c08fb264669e67e0"
+      "hash": "4c299f538e4c5947667813e30ff95569111e58c2378175c129770256e3b2a281"
     },
     {
       "action": "reject",

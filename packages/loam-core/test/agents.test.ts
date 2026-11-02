@@ -5,7 +5,6 @@ import {
   InterviewInput,
   loadSkills,
   parseDoc,
-  planAddStarterSkill,
   planDeleteSkill,
   planSaveInterview,
   planSyncAgentSkills,
@@ -14,9 +13,7 @@ import {
   countWords,
 } from '../src';
 import { runLint } from '../src/lint';
-import { freshBase, starterSkills, TODAY } from './helpers';
-
-const starter = (name: string) => starterSkills().find((s) => s.name === name)!;
+import { addSampleSkill, freshBase, TODAY } from './helpers';
 
 describe('working with agents other than Claude', () => {
   it('a new base has CLAUDE.md and GEMINI.md that both point to AGENTS.md', async () => {
@@ -38,7 +35,7 @@ describe('working with agents other than Claude', () => {
     const store = await freshBase();
     await store.writeFile('.agents/skills/my-own/SKILL.md', '---\nname: my-own\ndescription: Mine\n---\nMine.\n');
     await store.writeFile('.agents/skills/loam-lookalike-but-not-ours/notes.txt', 'keep');
-    await applyPlan(store, await planAddStarterSkill(store, starter('meeting-summary'), TODAY));
+    await addSampleSkill(store, 'meeting-summary');
     await applyPlan(store, await planSyncAgentSkills(store));
     for (const root of ['.claude/skills', '.agents/skills']) {
       const text = await store.readFile(`${root}/loam-meeting-summary/SKILL.md`);
@@ -67,7 +64,7 @@ describe('working with agents other than Claude', () => {
 
   it('Health notices a damaged copy in .agents/skills and Sync repairs it', async () => {
     const store = await freshBase();
-    await applyPlan(store, await planAddStarterSkill(store, starter('task-handoff'), TODAY));
+    await addSampleSkill(store, 'task-handoff');
     await applyPlan(store, await planSyncAgentSkills(store));
     await store.writeFile('.agents/skills/loam-task-handoff/SKILL.md', 'tampered');
     const before = await runLint(store, { today: TODAY });

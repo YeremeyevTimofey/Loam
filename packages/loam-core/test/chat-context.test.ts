@@ -11,7 +11,6 @@ import {
   LoamError,
   MemoryStore,
   planAddExample,
-  planAddStarterSkill,
   planImportSkill,
   planRecordCorrection,
   planSaveInterview,
@@ -22,7 +21,7 @@ import {
   type Plan,
 } from '../src';
 import { countTokens } from '../src/tokens';
-import { fixture, freshBase, starterSkills, TODAY } from './helpers';
+import { addSampleSkill, fixture, freshBase, TODAY } from './helpers';
 
 const apply = (store: KbStore, plan: Plan) => applyPlan(store, plan);
 const SLUG = 'weekly-client-report';
@@ -248,9 +247,9 @@ async function readAll(store: KbStore): Promise<Record<string, string>> {
 }
 
 describe('a skill for a chat', () => {
-  it('copies a starter skill with the profile, and tells the chat what to do about file names', async () => {
+  it('copies a skill from the library with the profile, and tells the chat what to do about file names', async () => {
     const store = await baseWithProcess();
-    await apply(store, await planAddStarterSkill(store, starterSkills().find((s) => s.name === 'meeting-prep')!, TODAY));
+    await addSampleSkill(store, 'meeting-prep');
     const bundle = await buildSkillChatBundle(store, 'meeting-prep', TODAY);
     expect(ids(bundle)).toEqual(['about', 'skill', 'names']);
     const out = text(bundle);

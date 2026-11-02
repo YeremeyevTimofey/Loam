@@ -35,7 +35,6 @@ apps/web/                   index.html (landing), install.html, 404.html, app/in
   src/app/                  the React app: screens, components, store (FsStore, DemoStore), lib/agents.ts
   src/landing/              build-time generators for the landing page and the install guide
   src/demo-data/kb/         the sample knowledge base (authored files + files derived by npm run demo:build)
-  src/starter-skills/       the starter skills (plain markdown)
   _headers.template         security headers (analytics host filled in at build time)
 apps/mcp-server/            src/ (server, CLI, tools), manifest.json (Claude Desktop), scripts/ (build, pack)
 packages/loam-core/         schema, scanner, lint, skill generation, KbStore: shared by app and server
@@ -48,7 +47,7 @@ scripts/                    demo data, assets, screenshots, rules audit, README 
 - **An address** (domain, repository, package name, contact): edit `site.config.json`, then `npm run readme && npm run build`.
 - **A link into the repository** (a file, a folder or a heading on GitHub): in the pages write `{{file:docs/ARCHITECTURE.md#context-lint}}` or `{{dir:apps/mcp-server}}`; in the app use `repoFile('…')` / `repoDir('…')` from `lib/links.ts`; in `README.md.tmpl` and the other markdown files use ordinary relative links. All of them are built from `site.config.json` (owner, repo, branch) and `npm run check:rules` fails if one points at a file, folder or heading that does not exist. The few addresses typed by hand in markdown and yaml (`CONTRIBUTING.md`, `SECURITY.md`, `.github/ISSUE_TEMPLATE/config.yml`) are checked against the config too.
 - **The interview**: `packages/loam-core/src/interview.ts`. Users get it through *Redo interview → Update interview script*; the server reads the copy in their folder.
-- **Starter skills**: `apps/web/src/starter-skills/*.md`. They must pass the scanner with no flags (a test checks).
+- **Skills**: Loam ships no ready-made skills. The skill of each process is written by `packages/loam-core/src/skillgen.ts` (a test checks that it passes the scanner and names only tools that exist); the search for the skill that fits a task is `packages/loam-core/src/skill-find.ts`; what the agent says about skills after the interview is `skillsIntroForAgent` in `ops-interview.ts`; the short explanation on the Skills screen is in `apps/web/src/app/screens/Skills.tsx`.
 - **The sample base**: edit the authored files in `apps/web/src/demo-data/kb/` (profile, process, corrections, examples, context, the imported skill), then `npm run demo:build`. Keep it believable.
 - **A new agent in the connect screen**: add it to `AGENTS` and `connectFor` in `apps/web/src/app/lib/agents.ts`, with tests in `apps/web/test/agents.test.ts`.
 - **A scanner rule**: `packages/loam-core/src/scanner.ts`. Add a fixture under `packages/loam-core/test/fixtures/` and a test; also add a benign sentence that must keep passing.

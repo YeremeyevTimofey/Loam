@@ -47,6 +47,10 @@
       "description": "Read one text file inside the knowledge base folder."
     },
     {
+      "name": "loam_find_skill",
+      "description": "Find the skill for a task in your own words: yours, built from your processes, or imported."
+    },
+    {
       "name": "loam_list_skills",
       "description": "List all skills with source, permissions and review state."
     },
