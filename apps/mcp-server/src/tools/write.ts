@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { ContextUpsertInput, isKnowledgeBase, planAddExample, planGenerateProcessSkill, planLogRun, planRecordCorrection, planScaffold, planUpsertContext, planUpsertNote } from '@loam/core';
+import { AddProcessInput, AUTOMATION_LABEL, ContextUpsertInput, FREQUENCY_LABEL, isKnowledgeBase, planAddExample, planAddProcess, planGenerateProcessSkill, planLogRun, planRecordCorrection, planScaffold, planUpsertContext, planUpsertNote } from '@loam/core';
 import { z } from 'zod';
 import type { Ctx } from '../context';
 import { commit, defineTool, renderDiff } from './define';
@@ -74,6 +74,31 @@ export function registerWriteTools(server: McpServer, ctx: Ctx): void {
       await commit(ready, result.plan);
       const verb = { added: 'Added', updated: 'Updated', removed: 'Removed' }[result.action];
       return `${verb} "${entry.name}" in ${result.file} (${result.fileWords} of ${result.budget} words).\n${result.plan.notes.map((n) => `Note: ${n}\n`).join('')}\n${renderDiff(result.plan)}\n\nShow this diff to the user and say which file changed.`;
+    },
+  });
+
+  defineTool(server, ctx, {
+    name: 'loam_add_process',
+    title: 'Add a recurring task as a process',
+    description:
+      'Adds ONE recurring task as a process and builds its skill, ONLY when the user asks for it (for example "add a process for my monthly invoice check", or a task that repeats but is not on the process map). Ask first how often it happens and how many minutes one run takes; do not invent steps or numbers. It does not touch the onboarding interview. A name that already exists is refused unless the user wants it changed (replace: true). Returns the process file as a diff.',
+    input: AddProcessInput.shape,
+    kind: 'write',
+    handler: async (args, ready) => {
+      await requireBase(ready);
+      const { plan, saved } = await planAddProcess(ready.store, args, ready.today());
+      await commit(ready, plan);
+      const processFile = plan.changes.filter((c) => c.path === `processes/${saved.slug}/process.md`);
+      const hours = saved.hours === null ? 'hours per year unknown' : `~${saved.hours} h/year`;
+      return [
+        `${saved.created ? 'Added' : 'Updated'} the process "${saved.title}" (${FREQUENCY_LABEL[args.frequency].toLowerCase()}, ${args.minutes_per_run} min, ${hours}, ${AUTOMATION_LABEL[saved.automation].toLowerCase()}) and built its skill "${saved.slug}".`,
+        `Files: processes/${saved.slug}/process.md, corrections.md, SKILL.md. It shows in the app after Refresh, and loam_list_skills lists the new skill.`,
+        ...plan.notes.map((n) => `Note: ${n}`),
+        '',
+        renderDiff({ ...plan, changes: processFile }),
+        '',
+        'Show the user this, and offer to add one real finished result (loam_add_example) so the skill copies their format.',
+      ].join('\n');
     },
   });
 

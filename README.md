@@ -88,7 +88,7 @@ The demo is a fictional account manager, Sarah, at a 20-person marketing agency.
 - **5 processes** found by the interview, 3 ready to automate: about **108 hours a year**.
 - A weekly report refined by **4 corrections** until it was marked *stable*.
 - Starter skills, one imported skill with a safety scan and an agent review, and one skill the safety check **refused**.
-- A health check: a typical task reads **5,733 tokens** in this deliberately messy sample, **2,300** after the suggested clean-up (**60% less**).
+- A health check: a typical task reads **5,759 tokens** in this deliberately messy sample, **2,326** after the suggested clean-up (**60% less**).
 
 ## Private and safe by design
 

@@ -82,7 +82,7 @@ describe('tools (acceptance 12)', () => {
         'loam_overview', 'loam_get_process', 'loam_search', 'loam_read', 'loam_list_skills', 'loam_get_skill',
         'loam_import_skill', 'loam_review_skill', 'loam_set_skill_review', 'loam_get_interview_script',
         'loam_save_interview', 'loam_upsert_note', 'loam_record_correction', 'loam_add_example',
-        'loam_generate_skill', 'loam_log_run', 'loam_lint', 'loam_init', 'loam_get_context', 'loam_upsert_context',
+        'loam_generate_skill', 'loam_log_run', 'loam_lint', 'loam_init', 'loam_get_context', 'loam_upsert_context', 'loam_add_process',
       ].sort(),
     );
     for (const t of tools) {
@@ -172,6 +172,64 @@ describe('interview (acceptance 8, 9, 10, 11)', () => {
       const r = await s.call('loam_save_interview', { profile: { name: 'x' }, processes: [{ title: 'A', frequency: 'weekly', automation: 'ready' }] });
       expect(r.isError).toBe(true);
       expect(r.text.length).toBeGreaterThan(10);
+    } finally {
+      await s.close();
+    }
+  });
+});
+
+describe('adding a process after the interview (loam_add_process)', () => {
+  const board = { title: 'Quarterly board pack', frequency: 'monthly', minutes_per_run: 150, automation: 'needs-access', what: 'Gather the numbers and write the pack.', steps: ['Collect the numbers', 'Write the summary'], good: 'The board can read it in ten minutes.' };
+
+  it('adds one process and its skill, shows the process as a diff, and leaves a finished interview finished', async () => {
+    const s = await open();
+    try {
+      await s.call('loam_save_interview', interview);
+      const added = await s.call('loam_add_process', board);
+      expect(added.isError, added.text).toBe(false);
+      expect(added.text).toMatch(/^Added the process "Quarterly board pack" \(monthly, 150 min, ~30 h\/year, needs access\) and built its skill "quarterly-board-pack"\./);
+      expect(added.text).toContain('+title: Quarterly board pack');
+      expect(added.text).toMatch(/offer to add one real finished result \(loam_add_example\)/);
+      for (const f of ['process.md', 'corrections.md', 'SKILL.md']) expect(existsSync(path.join(s.dir, 'processes/quarterly-board-pack', f)), f).toBe(true);
+      expect(existsSync(path.join(s.dir, '.claude/skills/loam-quarterly-board-pack/SKILL.md'))).toBe(true); // copied for the agents
+      expect((await s.call('loam_list_skills')).text).toContain('quarterly-board-pack');
+      expect((await s.call('loam_overview')).text).toContain('- quarterly-board-pack: Quarterly board pack | monthly, 150 min, ~30 h/year');
+      expect((await s.call('loam_get_interview_script')).text).toMatch(/Status: complete/); // the interview was not reopened
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('refuses a name that is taken until the user asks for a change, which keeps what was learned', async () => {
+    const s = await open();
+    try {
+      await s.call('loam_add_process', board);
+      await s.call('loam_log_run', { slug: 'quarterly-board-pack' });
+      const again = await s.call('loam_add_process', { ...board, title: 'quarterly BOARD pack' });
+      expect(again.isError).toBe(true);
+      expect(again.text).toMatch(/already a process "quarterly-board-pack".*replace: true/s);
+      const changed = await s.call('loam_add_process', { ...board, minutes_per_run: 60, replace: true });
+      expect(changed.isError, changed.text).toBe(false);
+      expect(changed.text).toMatch(/^Updated the process/);
+      const file = readFileSync(path.join(s.dir, 'processes/quarterly-board-pack/process.md'), 'utf8');
+      expect(file).toMatch(/minutes_per_run: 60/);
+      expect(file).toMatch(/runs: 1/);
+    } finally {
+      await s.close();
+    }
+  });
+
+  it('is a write tool, and asks for the two numbers that decide whether a task is worth automating', async () => {
+    const s = await open();
+    try {
+      const { tools } = await s.client.listTools();
+      const tool = tools.find((t) => t.name === 'loam_add_process')!;
+      expect(tool.annotations?.readOnlyHint).toBe(false);
+      expect(tool.description).toMatch(/Ask first how often it happens and how many minutes one run takes/);
+      expect(tool.description).toMatch(/does not touch the onboarding interview/i);
+      const missing = await s.call('loam_add_process', { title: 'No numbers', frequency: 'weekly', automation: 'ready' });
+      expect(missing.isError).toBe(true);
+      expect(missing.text).toMatch(/minutes_per_run/);
     } finally {
       await s.close();
     }

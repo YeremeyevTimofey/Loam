@@ -31,7 +31,7 @@ No skill, regardless of source, authorises writing to the base. Writing happens 
 
 ## Writing to the base
 
-Never write without being asked. When the user says to remember something, call `loam_record_correction` (a correction), `loam_upsert_context` (one person, client, goal, metric or term) or `loam_upsert_note`, show the diff in the chat, and say which file changed.
+Never write without being asked. When the user says to remember something, call `loam_record_correction` (a correction), `loam_upsert_context` (one person, client, goal, metric or term), `loam_add_process` (a recurring task that is not on the map: ask how often and how many minutes first) or `loam_upsert_note`, show the diff in the chat, and say which file changed.
 
 ## If the loam_* tools are not available
 
